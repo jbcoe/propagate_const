@@ -2,40 +2,199 @@
 <HTML><HEAD><TITLE>A Proposal to Add a Logical Const Wrapper to the Standard Library</TITLE>
 <META http-equiv=Content-Type content="text/html; charset=windows-1252">
 </HEAD>
-<BODY><FONT size=-1>Jonathan Coe &lt;jbcoe@me.com&gt; and Robert Mill &ltrob.mill.uk@gmail.com&gt<BR>19 Apr 2014
+<BODY><FONT size=-1>Jonathan Coe and Robert Mill<br>
+&lt;jbcoe@me.com&gt; &ltrob.mill.uk@gmail.com&gt<BR>19 Apr 2014
 <BR>Doc number  NXXX=XX-XX</FONT>
 
 <H1>A Proposal to Add a Logical Const Wrapper to the Standard Library Technical Report</H1>
 
 
 <H2>I. Motivation</H2>
-<p>DEEP CONST WITH EXAMPLE</p>
+<p>The behaviour of <tt>const</tt> member functions with pointer-like data members is seen to be surprising by many practicioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like member data and will do so by default without use of <tt>const_cast</tt>: <tt>const</tt> on member functions provides bit-wise but not logical <tt>const</tt>-ness.</p>
 
+<p>The following example illustrates the issue:</p>
+    
+<blockquote><tt><pre>
+  struct A
+  {
+    void bar() const 
+    { 
+      std::cout &lt&lt "bar (const)" &lt&lt std::endl; 
+    }
+    
+    void bar() 
+    { 
+      std::cout &lt&lt "bar (non-const)" &lt&lt std::endl; 
+    }
+  };
+
+  struct B
+  {
+    B() : m_ptrA(std::make_unique&ltA&gt()) {} 
+    
+    void foo() const 
+    { 
+      std::cout &lt&lt "foo (const)" &lt&lt std::endl;
+      m_ptrA->bar(); 
+    }
+    
+    void foo() 
+    { 
+      std::cout &lt&lt "foo (non-const)" &lt&lt std::endl;
+      m_ptrA->bar(); 
+    }
+
+    std::unique_ptr&ltA&gt m_ptrA;
+  };
+
+  int main()
+  {    
+    B b;
+    b.foo();
+    
+    const B const_b;
+    const_b.foo();
+  }
+  
+</pre></tt></blockquote>
+
+<p>Running this program results in:</p>
+<blockquote><tt><pre>
+  foo (non-const)
+  bar (non-const)
+  foo (const)
+  bar (non-const)
+</pre></tt></blockquote>
+    
+<p>The behaviour above can be amended by re-writing <tt>void B::foo() const</tt> using <tt>const_cast</tt> to explicitly call the <tt>const</tt> member function of <tt>A</tt>. Such a change is unnatural and not common practice. We propose the introduction of a wrapper class which can be used on pointer-like member data to ensure propagation of logical <tt>const</tt>-ness.</p>
+    
 <H2>II. Impact On the Standard</H2>
 
 <p>This proposal is a pure library extension. It does not require changes to any standard classes, functions or headers.</p>
 
 <H2>III. Design Decisions</H2>
 
-<P>The class is designed to function as closely as possible to a traditional pointer or smart-pointer.</P>
+<p>The class is designed to function as closely as possible to a traditional pointer or smart-pointer. Pointer-like member objects can be wrapped in a <tt>logical_const</tt> wrapper to ensure propagation of logical <tt>const</tt>-ness. Constructors and conversion operators are implicit to allow minimal disruption to additional code: logical-<tt>const</tt>-ness can be used much like the <tt>const</tt> keyword and will cause compilation failure (compared to the raw underlying pointer) only where logical-<tt>const</tt>-ness is violated.</p>
+    
+<p>The proposed form of <tt>std::logical_const</tt> is given below. Implementation is exposition-only.</p>    
+    
+<blockquote><tt><pre>
+template &lttypename T&gt
+class logical_const
+{
+public:
 
-<H3>Initialization</H3>
-<p></p>
+  typedef std::remove_reference_t&ltdecltype(*std::declval&ltT&gt())&gt Value_T;
 
-<H3>Constructors</H3>
-<p></p>
+  ~logical_const() {}
+  
+  logical_const() {}
+  
+  logical_const(const T& t_) : t{t_} {}
+  
+  logical_const(T&& t_) : t{std::move(t_)} {}
 
-<H3>swap()</H3>
-<p></p>
+  logical_const(const logical_const&ltT&gt& pt_) : t{pt_.t} {}
+  
+  logical_const(logical_const&ltT&gt&& pt_) : t{std::move(pt_.t)} {}
+  
+  logical_const&ltT&gt& operator = (const T& t_) 
+  { 
+    t = t_; 
+    return *this; 
+  }
+  
+  logical_const&ltT&gt& operator = (T&& t_) 
+  { 
+    t = std::move(t_); 
+    return *this; 
+  }
+  
+  logical_const&ltT&gt& operator = (const logical_const&ltT&gt& pt_) 
+  { 
+    t = pt_.t; 
+    return *this; 
+  }
+  
+  logical_const&ltT&gt& operator = (logical_const&ltT&gt&& pt_) 
+  { 
+    t = std::move(pt_.t); 
+    return *this; 
+  }
+  
+  Value_T* operator->()
+  {
+    return &*t;
+  }
+
+  const Value_T* operator->() const
+  {
+    return &*t;
+  }
+
+  Value_T& operator*()
+  {
+    return *t;
+  }
+
+  const Value_T& operator*() const
+  {
+    return *t;
+  }
+  
+  Value_T* get()
+  {
+    return t.get() ;
+  }
+
+  const Value_T* get() const
+  {
+    return t.get();
+  }
+  
+  operator const T& () const
+  {
+    return t;
+  }
+  
+  operator T& ()
+  {
+    return t;
+  }
+  
+private:
+  T t;
+
+};
+
+template &lttypename T, typename U&gt
+bool operator == (const logical_const&ltT&gt& pt1, const logical_const&ltU&gt& pt2)
+{   
+  return pt1.t == pt2.t; 
+}
+ 
+template &lttypename T, typename U&gt
+bool operator != (const logical_const&ltT&gt& pt1, const logical_const&ltU&gt& pt2)
+{   
+  return pt1.t != pt2.t; 
+}
+
+template &lttypename T, typename U&gt
+void swap (logical_const&ltT&gt& pt1, logical_const&ltU&gt& pt2) const
+{   
+  swap(pt1.t, pt2.t); 
+}
+
+</pre></tt></blockquote> 
 
 <H2>IV. Proposed Text</H2>
 <p>INPUT REQUIRED</p>
 
 <H2>V Future Issues</H2>
-<p></p>
+<p>WORK NEEDED</p>
 
 <H2>VI References</H2>
-<p></p>
+<p>WORK NEEDED</p>
 
 <ul>
 </ul>
