@@ -76,6 +76,10 @@
 
 <p>The class is designed to function as closely as possible to a traditional pointer or smart-pointer. Pointer-like member objects can be wrapped in a <tt>logical_const</tt> wrapper to ensure propagation of logical <tt>const</tt>-ness. Constructors and conversion operators are implicit to allow minimal disruption to additional code: logical-<tt>const</tt>-ness can be used much like the <tt>const</tt> keyword and will cause compilation failure (compared to the raw underlying pointer) only where logical-<tt>const</tt>-ness is violated.</p>
     
+<p>It is intended that <tt>logical_const</tt> contains no member data besides the wrapped pointer. Combined with compiler inlining of function calls this will mean that there is no run-time cost to using <tt>logical_const</tt>.</p>
+
+<H2>IV. Technical Specifications</h2>    
+    
 <p>The proposed form of <tt>std::logical_const</tt> is given below. Implementation is exposition-only.</p>    
     
 <blockquote><tt><pre>
@@ -187,10 +191,7 @@ void swap (logical_const&ltT&gt& pt1, logical_const&ltU&gt& pt2) const
 
 </pre></tt></blockquote> 
 
-<H2>IV. Proposed Text</H2>
-<p>INPUT REQUIRED</p>
-
-<H2>V Future Issues</H2>
+<H2>V Acknowledgements</H2>
 <p>WORK NEEDED</p>
 
 <H2>VI References</H2>
