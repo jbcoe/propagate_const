@@ -14,7 +14,7 @@
 <H2>I. Motivation</H2>
 <p>The behaviour of <tt>const</tt> member functions with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like member data and will do so by default without use of <tt>const_cast</tt>: <tt>const</tt> on member functions provides bit-wise but not logical <tt>const</tt>-ness.</p>
 
-<p>The following example illustrates the issue:</p>
+<p><b>Example:</b></p>
     
 <blockquote><tt><pre>
   struct A
@@ -87,7 +87,7 @@ struct B
 };
 </pre></tt></blockquote>
 
-<p>With an amended <tt>B</tt> running the program from the earlier example will give the following output:</p> 
+<p>With an amended <tt>B</tt>, running the program from the earlier example will give the following output:</p> 
 <blockquote><tt><pre>
   foo (non-const)
   bar (non-const)
