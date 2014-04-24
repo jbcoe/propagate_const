@@ -12,7 +12,7 @@
 <H1>A Proposal to Add a Logical Const Wrapper to the Standard Library Technical Report</H1>
 
 <H2>I. Motivation</H2>
-<p>The behaviour of <tt>const</tt> member functions with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like member data and will do so by default without use of <tt>const_cast</tt>: <tt>const</tt> on member functions provides bit-wise but not logical <tt>const</tt>-ness.</p>
+<p>The behaviour of <tt>const</tt> member functions with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like member data and will do so by default without use of <tt>const_cast</tt>: <tt>const</tt> on member functions provides bit-wise but not logical <tt>const</tt>-ness [1][2].</p>
 
 <p><b>Example:</b></p>
     
@@ -223,12 +223,14 @@ void swap (logical_const&ltT&gt& pt1, logical_const&ltU&gt& pt2)
 </pre></tt></blockquote> 
 
 <H2>V Acknowledgements</H2>
-<p>Thanks to Walter Brown, Jonathan Wakely, Nick Maclaren and Beman Dawes for helpful discussion.</p>
+<p>Thanks to Walter Brown, Nick Maclaren, Ville Voutilainen, Jonathan Wakely and others for helpful discussion.</p>
 
 <H2>VI References</H2>
-<p>WORK NEEDED</p>
-
 <ul>
+  <li>[1] Bjarne Stroustrup, The C++ Programming Language 4rd edition, 2013,
+          Addison Wesley ISBN-10: 0321563840 p464</li>
+
+ <li>[2] Martin Reddy, API design for C++, Elsevier ISBN-10: 0123850037, Section 3.1.5</li>
 </ul>
 
 </BODY></HTML>
