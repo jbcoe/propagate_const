@@ -12,7 +12,7 @@
 <H1>A Proposal to Add a Logical Const Wrapper to the Standard Library Technical Report</H1>
 
 <H2>I. Motivation</H2>
-<p>The behaviour of <tt>const</tt> member functions with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like member data and will do so by default without use of <tt>const_cast</tt>: <tt>const</tt> on member functions provides bit-wise but not logical <tt>const</tt>-ness [1][2].</p>
+<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>; that is, <tt>const</tt> on member functions provides bit-wise but not logical <tt>const</tt>-ness [1][2].</p>
 
 <p><b>Example:</b></p>
     
@@ -71,7 +71,7 @@
 <p>The behaviour above can be amended by re-writing <tt>void B::foo() const</tt> using <tt>const_cast</tt> to explicitly call the <tt>const</tt> member function of <tt>A</tt>. Such a change is unnatural and not common practice. We propose the introduction of a wrapper class which can be used on pointer-like member data to ensure propagation of logical <tt>const</tt>-ness.</p>
  
 <h3>Introducing <tt>logical_const</tt></h3>
-<p>The class <tt>logical_const</tt> is designed to function as closely as possible to a traditional pointer or smart-pointer. Pointer-like member objects can be wrapped in a <tt>logical_const</tt> wrapper to ensure propagation of logical <tt>const</tt>-ness.</p> 
+<p>The class <tt>logical_const</tt> is designed to function as closely as possible to a traditional pointer or smart-pointer. Pointer-like member objects can be wrapped in a <tt>logical_const</tt> object to ensure propagation of logical <tt>const</tt>-ness.</p> 
     
 <p>A logically-<tt>const</tt> <tt>B</tt> would be written as</p>
 <blockquote><tt><pre>
@@ -102,16 +102,16 @@ struct B
 
 <H2>III. Design Decisions</H2>
 
-<p>Constructors and conversion operators are implicit to allow minimal disruption to additional code: logical-<tt>const</tt>-ness can be used much like the <tt>const</tt> keyword and will cause compilation failure (compared to the raw underlying pointer) only where logical-<tt>const</tt>-ness is violated. Logical-<tt>const</tt>-ness can be imparted upon existing code by decorating pointer-like members of a class with <tt>logical_const</tt></p>
+<p>Constructors and conversion operators are implicit to allow minimal disruption to additional code. The <tt>logical_const</tt> wrapper can be used much like the <tt>const</tt> keyword and will cause compilation failure wherever logical-<tt>const</tt>-ness is violated. Logical-<tt>const</tt>-ness can be introduced into existing code by decorating pointer-like members of a class with <tt>logical_const</tt></p>
     
     
 <p>The change required to introduce logical-<tt>const</tt>-ness to a class is simple and local enough to be enforced during code review and taught to C++ developers in the same way as smart-pointers are taught to ensure exception safety.</p>
     
-<p>It is intended that <tt>logical_const</tt> contains no member data besides the wrapped pointer. Combined with compiler inlining of function calls this will mean that there is no run-time cost to using <tt>logical_const</tt>.</p>
+<p>It is intended that <tt>logical_const</tt> contains no member data besides the wrapped pointer. Inlining of function calls by the compiler will ensure that using <tt>logical_const</tt> incurs no run-time cost.</p>
 
 <H2>IV. Technical Specifications</h2>    
     
-<p>The proposed form of <tt>std::logical_const</tt> is given below. Implementation is exposition-only.</p>    
+<p>The proposed form of <tt>std::logical_const</tt> is given below. Implementation is exposition-only.</p>
     
 <blockquote><tt><pre>
 template &lttypename T&gt
@@ -199,7 +199,6 @@ public:
   
 private:
   T t;
-
 };
 
 template &lttypename T, typename U&gt
@@ -227,10 +226,10 @@ void swap (logical_const&ltT&gt& pt1, logical_const&ltU&gt& pt2)
 
 <H2>VI References</H2>
 <ul>
-  <li>[1] Bjarne Stroustrup, The C++ Programming Language 4rd edition, 2013,
+  <li>[1] Bjarne Stroustrup, The C++ Programming Language, 4th edition, 2013,
           Addison Wesley ISBN-10: 0321563840 p464</li>
 
- <li>[2] Martin Reddy, API design for C++, Elsevier ISBN-10: 0123850037, Section 3.1.5</li>
+  <li>[2] Martin Reddy, API design for C++, 2011, Elsevier ISBN-10: 0123850037, Section 3.1.5</li>
 </ul>
 
 </BODY></HTML>
