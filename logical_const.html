@@ -6,7 +6,7 @@
 <BR>Doc number XXXX=XX-XX
 <br>24 Apr 2014
 <br>Jonathan Coe &lt;jbcoe@me.com&gt;
-<br>Robert Mill &lt;rob.mill.uk@gmail.com&gt
+<br>Robert Mill &lt;rob.mill.uk@gmail.com&gt;
 </FONT>
     
 <H1>A Proposal to Add a Logical Const Wrapper to the Standard Library Technical Report</H1>
@@ -21,32 +21,32 @@
   {
     void bar() const 
     { 
-      std::cout &lt&lt "bar (const)" &lt&lt std::endl; 
+      std::cout &lt;&lt; "bar (const)" &lt;&lt; std::endl; 
     }
     
     void bar() 
     { 
-      std::cout &lt&lt "bar (non-const)" &lt&lt std::endl; 
+      std::cout &lt;&lt; "bar (non-const)" &lt;&lt; std::endl; 
     }
   };
 
   struct B
   {
-    B() : m_ptrA(std::make_unique&ltA&gt()) {} 
+    B() : m_ptrA(std::make_unique&lt;A&gt;()) {} 
     
     void foo() const 
     { 
-      std::cout &lt&lt "foo (const)" &lt&lt std::endl;
+      std::cout &lt;&lt; "foo (const)" &lt;&lt; std::endl;
       m_ptrA->bar(); 
     }
     
     void foo() 
     { 
-      std::cout &lt&lt "foo (non-const)" &lt&lt std::endl;
+      std::cout &lt;&lt; "foo (non-const)" &lt;&lt; std::endl;
       m_ptrA->bar(); 
     }
 
-    std::unique_ptr&ltA&gt m_ptrA;
+    std::unique_ptr&lt;A&gt; m_ptrA;
   };
 
   int main()
@@ -84,7 +84,7 @@ struct B
   
   void foo();       // unchanged
 
-  std::logical_const&lt;std::unique_ptr&ltA&gt&gt m_ptrA;
+  std::logical_const&lt;std::unique_ptr&lt;A&gt;&gt; m_ptrA;
 };
 </pre></tt></blockquote>
 
@@ -112,27 +112,37 @@ struct B
     
 <p>It is intended that <tt>logical_const</tt> contains no member data besides the wrapped pointer. Inlining of function calls by the compiler will ensure that using <tt>logical_const</tt> incurs no run-time cost.</p>
 
+<h3>Encapsulation vs inheritance</h3>
+    
 <h3>Construction and Assignment</h3>
 <p> A <tt>logical_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>logical_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from. For instance, a <tt>logical_const&lt;std::shared_ptr&lt;T&gt;&gt;</tt> can be constructed or assigned from a <tt>std::unique_ptr&lt;U&gt;</tt> where <tt>U</tt> is a sub-class of <tt>T</tt>.</p>
 
-<h3>get()</h3>
+<h3>Pointer-like functions</h3>
+<p><tt>operator*</tt> and <tt>operator-></tt> are defined to preserve logical <tt>const</tt>-ness. When a <tt>const</tt> <tt>logical_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
+    
+<h3><tt>get()</tt></h3>
 <p>Returns the address of the object pointed to by the wrapped pointer. <tt>get()</tt> is intended to be used to ensure logical-<tt>const</tt>-ness is preserved when using interfaces which require raw-C-style pointers</p>
     
-<h3>data()</h3>
-Returns a reference to the wrapped pointer. The reference will be <tt>const</tt> or non-<tt>const</tt> depending on which version of <tt>data()</tt> was called.
-<h3>Encapsulation vs inheritance</h3>
+<h3>Equality, inequality and comparison</h3>    
+<p>Free standing equality, inequality and comparison operators are provided so that a <tt>logical_const&lt;T&gt;</tt> can be used in any equality, inequality or comparison where a <tt>T</tt> could be used. Logical <tt>const</tt>-ness should not alter the result of any equality, inequality or comparison operation.</p>
+    
+<h3><tt>swap()</tt></h3>    
+<p>Should not add or remove logical <tt>const</tt>-ness but should not unduly restrict the types with which <tt>logical_const&lt;T&gt;</tt> can be swapped. If <tt>T</tt> and <tt>U</tt> can be swapped then logically-<tt>const</tt> <tt>T</tt> and <tt>U</tt> can be swapped.</p>
+    
+<h3>cast_away_logical_const()</h3>
+<p>A free function allows the underlying pointer to be accessed. Use of this function will allow logical <tt>const</tt>-ness to be dropped so is discouraged and named such that it will be easy to find in code review.</p>
     
 <H2>IV. Technical Specifications</h2>    
     
 <p>The proposed form of <tt>std::logical_const</tt> is given below. Implementation is exposition-only.</p>
     
 <blockquote><tt><pre>
-template &lttypename T&gt
+template &lt;typename T&gt;
 class logical_const
 {
 public:
 
-  typedef std::remove_reference_t&ltdecltype(*std::declval&ltT&gt())&gt value_type;
+  typedef std::remove_reference_t&lt;decltype(*std::declval&lt;T&gt;())&gt; value_type;
 
   ~logical_const() 
   {
@@ -142,34 +152,34 @@ public:
   {
   }
   
-  template &lt;typename U&gt
+  template &lt;typename U&gt;
   logical_const(U&& u) : t{std::forward&lt;U&gt;(u))} 
   {
   }
 
-  template &lt;typename U&gt
-  logical_const&ltT&gt& operator = (U&& u) 
+  template &lt;typename U&gt;
+  logical_const&lt;T&gt;& operator = (U&& u) 
   { 
     t = std::forward&lt;U&gt;(u); 
     return *this; 
   }
   
-  template &lt;typename U&gt
-  logical_const(const logical_const&lt;U&gt& pu) : t{pu.t} {}
+  template &lt;typename U&gt;
+  logical_const(const logical_const&lt;U&gt;& pu) : t{pu.t} {}
   
-  template &lt;typename U&gt
-  logical_const(logical_const&lt;U&gt&& pu) : t{std::move(pu.t)} {}
+  template &lt;typename U&gt;
+  logical_const(logical_const&lt;U&gt;&& pu) : t{std::move(pu.t)} {}
   
   
-  template &lt;typename U&gt
-  logical_const&ltT&gt& operator = (const logical_const&lt;U&gt;& pt) 
+  template &lt;typename U&gt;
+  logical_const&lt;T&gt;& operator = (const logical_const&lt;U&gt;& pt) 
   { 
     t = pt.t; 
     return *this; 
   }
   
-  template &lt;typename U&gt
-  logical_const&ltT&gt& operator = (logical_const&lt;U&gt;&& pt) 
+  template &lt;typename U&gt;
+  logical_const&lt;T&gt;& operator = (logical_const&lt;U&gt;&& pt) 
   { 
     t = std::move(pt.t); 
     return *this; 
@@ -205,12 +215,7 @@ public:
     return *t;
   }
   
-  value_type& data()
-  {
-    return t;
-  }
-
-  const value_type& data() const
+  operator bool () const
   {
     return t;
   }
@@ -219,28 +224,82 @@ private:
   T t;
 };
 
-template &lttypename T, typename U&gt
-bool operator == (const logical_const&ltT&gt& pt1, const logical_const&ltU&gt& pt2)
+template &lt;typename T, typename U&gt;
+bool operator == (const logical_const&lt;T&gt;& pt, const logical_const&lt;U&gt;& pu)
 {   
-  return pt1.t == pt2.t; 
+  return pt.t == pu.t; 
 }
  
-template &lttypename T, typename U&gt
-bool operator != (const logical_const&ltT&gt& pt1, const logical_const&ltU&gt& pt2)
+template &lt;typename T, typename U&gt;
+bool operator != (const logical_const&lt;T&gt;& pt, const logical_const&lt;U&gt;& pu)
 {   
-  return pt1.t != pt2.t; 
+  return pt.t != pu.t; 
 }
 
-template &lttypename T, typename U&gt
-void swap (logical_const&ltT&gt& pt1, logical_const&ltU&gt& pt2)
+template &lt;typename T, typename U&gt;
+bool operator &lt; (const logical_const&lt;T&gt;& pt, const logical_const&lt;U&gt;& pu)
+{   
+  return pt.t &lt; pu.t; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator == (const logical_const&lt;T&gt;& pt, const U& u)
+{   
+  return pt.t == u; 
+}
+ 
+template &lt;typename T, typename U&gt;
+bool operator != (const logical_const&lt;T&gt;& pt, const U& u)
+{   
+  return pt.t != u; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &lt; (const logical_const&lt;T&gt;& pt, const U& u)
+{   
+  return pt.t &lt; u; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator == (const T& t, const logical_const&lt;U&gt;& pu)
+{   
+  return t == pu.t; 
+}
+ 
+template &lt;typename T, typename U&gt;
+bool operator != (const T& t, const logical_const&lt;U&gt;& pu)
+{   
+  return t != pu.t; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &lt; (const T& t, const logical_const&lt;U&gt;& pu)
+{   
+  return t &lt; pu.t; 
+}
+
+template &lt;typename T, typename U&gt;
+void swap (logical_const&lt;T&gt;& pt1, logical_const&lt;U&gt;& pt2)
 {   
   swap(pt1.t, pt2.t); 
+}
+
+template &lt;typename T&gt;
+const T& cast_away_logical_const(const logical_const&lt;T&gt;& pt1)
+{
+  return pt1.t;
+}
+
+template &lt;typename T&gt;
+T& cast_away_logical_const(logical_const&lt;T&gt;& pt1)
+{
+  return pt1.t;
 }
 
 </pre></tt></blockquote> 
 
 <H2>V Acknowledgements</H2>
-<p>Thanks to Jamie Alsop, Walter Brown, Nick Maclaren, Ville Voutilainen, Jonathan Wakely and others for helpful discussion.</p>
+<p>Thanks to Walter Brown, Nick Maclaren, Ville Voutilainen, Jonathan Wakely and others for helpful discussion.</p>
 
 <H2>VI References</H2>
 <ul>
