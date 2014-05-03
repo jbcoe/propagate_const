@@ -1,18 +1,17 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML><HEAD><TITLE>A Proposal to Add a Logical Const Wrapper to the Standard Library</TITLE>
-<META http-equiv=Content-Type content="text/html; charset=windows-1252">
-</HEAD>
-<BODY><FONT size=-1>
-<BR>Doc number XXXX=XX-XX
-<br>24 Apr 2014
-<br>Jonathan Coe &lt;jbcoe@me.com&gt;
-<br>Robert Mill &lt;rob.mill.uk@gmail.com&gt;
-</FONT>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css"></style></head>
+    
+<body><div><font size=-1>
+<br>Doc number D3973
+<br>2014-04-24
+<br>Jonathan Coe &lt;<a href="mailto:jbcoe@me.com" target="_blank">jbcoe@me.com</a>&gt;
+<br>Robert Mill &lt;<a href="mailto:rob.mill.uk@gmail.com" target="_blank">rob.mill.uk@gmail.com</a>&gt;
+</font>
     
 <H1>A Proposal to Add a Logical Const Wrapper to the Standard Library Technical Report</H1>
 
 <H2>I. Motivation</H2>
-<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>; that is, <tt>const</tt> on member functions provides bit-wise but not logical <tt>const</tt>-ness [1].</p>
+<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>; that is, <tt>const</tt> on member functions provides physical but not logical <tt>const</tt>-ness [1].</p>
 
 <p><b>Example:</b></p>
     
@@ -97,7 +96,8 @@ struct B
 </pre></tt></blockquote>   
     
 <h3>The pimpl idiom with <tt>logical_const</tt></h3>
-
+[2]
+    
 <h3>Thread safety and <tt>logical_const</tt></h3>
     
 <H2>II. Impact On the Standard</H2>
@@ -121,7 +121,7 @@ struct B
 <p><tt>operator*</tt> and <tt>operator-></tt> are defined to preserve logical <tt>const</tt>-ness. When a <tt>const</tt> <tt>logical_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
     
 <h3><tt>get()</tt></h3>
-<p>Returns the address of the object pointed to by the wrapped pointer. <tt>get()</tt> is intended to be used to ensure logical-<tt>const</tt>-ness is preserved when using interfaces which require raw-C-style pointers</p>
+<p>Returns the address of the object pointed to by the wrapped pointer. <tt>get()</tt> is intended to be used to ensure logical-<tt>const</tt>-ness is preserved when using interfaces which require raw C-style pointers</p>
     
 <h3>Equality, inequality and comparison</h3>    
 <p>Free standing equality, inequality and comparison operators are provided so that a <tt>logical_const&lt;T&gt;</tt> can be used in any equality, inequality or comparison where a <tt>T</tt> could be used. Logical <tt>const</tt>-ness should not alter the result of any equality, inequality or comparison operation.</p>
@@ -309,4 +309,4 @@ T& cast_away_logical_const(logical_const&lt;T&gt;& pt1)
   <li>[2] Martin Reddy, API design for C++, 2011, Elsevier ISBN-10: 0123850037, Section 3.1.5</li>
 </ul>
 
-</BODY></HTML>
+</div></body></html>
