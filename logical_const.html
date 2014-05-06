@@ -10,7 +10,10 @@
     
 <H1>A Proposal to Add a Logical Const Wrapper to the Standard Library Technical Report</H1>
 
-<H2>I. Motivation</H2>
+<H2>I. Introduction</H2>
+<p>We propose the introduction of a <tt>logical_const</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like member variables.</p>
+    
+<H2>II. Motivation</H2>
 <p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>; that is, <tt>const</tt> on member functions provides physical but not logical <tt>const</tt>-ness [1].</p>
 
 <p><b>Example:</b></p>
@@ -80,7 +83,6 @@ struct B
   B();              // unchanged
   
   void foo() const; // unchanged
-  
   void foo();       // unchanged
 
   std::logical_const&lt;std::unique_ptr&lt;A&gt;&gt; m_ptrA;
@@ -96,17 +98,48 @@ struct B
 </pre></tt></blockquote>   
     
 <h3>The pimpl idiom with <tt>logical_const</tt></h3>
-[2]
+<p>The pimpl (pointer-to-implementation) idiom pushes implementation details of a class into a separate object, a pointer to which is stored in the original class [2].</p>
+    
+<blockquote><tt><pre>class C
+{
+  void foo() const;
+  void foo();
+    
+  std::unique_ptr&lt;CImpl&gt; m_pimpl;
+};
+
+void C::foo() const 
+{ 
+  m_pimpl->foo(); 
+}
+
+void C::foo() 
+{ 
+  m_pimpl->foo(); 
+}
+
+</pre></tt></blockquote> 
+    
+ <p>When using the pimpl idiom the compiler will not catch changes to member variables within <tt>const</tt> member functions. Member variables are kept in a separate object and the compiler only checks that the address of this object is unchanged. When the pimpl object is wrapped in <tt>logical_const</tt>, <tt>const</tt> member functions will only be able to call <tt>const</tt> functions on the pimpl object and will be unable to modify (non-<tt>mutable</tt>) member variables of the pimpl object without explicit <tt>const_cast</tt>s. The class above would be modified as follows:</p>
+
+<blockquote><tt><pre>class C
+{
+    void foo() const;  // unchanged
+    void foo();        // unchanged
+    
+    std::logical_const&lt;std::unique_ptr&lt;CImpl&gt;&gt; m_pimpl;
+};</pre></tt></blockquote> 
     
 <h3>Thread safety and <tt>logical_const</tt></h3>
     
-<H2>II. Impact On the Standard</H2>
+<H2>III. Impact On the Standard</H2>
 
 <p>This proposal is a pure library extension. It does not require changes to any standard classes, functions or headers.</p>
 
-<H2>III. Design Decisions</H2>
+<H2>IV. Design Decisions</H2>
 
-<p>Given absolute freedom we would propose changing <tt>const</tt> to propagate logical-<tt>const</tt>-ness. That's not practical as it will break existing code and change behaviour in potentially undesirable ways. Instead we suggest using a wrapper-class around member-data where logically-<tt>const</tt> behaviour is required. The <tt>logical_const</tt> wrapper can be used much like the <tt>const</tt> keyword and will cause compilation failure wherever logical-<tt>const</tt>-ness is violated. Logical-<tt>const</tt>-ness can be introduced into existing code by decorating pointer-like members of a class with <tt>logical_const</tt></p>
+<p>Given absolute freedom we would propose changing <tt>const</tt> to propagate logical-<tt>const</tt>-ness. That's not practical as it will break existing code and change behaviour in potentially undesirable ways. [DISCUSS INTRODUCING A NEW KEYWORD]
+Instead we suggest using a wrapper-class around member-data where logically-<tt>const</tt> behaviour is required. The <tt>logical_const</tt> wrapper can be used much like the <tt>const</tt> keyword and will cause compilation failure wherever logical-<tt>const</tt>-ness is violated. Logical-<tt>const</tt>-ness can be introduced into existing code by decorating pointer-like members of a class with <tt>logical_const</tt></p>
     
 <p>The change required to introduce logical-<tt>const</tt>-ness to a class is simple and local enough to be enforced during code review and taught to C++ developers in the same way as smart-pointers are taught to ensure exception safety.</p>
     
@@ -132,7 +165,7 @@ struct B
 <h3>cast_away_logical_const()</h3>
 <p>A free function allows the underlying pointer to be accessed. Use of this function will allow logical <tt>const</tt>-ness to be dropped so is discouraged and named such that it will be easy to find in code review.</p>
     
-<H2>IV. Technical Specifications</h2>    
+<H2>V. Technical Specifications</h2>    
     
 <p>The proposed form of <tt>std::logical_const</tt> is given below. Implementation is exposition-only.</p>
     
@@ -298,15 +331,15 @@ T& cast_away_logical_const(logical_const&lt;T&gt;& pt1)
 
 </pre></tt></blockquote> 
 
-<H2>V Acknowledgements</H2>
+<H2>VI Acknowledgements</H2>
 <p>Thanks to Walter Brown, Nick Maclaren, Ville Voutilainen, Jonathan Wakely and others for helpful discussion.</p>
 
-<H2>VI References</H2>
+<H2>VII References</H2>
 <ul>
   <li>[1] Bjarne Stroustrup, The C++ Programming Language, 4th edition, 2013,
           Addison Wesley ISBN-10: 0321563840 p464</li>
 
-  <li>[2] Martin Reddy, API design for C++, 2011, Elsevier ISBN-10: 0123850037, Section 3.1.5</li>
+  <li>[2] Martin Reddy, API design for C++, 2011, Elsevier ISBN-10: 0123850037, Section 3.1</li>
 </ul>
 
 </div></body></html>
