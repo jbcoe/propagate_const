@@ -120,7 +120,8 @@ void C::foo()
 
 </pre></tt></blockquote> 
     
- <p>When using the pimpl idiom the compiler will not catch changes to member variables within <tt>const</tt> member functions. Member variables are kept in a separate object and the compiler only checks that the address of this object is unchanged. When the pimpl object is wrapped in <tt>logical_const</tt>, <tt>const</tt> member functions will only be able to call <tt>const</tt> functions on the pimpl object and will be unable to modify (non-<tt>mutable</tt>) member variables of the pimpl object without explicit <tt>const_cast</tt>s. The class above would be modified as follows:</p>
+ <p>When using the pimpl idiom the compiler will not catch changes to member variables within <tt>const</tt> member functions. Member variables are kept in a separate object and the compiler only checks that the address of this object is unchanged. By introducing the pimpl idiom into a class to decouple interface and implementation, the author may have inadventantly lost compiler checks on <tt>const</tt>-correctness.</p>
+<p>When the pimpl object is wrapped in <tt>logical_const</tt>, <tt>const</tt> member functions will only be able to call <tt>const</tt> functions on the pimpl object and will be unable to modify (non-<tt>mutable</tt>) member variables of the pimpl object without explicit <tt>const_cast</tt>s: <tt>const</tt>-correctness is restored. The class above would be modified as follows:</p>
 
 <blockquote><tt><pre>class C
 {
@@ -146,6 +147,8 @@ Instead we suggest using a wrapper-class around member-data where logically-<tt>
 <p>It is intended that <tt>logical_const</tt> contains no member data besides the wrapped pointer. Inlining of function calls by the compiler will ensure that using <tt>logical_const</tt> incurs no run-time cost.</p>
 
 <h3>Encapsulation vs inheritance</h3>
+
+Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure logical <tt>const</tt>-ness, if <tt>logical_const&lt;T&gt;</tt> inherits from <tt>T</tt> then it would allow potentially non-logicall-<tt>const</tt> member functions of <tt>T</tt> to be called in a <tt>const</tt> context.
     
 <h3>Construction and Assignment</h3>
 <p> A <tt>logical_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>logical_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from. For instance, a <tt>logical_const&lt;std::shared_ptr&lt;T&gt;&gt;</tt> can be constructed or assigned from a <tt>std::unique_ptr&lt;U&gt;</tt> where <tt>U</tt> is a sub-class of <tt>T</tt>.</p>
