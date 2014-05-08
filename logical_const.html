@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css"></style></head>
     
 <body><div><font size=-1>
@@ -11,7 +11,7 @@
 <H1>A Proposal to Add a Logical Const Wrapper to the Standard Library Technical Report</H1>
 
 <H2>I. Introduction</H2>
-<p>We propose the introduction of a <tt>logical_const</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like member variables.</p>
+<p>We propose the introduction of a <tt>logical_const</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like (or reference-like) member variables.</p>
     
 <H2>II. Motivation</H2>
 <p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>; that is, <tt>const</tt> on member functions provides physical but not logical <tt>const</tt>-ness [1].</p>
@@ -134,7 +134,9 @@ void C::foo()
     
 <h3>Thread safety and <tt>logical_const</tt></h3>
 
-Without the thread-safe version of <tt>foo()</tt>
+<p>Herb Sutter introduced the appealing notion that <tt>const</tt> means thread-safe [3]. Without <tt>logical_const</tt>, changes outside a class with pointer-like members can render the <tt>const</tt> methods of that class non-thread-safe. This means that maintaining the rule <tt>const</tt>=thread-safe requires a global review of the code base.</p>
+
+<p>Without the non-thread-safe version of <tt>foo()</tt> the code below is thread safe. Introduction of a non-<tt>const</tt> (and non-thread-safe) <tt>foo()</tt> into <tt>D</tt> renders <tt>E</tt> non-thread safe.</p>
 
 <blockquote><tt><pre>struct D
 {
@@ -166,6 +168,19 @@ int main()
   t2.join();
 }
 </pre></tt></blockquote>
+
+<p>One solution to the above is to forbid pointer-like member variables in classes if <tt>const</tt>=thread-safe. This is undesirably restrictive. If instead all pointer-like member variables are decorated with <tt>logical_const</tt> then the compiler will catch violations of logical-<tt>const</tt>-ness that could render code non-thread-safe.</p>
+
+<blockquote><tt><pre>struct E
+{
+  E(D& pD);                 // unchanged
+
+  void operator() () const; //  unchanged
+
+  <font color=blue><b>std::logical_const&lt;</b></font>D*<font color=blue><b>&gt;</b></font> m_pD;
+};</pre></tt></blockquote>
+
+<p>Introduction of <tt>logical_const</tt> cannot automatically guarantee thread safety but can allow <tt>const</tt>=thread-safe to be locally verified during code review.</p>
 
 <H2>III. Impact On the Standard</H2>
 
@@ -224,7 +239,7 @@ public:
   }
   
   template &lt;typename U&gt;
-  logical_const(U&& u) : t{std::forward&lt;U&gt;(u))} 
+  logical_const(U&& u) : t{std::forward&lt;U&gt;(u)}
   {
   }
 
@@ -378,6 +393,9 @@ T& cast_away_logical_const(logical_const&lt;T&gt;& pt1)
           Addison Wesley ISBN-10: 0321563840 p464</li>
 
   <li>[2] Martin Reddy, API design for C++, 2011, Elsevier ISBN-10: 0123850037, Section 3.1</li>
+
+    <li>[3]
+        <a href="http://channel9.msdn.com/posts/C-and-Beyond-2012-Herb-Sutter-You-dont-know-blank-and-blank">Herb Sutter, C++ and Beyond 2012: Herb Sutter - You don't know [blank] and [blank]</a></li>
 </ul>
 
 </div></body></html>
