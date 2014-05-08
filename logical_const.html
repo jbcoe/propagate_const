@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css"></style></head>
     
 <body><div><font size=-1>
@@ -126,15 +126,47 @@ void C::foo()
 
 <blockquote><tt><pre>class C
 {
-    void foo() const;  // unchanged
-    void foo();        // unchanged
-    
-    <font color=blue><b>std::logical_const&lt;</b></font>std::unique_ptr&lt;CImpl&gt;<font color=blue><b>&gt;</b></font> m_pimpl;
+  void foo() const;  // unchanged
+  void foo();        // unchanged
+  
+  <font color=blue><b>std::logical_const&lt;</b></font>std::unique_ptr&lt;CImpl&gt;<font color=blue><b>&gt;</b></font> m_pimpl;
 };</pre></tt></blockquote> 
     
 <h3>Thread safety and <tt>logical_const</tt></h3>
-<p>[ TODO ]</p>
-    
+
+Without the thread-safe version of <tt>foo()</tt>
+
+<blockquote><tt><pre>struct D
+{
+  int foo() const { /* thread-safe */ }
+  int foo() { /* non-thread-safe */ }
+};
+
+struct E
+{
+  E(D& pD) : m_pD{&pD} {}
+
+  void operator() () const
+  {
+    m_pD->foo();
+  }
+
+  D* m_pD;
+};
+
+int main()
+{
+  D d;
+  const E e1(d);
+  const E e2(d);
+
+  std::thread t1(e1);
+  std::thread t2(e2);
+  t1.join();
+  t2.join();
+}
+</pre></tt></blockquote>
+
 <H2>III. Impact On the Standard</H2>
 
 <p>This proposal is a pure library extension. It does not require changes to any standard classes, functions or headers.</p>
