@@ -14,7 +14,7 @@
 <p>We propose the introduction of a <tt>logical_const</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like (or reference-like) member variables.</p>
     
 <H2>II. Motivation</H2>
-<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many practitioners of C++. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>; that is, <tt>const</tt> on member functions provides physical but not logical <tt>const</tt>-ness [1].</p>
+<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many experienced C++ developers. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>; that is, <tt>const</tt> on member functions provides physical but not logical <tt>const</tt>-ness [1].</p>
 
 <p><b>Example:</b></p>
     
@@ -132,11 +132,11 @@ void C::foo()
   <font color=blue><b>std::logical_const&lt;</b></font>std::unique_ptr&lt;CImpl&gt;<font color=blue><b>&gt;</b></font> m_pimpl;
 };</pre></tt></blockquote> 
     
-<h3>Thread safety and <tt>logical_const</tt></h3>
+<h3>Thread-safety and <tt>logical_const</tt></h3>
 
-<p>Herb Sutter introduced the appealing notion that <tt>const</tt> means thread-safe [3]. Without <tt>logical_const</tt>, changes outside a class with pointer-like members can render the <tt>const</tt> methods of that class non-thread-safe. This means that maintaining the rule <tt>const</tt>=thread-safe requires a global review of the code base.</p>
+<p>Herb Sutter introduced the appealing notion that <tt>const</tt> implies thread-safe [3]. Without <tt>logical_const</tt>, changes outside a class with pointer-like members can render the <tt>const</tt> methods of that class non-thread-safe. This means that maintaining the rule <tt>const</tt>=>thread-safe requires a global review of the code base.</p>
 
-<p>Without the non-thread-safe version of <tt>foo()</tt> the code below is thread safe. Introduction of a non-<tt>const</tt> (and non-thread-safe) <tt>foo()</tt> into <tt>D</tt> renders <tt>E</tt> non-thread safe.</p>
+<p>With only the <tt>const</tt> version of <tt>foo()</tt> the code below is thread-safe. Introduction of a non-<tt>const</tt> (and non-thread-safe) <tt>foo()</tt> into <tt>D</tt> renders <tt>E</tt> non-thread-safe.</p>
 
 <blockquote><tt><pre>struct D
 {
@@ -169,7 +169,7 @@ int main()
 }
 </pre></tt></blockquote>
 
-<p>One solution to the above is to forbid pointer-like member variables in classes if <tt>const</tt>=thread-safe. This is undesirably restrictive. If instead all pointer-like member variables are decorated with <tt>logical_const</tt> then the compiler will catch violations of logical-<tt>const</tt>-ness that could render code non-thread-safe.</p>
+<p>One solution to the above is to forbid pointer-like member variables in classes if <tt>const</tt>=>thread-safe. This is undesirably restrictive. If instead all pointer-like member variables are decorated with <tt>logical_const</tt> then the compiler will catch violations of logical-<tt>const</tt>-ness that could render code non-thread-safe.</p>
 
 <blockquote><tt><pre>struct E
 {
@@ -180,7 +180,7 @@ int main()
   <font color=blue><b>std::logical_const&lt;</b></font>D*<font color=blue><b>&gt;</b></font> m_pD;
 };</pre></tt></blockquote>
 
-<p>Introduction of <tt>logical_const</tt> cannot automatically guarantee thread safety but can allow <tt>const</tt>=thread-safe to be locally verified during code review.</p>
+<p>Introduction of <tt>logical_const</tt> cannot automatically guarantee thread-safety but can allow <tt>const</tt>=>thread-safe to be locally verified during code review.</p>
 
 <H2>III. Impact On the Standard</H2>
 
