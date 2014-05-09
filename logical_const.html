@@ -226,10 +226,14 @@ Inheritance from the wrapped pointer-like object (where it is a class type) was 
 template &lt;typename T&gt;
 class logical_const
 {
+  typedef decltype(*std::declval&lt;T&gt;()) reference_type;
+ 
 public:
 
-  typedef std::remove_reference_t&lt;decltype(*std::declval&lt;T&gt;())&gt; value_type;
-
+  using value_type = typename std::enable_if&lt;
+     std::is_lvalue_reference&lt;reference_type&gt;::value,
+     typename std::remove_reference&lt;reference_type&gt;::type&gt;::type;
+     
   ~logical_const() 
   {
   }
