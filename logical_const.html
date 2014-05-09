@@ -308,9 +308,9 @@ public:
     return *t;
   }
   
-  operator bool () const
+  explicit operator bool () const
   {
-    return t;
+    return static_cast&lt;bool&gt;(t);
   }
   
 private:
