@@ -201,7 +201,7 @@ int main()
 Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure logical <tt>const</tt>-ness; if <tt>logical_const&lt;T&gt;</tt> were to inherit from <tt>T</tt>, then it would allow potentially non-logical-<tt>const</tt> member functions of <tt>T</tt> to be called in a <tt>const</tt> context.
     
 <h3>Construction and Assignment</h3>
-<p> A <tt>logical_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>logical_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from. For instance, a <tt>logical_const&lt;std::shared_ptr&lt;T&gt;&gt;</tt> can be constructed or assigned from a <tt>std::unique_ptr&lt;U&gt;</tt> where <tt>U</tt> is a sub-class of <tt>T</tt>.</p>
+<p> A <tt>logical_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>logical_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from.
 
 <h3>Pointer-like functions</h3>
 <p><tt>operator*</tt> and <tt>operator-></tt> are defined to preserve logical <tt>const</tt>-ness. When a <tt>const</tt> <tt>logical_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
