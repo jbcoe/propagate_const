@@ -218,6 +218,9 @@ Inheritance from the wrapped pointer-like object (where it is a class type) was 
 <h3><tt>cast_away_logical_const</tt></h3>
 <p><tt>cast_away_logical_const</tt> is a free-standing function which allows the underlying pointer to be accessed. The use of this function allows logical <tt>const</tt>-ness to be dropped and is therefore discouraged. The function is named such that it will be easy to find in code review.</p>
     
+<h3><tt>hash</tt></h3>
+<p>The <tt>hash</tt> struct is specialized so that logical-<tt>const</tt>-ness does not alter the result of hash evaluation.</p>
+    
 <H2>V. Technical Specifications</h2>    
     
 <p>The proposed form of <tt>std::logical_const</tt> is given below. Implementation is exposition-only.</p>
@@ -375,18 +378,27 @@ void swap (logical_const&lt;T&gt;& pt1, logical_const&lt;U&gt;& pt2)
 }
 
 template &lt;typename T&gt;
-const T& cast_away_logical_const(const logical_const&lt;T&gt;& pt1)
+const T& cast_away_logical_const(const logical_const&lt;T&gt;& pt)
 {
-  return pt1.t;
+  return pt.t;
 }
 
 template &lt;typename T&gt;
-T& cast_away_logical_const(logical_const&lt;T&gt;& pt1)
+T& cast_away_logical_const(logical_const&lt;T&gt;& pt)
 {
-  return pt1.t;
+  return pt.t;
 }
 
-</pre></tt></blockquote> 
+template &lt;typename T&gt;
+struct hash&lt;logical_const&lt;T&gt;&gt;
+{
+  size_t operator()(const logical_const&lt;T&gt;& p) const
+  {
+    return m_hash(cast_away_logical_const(p));
+  }
+  
+  std::hash&lt;T&gt; m_hash;
+};</pre></tt></blockquote> 
 
 <H2>VI Acknowledgements</H2>
 <p>Thanks to Walter Brown, Nick Maclaren, Ville Voutilainen, Jonathan Wakely and others for helpful discussion.</p>
