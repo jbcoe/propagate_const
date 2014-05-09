@@ -237,9 +237,7 @@ public:
      std::is_lvalue_reference&lt;reference_type&gt;::value,
      typename std::remove_reference&lt;reference_type&gt;::type&gt;::type;
      
-  ~logical_const() 
-  {
-  }
+  ~logical_const() = default;
   
   logical_const(): t{} 
   {
@@ -390,14 +388,12 @@ T& cast_away_logical_const(logical_const&lt;T&gt;& pt)
 }
 
 template &lt;typename T&gt;
-struct hash&lt;logical_const&lt;T&gt;&gt;
+struct hash&lt;logical_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
 {
   size_t operator()(const logical_const&lt;T&gt;& p) const
   {
-    return m_hash(cast_away_logical_const(p));
+    return operator()(cast_away_logical_const(p));
   }
-  
-  std::hash&lt;T&gt; m_hash;
 };</pre></tt></blockquote> 
 
 <H2>VI Acknowledgements</H2>
