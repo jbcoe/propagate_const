@@ -228,7 +228,7 @@ Inheritance from the wrapped pointer-like object (where it is a class type) was 
 <blockquote><tt><pre>
 template &lt;typename T&gt;
 class logical_const
-{
+{ 
   typedef decltype(*std::declval&lt;T&gt;()) reference_type;
  
 public:
@@ -278,22 +278,22 @@ public:
   
   value_type* operator->()
   {
-    return std::addressof(*t);
+    return underlying_pointer(t);
   }
 
   const value_type* operator->() const
   {
-    return std::addressof(*t);
+    return underlying_pointer(t);
   }
   
   value_type* get()
   {
-    return std::addressof(*t);
+    return underlying_pointer(t);
   }
 
   const value_type* get() const
   {
-    return std::addressof(*t);
+    return underlying_pointer(t);
   }
   
   value_type& operator*()
@@ -313,6 +313,30 @@ public:
   
 private:
   T t;
+  
+  template&lt;typename U&gt;
+  static value_type* underlying_pointer(U* p)
+  { 
+    return p; 
+  }
+
+  template&lt;typename U&gt;
+  static value_type* underlying_pointer(U& p)
+  { 
+    return p.operator-&gt;(); 
+  }
+
+  template&lt;typename U&gt;
+  static const value_type* underlying_pointer(const U* p)
+  { 
+    return p; 
+  }
+
+  template&lt;typename U&gt;
+  static const value_type* underlying_pointer(const U& p)
+  { 
+    return p.operator-&gt;(); 
+  }
 };
 
 template &lt;typename T, typename U&gt;
@@ -397,7 +421,7 @@ struct hash&lt;logical_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
 };</pre></tt></blockquote> 
 
 <H2>VI Acknowledgements</H2>
-<p>Thanks to Walter Brown, Nick Maclaren, Ville Voutilainen, Jonathan Wakely and others for helpful discussion.</p>
+<p>Thanks to Walter Brown, Kevin Channon, Nick Maclaren, Roger Orr, Ville Voutilainen, Jonathan Wakely, David Ward and others for helpful discussion.</p>
 
 <H2>VII References</H2>
 <ul>
