@@ -9,13 +9,13 @@
 <br>Robert Mill &lt;<a href="mailto:rob.mill.uk@gmail.com" target="_blank">rob.mill.uk@gmail.com</a>&gt;
 </font>
     
-<H1>A Proposal to Add a Logical Const Wrapper to the Standard Library Technical Report</H1>
+<H1>A Proposal to Add a Const-Safe Wrapper to the Standard Library Technical Report</H1>
 
 <H2>I. Introduction</H2>
-<p>We propose the introduction of a <tt>logical_const</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like (or reference-like) member variables.</p>
+<p>We propose the introduction of a <tt>const_safe</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like (or reference-like) member variables.</p>
     
 <H2>II. Motivation</H2>
-<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many experienced C++ developers. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>; that is, <tt>const</tt> on member functions provides physical but not logical <tt>const</tt>-ness [1].</p>
+<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many experienced C++ developers. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>.</p>
 
 <p><b>Example:</b></p>
     
@@ -71,13 +71,13 @@
   bar (non-const)
 </pre></tt></blockquote>
     
-<p>The behaviour above can be amended by re-writing <tt>void B::foo() const</tt> using <tt>const_cast</tt> to explicitly call the <tt>const</tt> member function of <tt>A</tt>. Such a change is unnatural and not common practice. We propose the introduction of a wrapper class which can be used on pointer-like member data to ensure propagation of logical <tt>const</tt>-ness.</p>
+<p>The behaviour above can be amended by re-writing <tt>void B::foo() const</tt> using <tt>const_cast</tt> to explicitly call the <tt>const</tt> member function of <tt>A</tt>. Such a change is unnatural and not common practice. We propose the introduction of a wrapper class which can be used on pointer-like member data to ensure propagation of <tt>const</tt>-ness.</p>
  
-<h3>Introducing <tt>logical_const</tt></h3>
+<h3>Introducing <tt>const_safe</tt></h3>
 
-<p>The class <tt>logical_const</tt> is designed to function as closely as possible to a traditional pointer or smart-pointer. Pointer-like member objects can be wrapped in a <tt>logical_const</tt> object to ensure propagation of logical <tt>const</tt>-ness.</p> 
+<p>The class <tt>const_safe</tt> is designed to function as closely as possible to a traditional pointer or smart-pointer. Pointer-like member objects can be wrapped in a <tt>const_safe</tt> object to ensure propagation of <tt>const</tt>-ness.</p> 
     
-<p>A logically-<tt>const</tt> <tt>B</tt> would be written as</p>
+<p>A <tt>const</tt>-safe <tt>B</tt> would be written as</p>
 <blockquote><tt><pre>
 struct B
 {
@@ -86,7 +86,7 @@ struct B
   void foo() const; // unchanged
   void foo();       // unchanged
 
-  <font color=blue><b>std::logical_const&lt;</b></font>std::unique_ptr&lt;A&gt;<font color=blue><b>&gt;</b></font> m_ptrA;
+  <font color=blue><b>std::const_safe&lt;</b></font>std::unique_ptr&lt;A&gt;<font color=blue><b>&gt;</b></font> m_ptrA;
 };
 </pre></tt></blockquote>
 
@@ -98,7 +98,7 @@ struct B
   bar (const)
 </pre></tt></blockquote>   
     
-<h3>The pimpl idiom with <tt>logical_const</tt></h3>
+<h3>The pimpl idiom with <tt>const_safe</tt></h3>
 <p>The pimpl (pointer-to-implementation) idiom pushes implementation details of a class into a separate object, a pointer to which is stored in the original class [2].</p>
     
 <blockquote><tt><pre>class C
@@ -123,19 +123,19 @@ void C::foo()
     
  <p>When using the pimpl idiom the compiler will not catch changes to member variables within <tt>const</tt> member functions. Member variables are kept in a separate object and the compiler only checks that the address of this object is unchanged. By introducing the pimpl idiom into a class to decouple interface and implementation, the author may have inadventantly lost compiler checks on <tt>const</tt>-correctness.</p>
     
-<p>When the pimpl object is wrapped in <tt>logical_const</tt>, <tt>const</tt> member functions will only be able to call <tt>const</tt> functions on the pimpl object and will be unable to modify (non-<tt>mutable</tt>) member variables of the pimpl object without explicit <tt>const_cast</tt>s: <tt>const</tt>-correctness is restored. The class above would be modified as follows:</p>
+<p>When the pimpl object is wrapped in <tt>const_safe</tt>, <tt>const</tt> member functions will only be able to call <tt>const</tt> functions on the pimpl object and will be unable to modify (non-<tt>mutable</tt>) member variables of the pimpl object without explicit <tt>const_cast</tt>s: <tt>const</tt>-correctness is restored. The class above would be modified as follows:</p>
 
 <blockquote><tt><pre>class C
 {
   void foo() const;  // unchanged
   void foo();        // unchanged
   
-  <font color=blue><b>std::logical_const&lt;</b></font>std::unique_ptr&lt;CImpl&gt;<font color=blue><b>&gt;</b></font> m_pimpl;
+  <font color=blue><b>std::const_safe&lt;</b></font>std::unique_ptr&lt;CImpl&gt;<font color=blue><b>&gt;</b></font> m_pimpl;
 };</pre></tt></blockquote> 
     
-<h3>Thread-safety and <tt>logical_const</tt></h3>
+<h3>Thread-safety and <tt>const_safe</tt></h3>
 
-<p>Herb Sutter introduced the appealing notion that <tt>const</tt> implies thread-safe [3]. Without <tt>logical_const</tt>, changes outside a class with pointer-like members can render the <tt>const</tt> methods of that class non-thread-safe. This means that maintaining the rule <tt>const</tt>=>thread-safe requires a global review of the code base.</p>
+<p>Herb Sutter introduced the appealing notion that <tt>const</tt> implies thread-safe [3]. Without <tt>const_safe</tt>, changes outside a class with pointer-like members can render the <tt>const</tt> methods of that class non-thread-safe. This means that maintaining the rule <tt>const</tt>=>thread-safe requires a global review of the code base.</p>
 
 <p>With only the <tt>const</tt> version of <tt>foo()</tt> the code below is thread-safe. Introduction of a non-<tt>const</tt> (and non-thread-safe) <tt>foo()</tt> into <tt>D</tt> renders <tt>E</tt> non-thread-safe.</p>
 
@@ -170,7 +170,7 @@ int main()
 }
 </pre></tt></blockquote>
 
-<p>One solution to the above is to forbid pointer-like member variables in classes if <tt>const</tt>=>thread-safe. This is undesirably restrictive. If instead all pointer-like member variables are decorated with <tt>logical_const</tt> then the compiler will catch violations of logical-<tt>const</tt>-ness that could render code non-thread-safe.</p>
+<p>One solution to the above is to forbid pointer-like member variables in classes if <tt>const</tt>=>thread-safe. This is undesirably restrictive. If instead all pointer-like member variables are decorated with <tt>const_safe</tt> then the compiler will catch violations of <tt>const</tt>-ness that could render code non-thread-safe.</p>
 
 <blockquote><tt><pre>struct E
 {
@@ -178,10 +178,10 @@ int main()
 
   void operator() () const; //  unchanged
 
-  <font color=blue><b>std::logical_const&lt;</b></font>D*<font color=blue><b>&gt;</b></font> m_pD;
+  <font color=blue><b>std::const_safe&lt;</b></font>D*<font color=blue><b>&gt;</b></font> m_pD;
 };</pre></tt></blockquote>
 
-<p>Introduction of <tt>logical_const</tt> cannot automatically guarantee thread-safety but can allow <tt>const</tt>=>thread-safe to be locally verified during code review.</p>
+<p>Introduction of <tt>const_safe</tt> cannot automatically guarantee thread-safety but can allow <tt>const</tt>=>thread-safe to be locally verified during code review.</p>
 
 <H2>III. Impact On the Standard</H2>
 
@@ -189,46 +189,46 @@ int main()
 
 <H2>IV. Design Decisions</H2>
 
-<p>Given absolute freedom we would propose changing the <tt>const</tt> keyword to propagate logical-<tt>const</tt>-ness. That would be impractical, however, as it would break existing code and change behaviour in potentially undesirable ways. A second approach would be the introduction of a new keyword to modify <tt>const</tt>, for instance, <tt>logical const</tt>, which enforces logical-<tt>const</tt>-ness. Although this change would maintain backward-compatibility, it would require enhancements to the C++ compiler.</p>
+<p>Given absolute freedom we would propose changing the <tt>const</tt> keyword to propagate <tt>const</tt>-ness. That would be impractical, however, as it would break existing code and change behaviour in potentially undesirable ways. A second approach would be the introduction of a new keyword to modify <tt>const</tt>, for instance, <tt>deep const</tt>, which enforces <tt>const</tt>-safeness. Although this change would maintain backward-compatibility, it would require enhancements to the C++ compiler.</p>
 
-<p>We suggest that the standard library supply a class that wraps member data where logically-<tt>const</tt> behaviour is required. The <tt>logical_const</tt> wrapper can be used much like the <tt>const</tt> keyword and will cause compilation failure wherever logical-<tt>const</tt>-ness is violated. Logical-<tt>const</tt>-ness can be introduced into existing code by decorating pointer-like members of a class with <tt>logical_const</tt>.</p>
+<p>We suggest that the standard library supply a class that wraps member data where <tt>const</tt>-safe behaviour is required. The <tt>const_safe</tt> wrapper can be used much like the <tt>const</tt> keyword and will cause compilation failure wherever <tt>const</tt>-ness is violated. <tt>const</tt>-safety can be introduced into existing code by decorating pointer-like members of a class with <tt>const_safe</tt>.</p>
     
-<p>The change required to introduce logical-<tt>const</tt>-ness to a class is simple and local enough to be enforced during code review and taught to C++ developers in the same way as smart-pointers are taught to ensure exception safety.</p>
+<p>The change required to introduce <tt>const</tt>-safety to a class is simple and local enough to be enforced during code review and taught to C++ developers in the same way as smart-pointers are taught to ensure exception safety.</p>
     
-<p>It is intended that <tt>logical_const</tt> contains no member data besides the wrapped pointer. Inlining of function calls by the compiler will ensure that using <tt>logical_const</tt> incurs no run-time cost.</p>
+<p>It is intended that <tt>const_safe</tt> contains no member data besides the wrapped pointer. Inlining of function calls by the compiler will ensure that using <tt>const_safe</tt> incurs no run-time cost.</p>
 
 <h3>Encapsulation vs inheritance</h3>
 
-Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure logical <tt>const</tt>-ness; if <tt>logical_const&lt;T&gt;</tt> were to inherit from <tt>T</tt>, then it would allow potentially non-logical-<tt>const</tt> member functions of <tt>T</tt> to be called in a <tt>const</tt> context.
+Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure <tt>const</tt>-safety; if <tt>const_safe&lt;T&gt;</tt> were to inherit from <tt>T</tt>, then it would allow potentially <tt>const</tt>-unsafe member functions of <tt>T</tt> to be called in a <tt>const</tt> context.
     
 <h3>Construction and Assignment</h3>
-<p> A <tt>logical_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>logical_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from.
+<p> A <tt>const_safe&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>const_safe&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from.
 
 <h3>Pointer-like functions</h3>
-<p><tt>operator*</tt> and <tt>operator-></tt> are defined to preserve logical <tt>const</tt>-ness. When a <tt>const</tt> <tt>logical_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
+<p><tt>operator*</tt> and <tt>operator-></tt> are defined to preserve <tt>const</tt>-safety. When a <tt>const</tt> <tt>const_safe&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
     
 <h3><tt>get</tt></h3>
-<p>The <tt>get</tt> function returns the address of the object pointed to by the wrapped pointer. <tt>get()</tt> is intended to be used to ensure logical-<tt>const</tt>-ness is preserved when using interfaces which require raw C-style pointers</p>
+<p>The <tt>get</tt> function returns the address of the object pointed to by the wrapped pointer. <tt>get()</tt> is intended to be used to ensure <tt>const</tt>-safety is preserved when using interfaces which require raw C-style pointers</p>
     
 <h3>Equality, inequality and comparison</h3>    
-<p>Free-standing equality, inequality and comparison operators are provided so that a <tt>logical_const&lt;T&gt;</tt> can be used in any equality, inequality or comparison where a <tt>T</tt> could be used. Logical <tt>const</tt>-ness should not alter the result of any equality, inequality or comparison operation.</p>
+<p>Free-standing equality, inequality and comparison operators are provided so that a <tt>const_safe&lt;T&gt;</tt> can be used in any equality, inequality or comparison where a <tt>T</tt> could be used. <tt>const</tt>-safety should not alter the result of any equality, inequality or comparison operation.</p>
     
 <h3><tt>swap</tt></h3>    
-<p>The <tt>swap</tt> function should not add or remove logical <tt>const</tt>-ness but should not unduly restrict the types with which <tt>logical_const&lt;T&gt;</tt> can be swapped. If <tt>T</tt> and <tt>U</tt> can be swapped then logically-<tt>const</tt> <tt>T</tt> and <tt>U</tt> can be swapped.</p>
+<p>The <tt>swap</tt> function should not add or remove <tt>const</tt>-ness but should not unduly restrict the types with which <tt>const_safe&lt;T&gt;</tt> can be swapped. If <tt>T</tt> and <tt>U</tt> can be swapped then <tt>const</tt>-safe <tt>T</tt> and <tt>U</tt> can be swapped.</p>
     
-<h3><tt>cast_away_logical_const</tt></h3>
-<p><tt>cast_away_logical_const</tt> is a free-standing function which allows the underlying pointer to be accessed. The use of this function allows logical <tt>const</tt>-ness to be dropped and is therefore discouraged. The function is named such that it will be easy to find in code review.</p>
+<h3><tt>cast_away_const_safe</tt></h3>
+<p><tt>cast_away_const_safe</tt> is a free-standing function which allows the underlying pointer to be accessed. The use of this function allows <tt>const</tt>-safety to be dropped and is therefore discouraged. The function is named such that it will be easy to find in code review.</p>
     
 <h3><tt>hash</tt></h3>
-<p>The <tt>hash</tt> struct is specialized so that logical-<tt>const</tt>-ness does not alter the result of hash evaluation.</p>
+<p>The <tt>hash</tt> struct is specialized so that inclusion of <tt>const_safe</tt> does not alter the result of hash evaluation.</p>
     
 <H2>V. Technical Specifications</h2>    
     
-<p>The proposed form of <tt>std::logical_const</tt> is given below. Implementation is exposition-only.</p>
+<p>The proposed form of <tt>std::const_safe</tt> is given below. Implementation is exposition-only.</p>
     
 <blockquote><tt><pre>
 template &lt;typename T&gt;
-class logical_const
+class const_safe
 { 
   typedef decltype(*std::declval&lt;T&gt;()) reference_type;
  
@@ -238,40 +238,40 @@ public:
      std::is_lvalue_reference&lt;reference_type&gt;::value,
      typename std::remove_reference&lt;reference_type&gt;::type&gt;::type;
      
-  ~logical_const() = default;
+  ~const_safe() = default;
   
-  logical_const(): t{} 
+  const_safe(): t{} 
   {
   }
   
   template &lt;typename U&gt;
-  logical_const(U&& u) : t{std::forward&lt;U&gt;(u)}
+  const_safe(U&& u) : t{std::forward&lt;U&gt;(u)}
   {
   }
 
   template &lt;typename U&gt;
-  logical_const&lt;T&gt;& operator = (U&& u) 
+  const_safe&lt;T&gt;& operator = (U&& u) 
   { 
     t = std::forward&lt;U&gt;(u); 
     return *this; 
   }
   
   template &lt;typename U&gt;
-  logical_const(const logical_const&lt;U&gt;& pu) : t{pu.t} {}
+  const_safe(const const_safe&lt;U&gt;& pu) : t{pu.t} {}
   
   template &lt;typename U&gt;
-  logical_const(logical_const&lt;U&gt;&& pu) : t{std::move(pu.t)} {}
+  const_safe(const_safe&lt;U&gt;&& pu) : t{std::move(pu.t)} {}
   
   
   template &lt;typename U&gt;
-  logical_const&lt;T&gt;& operator = (const logical_const&lt;U&gt;& pt) 
+  const_safe&lt;T&gt;& operator = (const const_safe&lt;U&gt;& pt) 
   { 
     t = pt.t; 
     return *this; 
   }
   
   template &lt;typename U&gt;
-  logical_const&lt;T&gt;& operator = (logical_const&lt;U&gt;&& pt) 
+  const_safe&lt;T&gt;& operator = (const_safe&lt;U&gt;&& pt) 
   { 
     t = std::move(pt.t); 
     return *this; 
@@ -341,83 +341,83 @@ private:
 };
 
 template &lt;typename T, typename U&gt;
-bool operator == (const logical_const&lt;T&gt;& pt, const logical_const&lt;U&gt;& pu)
+bool operator == (const const_safe&lt;T&gt;& pt, const const_safe&lt;U&gt;& pu)
 {   
   return pt.t == pu.t; 
 }
  
 template &lt;typename T, typename U&gt;
-bool operator != (const logical_const&lt;T&gt;& pt, const logical_const&lt;U&gt;& pu)
+bool operator != (const const_safe&lt;T&gt;& pt, const const_safe&lt;U&gt;& pu)
 {   
   return pt.t != pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt; (const logical_const&lt;T&gt;& pt, const logical_const&lt;U&gt;& pu)
+bool operator &lt; (const const_safe&lt;T&gt;& pt, const const_safe&lt;U&gt;& pu)
 {   
   return pt.t &lt; pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator == (const logical_const&lt;T&gt;& pt, const U& u)
+bool operator == (const const_safe&lt;T&gt;& pt, const U& u)
 {   
   return pt.t == u; 
 }
  
 template &lt;typename T, typename U&gt;
-bool operator != (const logical_const&lt;T&gt;& pt, const U& u)
+bool operator != (const const_safe&lt;T&gt;& pt, const U& u)
 {   
   return pt.t != u; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt; (const logical_const&lt;T&gt;& pt, const U& u)
+bool operator &lt; (const const_safe&lt;T&gt;& pt, const U& u)
 {   
   return pt.t &lt; u; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator == (const T& t, const logical_const&lt;U&gt;& pu)
+bool operator == (const T& t, const const_safe&lt;U&gt;& pu)
 {   
   return t == pu.t; 
 }
  
 template &lt;typename T, typename U&gt;
-bool operator != (const T& t, const logical_const&lt;U&gt;& pu)
+bool operator != (const T& t, const const_safe&lt;U&gt;& pu)
 {   
   return t != pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt; (const T& t, const logical_const&lt;U&gt;& pu)
+bool operator &lt; (const T& t, const const_safe&lt;U&gt;& pu)
 {   
   return t &lt; pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-void swap (logical_const&lt;T&gt;& pt1, logical_const&lt;U&gt;& pt2)
+void swap (const_safe&lt;T&gt;& pt1, const_safe&lt;U&gt;& pt2)
 {   
   swap(pt1.t, pt2.t); 
 }
 
 template &lt;typename T&gt;
-const T& cast_away_logical_const(const logical_const&lt;T&gt;& pt)
+const T& cast_away_const_safe(const const_safe&lt;T&gt;& pt)
 {
   return pt.t;
 }
 
 template &lt;typename T&gt;
-T& cast_away_logical_const(logical_const&lt;T&gt;& pt)
+T& cast_away_const_safe(const_safe&lt;T&gt;& pt)
 {
   return pt.t;
 }
 
 template &lt;typename T&gt;
-struct hash&lt;logical_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
+struct hash&lt;const_safe&lt;T&gt;&gt; : std::hash&lt;T&gt;
 {
-  size_t operator()(const logical_const&lt;T&gt;& p) const
+  size_t operator()(const const_safe&lt;T&gt;& p) const
   {
-    return operator()(cast_away_logical_const(p));
+    return operator()(cast_away_const_safe(p));
   }
 };</pre></tt></blockquote> 
 
