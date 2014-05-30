@@ -3,16 +3,16 @@
     
 <body><div><font size=-1>
 <br>Doc number: XXXXX
-<br>Date: 2014-05-12
+<br>Date: 2014-XX-XX
 <br>Project: Programming Language C++, Library Evolution Working Group
 <br>Reply-to: Jonathan Coe &lt;<a href="mailto:jbcoe@me.com" target="_blank">jbcoe@me.com</a>&gt;
 <br>Robert Mill &lt;<a href="mailto:rob.mill.uk@gmail.com" target="_blank">rob.mill.uk@gmail.com</a>&gt;
 </font>
     
-<H1>A Proposal to Add a Const-Safe Wrapper to the Standard Library Technical Report</H1>
+<H1>A Proposal to Add a Const-Safe Wrapper to the Standard Library</H1>
 
 <H2>I. Introduction</H2>
-<p>We propose the introduction of a <tt>const_safe</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like (or reference-like) member variables.</p>
+<p>We propose the introduction of a <tt>const_safe</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like member variables.</p>
     
 <H2>II. Motivation</H2>
 <p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many experienced C++ developers. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>.</p>
@@ -73,7 +73,7 @@
     
 <p>The behaviour above can be amended by re-writing <tt>void B::foo() const</tt> using <tt>const_cast</tt> to explicitly call the <tt>const</tt> member function of <tt>A</tt>. Such a change is unnatural and not common practice. We propose the introduction of a wrapper class which can be used on pointer-like member data to ensure propagation of <tt>const</tt>-ness.</p>
  
-<h3>Introducing <tt>const_safe</tt></h3>
+<h4>Introducing <tt>const_safe</tt></h4>
 
 <p>The class <tt>const_safe</tt> is designed to function as closely as possible to a traditional pointer or smart-pointer. Pointer-like member objects can be wrapped in a <tt>const_safe</tt> object to ensure propagation of <tt>const</tt>-ness.</p> 
     
