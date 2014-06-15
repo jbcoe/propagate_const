@@ -3,7 +3,7 @@
     
 <body><div><font size=-1>
 <br>Doc number: D4057
-<br>Date: 2014-06-09
+<br>Date: 2014-06-15
 <br>Project: Programming Language C++, Library Evolution Working Group
 <br>Reply-to: Jonathan Coe &lt;<a href="mailto:jbcoe@me.com" target="_blank">jbcoe@me.com</a>&gt;
 <br>Robert Mill &lt;<a href="mailto:rob.mill.uk@gmail.com" target="_blank">rob.mill.uk@gmail.com</a>&gt;
@@ -199,10 +199,12 @@ int main()
 
 <h3>Encapsulation vs inheritance</h3>
 
-Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure <tt>const</tt>-propagation; if <tt>propagate_const&lt;T&gt;</tt> were to inherit from <tt>T</tt>, then it would allow potentially <tt>const</tt>-unsafe member functions of <tt>T</tt> to be called in a <tt>const</tt> context.
+<p>Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure <tt>const</tt>-propagation; if <tt>propagate_const&lt;T&gt;</tt> were to inherit from <tt>T</tt>, then it would allow potentially <tt>const</tt>-unsafe member functions of <tt>T</tt> to be called in a <tt>const</tt> context.</p>
     
 <h3>Construction and Assignment</h3>
-<p> A <tt>propagate_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>propagate_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from.
+<p> A <tt>propagate_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>propagate_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from. 
+There should be no additional cost of construction for a <tt>propagate_const&lt;T&gt;</tt> beyond that for construction of a <tt>T</tt>. 
+The wrapped <tt>T</tt> should not be value-initialized as this would incur a cost for raw pointers. If value-initialization is desirable then it can be accomplished with another wrapper class like <tt>boost::value_initialized</tt> [4].</p>
 
 <h3>Pointer-like functions</h3>
 <p><tt>operator*</tt> and <tt>operator-></tt> are defined to preserve <tt>const</tt>-propagation. When a <tt>const</tt> <tt>propagate_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
@@ -240,9 +242,7 @@ public:
      
   ~propagate_const() = default;
   
-  propagate_const(): t{} 
-  {
-  }
+  propagate_const() = default;
   
   template &lt;typename U&gt;
   propagate_const(U&& u) : t{std::forward&lt;U&gt;(u)}
@@ -433,6 +433,8 @@ struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
 
     <li>[3]
         <a href="http://channel9.msdn.com/posts/C-and-Beyond-2012-Herb-Sutter-You-dont-know-blank-and-blank">Herb Sutter, C++ and Beyond 2012: Herb Sutter - You don't know [blank] and [blank]</a></li>
+    <li>[4]
+        <a href="http://www.boost.org/doc/libs/1_55_0/libs/utility/value_init.htm">boost value_initialized</a></li>
 </ul>
 
 </div></body></html>
