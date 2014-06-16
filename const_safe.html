@@ -3,7 +3,7 @@
     
 <body><div><font size=-1>
 <br>Doc number: D4057
-<br>Date: 2014-06-15
+<br>Date: 2014-06-16
 <br>Project: Programming Language C++, Library Evolution Working Group
 <br>Reply-to: Jonathan Coe &lt;<a href="mailto:jbcoe@me.com" target="_blank">jbcoe@me.com</a>&gt;
 <br>Robert Mill &lt;<a href="mailto:rob.mill.uk@gmail.com" target="_blank">rob.mill.uk@gmail.com</a>&gt;
@@ -224,9 +224,10 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
 <h3><tt>hash</tt></h3>
 <p>The <tt>hash</tt> struct is specialized so that inclusion of <tt>propagate_const</tt> does not alter the result of hash evaluation.</p>
     
-<H2>V. Technical Specifications</h2>    
+<H2>V. Expository Implementation</h2>    
     
-<p>The proposed form of <tt>std::propagate_const</tt> is given below. Implementation is exposition-only.</p>
+<p>Sample form of <tt>std::propagate_const</tt> is given below and makes use of 
+an overloaded templated helper function: <tt>underlying_pointer</tt>.</p> 
     
 <blockquote><tt><pre>
 template &lt;typename T&gt;
