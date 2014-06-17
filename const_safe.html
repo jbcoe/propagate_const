@@ -199,7 +199,7 @@ int main()
 
 <h3>Encapsulation vs inheritance</h3>
 
-<p>Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure <tt>const</tt>-propagation; if <tt>propagate_const&lt;T&gt;</tt> were to inherit from <tt>T</tt>, then it would allow potentially <tt>const</tt>-unsafe member functions of <tt>T</tt> to be called in a <tt>const</tt> context.</p>
+<p>Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure <tt>const</tt>-propagation; if <tt>propagate_const&lt;T&gt;</tt> were to inherit from <tt>T</tt>, then it would allow potentially non-<tt>const</tt> member functions of <tt>T</tt> to be called in a <tt>const</tt> context.</p>
     
 <h3>Construction and Assignment</h3>
 <p> A <tt>propagate_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>propagate_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from. 
