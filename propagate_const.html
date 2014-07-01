@@ -15,7 +15,7 @@
 <p>We propose the introduction of a <tt>propagate_const</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like member variables.</p>
     
 <H2>II. Motivation</H2>
-<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many experienced C++ developers. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>.</p>
+<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many experienced C++ developers. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>consVcast</tt>.</p>
 
 <p><b>Example:</b></p>
     
@@ -57,8 +57,8 @@
     B b;
     b.foo();
     
-    const B const_b;
-    const_b.foo();
+    const B consVb;
+    consVb.foo();
   }
   
 </pre></tt></blockquote>
@@ -71,7 +71,7 @@
   bar (non-const)
 </pre></tt></blockquote>
     
-<p>The behaviour above can be amended by re-writing <tt>void B::foo() const</tt> using <tt>const_cast</tt> to explicitly call the <tt>const</tt> member function of <tt>A</tt>. Such a change is unnatural and not common practice. We propose the introduction of a wrapper class which can be used on pointer-like member data to ensure propagation of <tt>const</tt>-ness.</p>
+<p>The behaviour above can be amended by re-writing <tt>void B::foo() const</tt> using <tt>consVcast</tt> to explicitly call the <tt>const</tt> member function of <tt>A</tt>. Such a change is unnatural and not common practice. We propose the introduction of a wrapper class which can be used on pointer-like member data to ensure propagation of <tt>const</tt>-ness.</p>
  
 <h4>Introducing <tt>propagate_const</tt></h4>
 
@@ -123,7 +123,7 @@ void C::foo()
     
  <p>When using the pimpl idiom the compiler will not catch changes to member variables within <tt>const</tt> member functions. Member variables are kept in a separate object and the compiler only checks that the address of this object is unchanged. By introducing the pimpl idiom into a class to decouple interface and implementation, the author may have inadventantly lost compiler checks on <tt>const</tt>-correctness.</p>
     
-<p>When the pimpl object is wrapped in <tt>propagate_const</tt>, <tt>const</tt> member functions will only be able to call <tt>const</tt> functions on the pimpl object and will be unable to modify (non-<tt>mutable</tt>) member variables of the pimpl object without explicit <tt>const_cast</tt>s: <tt>const</tt>-correctness is restored. The class above would be modified as follows:</p>
+<p>When the pimpl object is wrapped in <tt>propagate_const</tt>, <tt>const</tt> member functions will only be able to call <tt>const</tt> functions on the pimpl object and will be unable to modify (non-<tt>mutable</tt>) member variables of the pimpl object without explicit <tt>consVcast</tt>s: <tt>const</tt>-correctness is restored. The class above would be modified as follows:</p>
 
 <blockquote><tt><pre>class C
 {
@@ -212,6 +212,9 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
 <h3><tt>get</tt></h3>
 <p>The <tt>get</tt> function returns the address of the object pointed to by the wrapped pointer. <tt>get()</tt> is intended to be used to ensure <tt>const</tt>-propagation is preserved when using interfaces which require raw C-style pointers</p>
     
+<h3><tt>operator value*</tt></h3>
+<p>When <tt>T</tt> is a raw pointer <tt>operator value*</tt> exists and allows implicit conversion to a raw pointer. This avoids using <tt>get</tt> to access the raw pointer in contexts where it was unnecesary before addition of the <tt>propagate_const</tt> wrapper.</p>
+    
 <h3>Equality, inequality and comparison</h3>    
 <p>Free-standing equality, inequality and comparison operators are provided so that a <tt>propagate_const&lt;T&gt;</tt> can be used in any equality, inequality or comparison where a <tt>T</tt> could be used. <tt>const</tt>-propagation should not alter the result of any equality, inequality or comparison operation.</p>
     
@@ -223,6 +226,10 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
     
 <h3><tt>hash</tt></h3>
 <p>The <tt>hash</tt> struct is specialized so that inclusion of <tt>propagate_const</tt> does not alter the result of hash evaluation.</p>
+    
+<h3><tt>noexcept</tt></h3>
+<p>We have omitted <tt>noexcept</tt> specifications until we have stronger guidelines from the Library Evolution Working group. The <tt>noexcept</tt> status of all functions will depend on the <tt>noexcept</tt> status of the corresponding functions on the underlying pointer.</p>
+    
     
 <H2>V. Expository Implementation</h2>    
     
@@ -237,7 +244,7 @@ class propagate_const
  
 public:
 
-  using value_type = typename std::enable_if&lt;
+  using value_type = std::enable_if_t&lt;
      std::is_lvalue_reference&lt;reference_type&gt;::value,
      typename std::remove_reference&lt;reference_type&gt;::type&gt;::type;
      
@@ -245,33 +252,42 @@ public:
   
   propagate_const() = default;
   
-  template &lt;typename U&gt;
+  template &lt;typename U, 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
   propagate_const(U&& u) : t{std::forward&lt;U&gt;(u)}
   {
   }
 
-  template &lt;typename U&gt;
+  template &lt;typename U, 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
   propagate_const&lt;T&gt;& operator = (U&& u) 
   { 
     t = std::forward&lt;U&gt;(u); 
     return *this; 
   }
   
-  template &lt;typename U&gt;
-  propagate_const(const propagate_const&lt;U&gt;& pu) : t{pu.t} {}
+  template &lt;typename U, 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
+  propagate_const(const propagate_const&lt;U&gt;& pu) : t{pu.t} 
+  {
+  }
   
-  template &lt;typename U&gt;
-  propagate_const(propagate_const&lt;U&gt;&& pu) : t{std::move(pu.t)} {}
+  template &lt;typename U, 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
+  propagate_const(propagate_const&lt;U&gt;&& pu) : t{std::move(pu.t)} 
+  {
+  }
   
-  
-  template &lt;typename U&gt;
+  template &lt;typename U, 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
   propagate_const&lt;T&gt;& operator = (const propagate_const&lt;U&gt;& pt) 
   { 
     t = pt.t; 
     return *this; 
   }
   
-  template &lt;typename U&gt;
+  template &lt;typename U, 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
   propagate_const&lt;T&gt;& operator = (propagate_const&lt;U&gt;&& pt) 
   { 
     t = std::move(pt.t); 
@@ -296,6 +312,20 @@ public:
   const value_type* get() const
   {
     return underlying_pointer(t);
+  }
+  
+  template &lt;typename T_=T, 
+            typename V = std::enable_if_t&lt;std::is_pointer&lt;T_&gt;::value&gt;&gt;
+  operator value_type*() 
+  { 
+    return underlying_pointer(t); 
+  }
+
+  template &lt;typename T_=T, 
+            typename V = std::enable_if_t&lt;std::is_pointer&lt;T_&gt;::value&gt;&gt;
+  operator const value_type*() const 
+  { 
+    return underlying_pointer(t); 
   }
   
   value_type& operator*()
@@ -360,39 +390,21 @@ bool operator &lt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt
 }
 
 template &lt;typename T, typename U&gt;
-bool operator == (const propagate_const&lt;T&gt;& pt, const U& u)
+bool operator &gt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu)
 {   
-  return pt.t == u; 
-}
- 
-template &lt;typename T, typename U&gt;
-bool operator != (const propagate_const&lt;T&gt;& pt, const U& u)
-{   
-  return pt.t != u; 
+  return pt.t &gt; pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt; (const propagate_const&lt;T&gt;& pt, const U& u)
+bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu)
 {   
-  return pt.t &lt; u; 
+  return pt.t &lt;= pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator == (const T& t, const propagate_const&lt;U&gt;& pu)
+bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu)
 {   
-  return t == pu.t; 
-}
- 
-template &lt;typename T, typename U&gt;
-bool operator != (const T& t, const propagate_const&lt;U&gt;& pu)
-{   
-  return t != pu.t; 
-}
-
-template &lt;typename T, typename U&gt;
-bool operator &lt; (const T& t, const propagate_const&lt;U&gt;& pu)
-{   
-  return t &lt; pu.t; 
+  return pt.t &gt;= pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
