@@ -176,7 +176,7 @@ int main()
 {
   E(D& pD);                 // unchanged
 
-  void operator() () const; //  unchanged
+  void operator() () const; // unchanged
 
   <font color=blue><b>std::propagate_const&lt;</b></font>D*<font color=blue><b>&gt;</b></font> m_pD;
 };</pre></tt></blockquote>
@@ -189,19 +189,19 @@ int main()
 
 <H2>IV. Design Decisions</H2>
 
-<p>Given absolute freedom we would propose changing the <tt>const</tt> keyword to propagate <tt>const</tt>-ness. That would be impractical, however, as it would break existing code and change behaviour in potentially undesirable ways. A second approach would be the introduction of a new keyword to modify <tt>const</tt>, for instance, <tt>deep const</tt>, which enforces <tt>const</tt>-propagatingness. Although this change would maintain backward-compatibility, it would require enhancements to the C++ compiler.</p>
+<p>Given absolute freedom we would propose changing the <tt>const</tt> keyword to propagate <tt>const</tt>-ness. That would be impractical, however, as it would break existing code and change behaviour in potentially undesirable ways. A second approach would be the introduction of a new keyword to modify <tt>const</tt>, for instance, <tt>deep const</tt>, which enforces <tt>const</tt>-propagation. Although this change would maintain backward-compatibility, it would require enhancements to the C++ compiler.</p>
 
 <p>We suggest that the standard library supply a class that wraps member data where <tt>const</tt>-propagating behaviour is required. The <tt>propagate_const</tt> wrapper can be used much like the <tt>const</tt> keyword and will cause compilation failure wherever <tt>const</tt>-ness is violated. <tt>const</tt>-propagation can be introduced into existing code by decorating pointer-like members of a class with <tt>propagate_const</tt>.</p>
     
 <p>The change required to introduce <tt>const</tt>-propagation to a class is simple and local enough to be enforced during code review and taught to C++ developers in the same way as smart-pointers are taught to ensure exception safety.</p>
     
-<p>It is intended that <tt>propagate_const</tt> contains no member data besides the wrapped pointer. Inlining of function calls by the compiler will ensure that using <tt>propagate_const</tt> incurs no run-time cost.</p>
+<p>It is intended that <tt>propagate_const</tt> contain no member data besides the wrapped pointer. Inlining of function calls by the compiler will ensure that using <tt>propagate_const</tt> incurs no run-time cost.</p>
 
 <h3>Encapsulation vs inheritance</h3>
 
 <p>Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure <tt>const</tt>-propagation; if <tt>propagate_const&lt;T&gt;</tt> were to inherit from <tt>T</tt>, then it would allow potentially non-<tt>const</tt> member functions of <tt>T</tt> to be called in a <tt>const</tt> context.</p>
     
-<h3>Construction and Assignment</h3>
+<h3>Construction and assignment</h3>
 <p> A <tt>propagate_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>propagate_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from. 
 There should be no additional cost of construction for a <tt>propagate_const&lt;T&gt;</tt> beyond that for construction of a <tt>T</tt>. 
 The wrapped <tt>T</tt> should not be value-initialized as this would incur a cost for raw pointers. If value-initialization is desirable then it can be accomplished with another wrapper class like <tt>boost::value_initialized</tt> [4].</p>
@@ -210,7 +210,7 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
 <p><tt>operator*</tt> and <tt>operator-></tt> are defined to preserve <tt>const</tt>-propagation. When a <tt>const</tt> <tt>propagate_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
     
 <h3><tt>get</tt></h3>
-<p>The <tt>get</tt> function returns the address of the object pointed to by the wrapped pointer. <tt>get()</tt> is intended to be used to ensure <tt>const</tt>-propagation is preserved when using interfaces which require raw C-style pointers</p>
+<p>The <tt>get</tt> function returns the address of the object pointed to by the wrapped pointer. <tt>get</tt> is intended to be used to ensure <tt>const</tt>-propagation is preserved when using interfaces which require raw C-style pointers</p>
     
 <h3><tt>operator value*</tt></h3>
 <p>When <tt>T</tt> is a raw pointer <tt>operator value*</tt> exists and allows implicit conversion to a raw pointer. This avoids using <tt>get</tt> to access the raw pointer in contexts where it was unnecesary before addition of the <tt>propagate_const</tt> wrapper.</p>
