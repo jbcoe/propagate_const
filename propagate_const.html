@@ -15,14 +15,7 @@
 <H2>I. Introduction</H2>
 <p>We propose the introduction of a <tt>propagate_const</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like member variables.</p>
       
-<H2>II. Changes from previous versions</H2>
-<H4>Changes since N4057</H4>
-<p>Extended comparison operators to avoid reliance on implicit conversions. Minor cosmetic changes.</p>
-
-<H4>Changes since N3973</H4>
-<p>Renamed class from <tt>logical_const</tt> to <tt>propagate_const</tt> as the former is used with different meaning in the D community. Add <tt>enable_if</tt> to reference implementation to prevent some functions entering into an overload set.</p>
-    
-<H2>III. Motivation</H2>
+<H2>II. Motivation</H2>
 <p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many experienced C++ developers. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>.</p>
 
 <p><b>Example:</b></p>
@@ -191,11 +184,11 @@ int main()
 
 <p>Introduction of <tt>propagate_const</tt> cannot automatically guarantee thread-safety but can allow <tt>const</tt>=>thread-safe to be locally verified during code review.</p>
 
-<H2>IV. Impact On the Standard</H2>
+<H2>III. Impact On the Standard</H2>
 
 <p>This proposal is a pure library extension. It does not require changes to any standard classes, functions or headers.</p>
 
-<H2>V. Design Decisions</H2>
+<H2>IV. Design Decisions</H2>
 
 <p>Given absolute freedom we would propose changing the <tt>const</tt> keyword to propagate <tt>const</tt>-ness. That would be impractical, however, as it would break existing code and change behaviour in potentially undesirable ways. A second approach would be the introduction of a new keyword to modify <tt>const</tt>, for instance, <tt>deep const</tt>, which enforces <tt>const</tt>-propagation. Although this change would maintain backward-compatibility, it would require enhancements to the C++ compiler.</p>
 
@@ -239,7 +232,7 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
 <p>We have omitted <tt>noexcept</tt> specifications until we have stronger guidelines from the Library Evolution Working group. The <tt>noexcept</tt> status of all functions will depend on the <tt>noexcept</tt> status of the corresponding functions on the underlying pointer.</p>
     
     
-<H2>VI. Expository Implementation</h2>    
+<H2>V. Expository Implementation</h2>    
     
 <p>A sample form of <tt>std::propagate_const</tt> is given below and makes use of 
 an overloaded templated helper function: <tt>underlying_pointer</tt>.</p> 
@@ -514,10 +507,22 @@ struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
   }
 };</pre></tt></blockquote> 
 
-<H2>VII Acknowledgements</H2>
+<H2>VI. Acknowledgements</H2>
 <p>Thanks to Walter Brown, Kevin Channon, Nick Maclaren, Roger Orr, Ville Voutilainen, Jonathan Wakely, David Ward and others for helpful discussion.</p>
 
-<H2>VIII References</H2>
+<H2>VII. Revisions</H2>
+<p>This paper revises N4057</p>
+<ul>
+<li>Extended comparison operators to avoid reliance on implicit conversions. Minor cosmetic changes.</li>
+</ul>
+    
+<p>N4057 revises N3973</p>
+<ul>
+<li>Renamed class from <tt>logical_const</tt> to <tt>propagate_const</tt> as the former is used with different meaning in the D community.</li> 
+<li>Add <tt>enable_if</tt> to reference implementation to prevent some functions entering into an overload set.</li>
+</ul>
+    
+<H2>VIII. References</H2>
 <ul>
   <li>[1] Bjarne Stroustrup, The C++ Programming Language, 4th edition, 2013,
           Addison Wesley ISBN-10: 0321563840 p464</li>
