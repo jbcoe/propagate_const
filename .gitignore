@@ -1,2 +1,5 @@
+*.dvi
+*.log
+*.ps
 *.pdf
 *.sh
