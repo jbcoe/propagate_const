@@ -2,21 +2,28 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css"></style></head>
     
 <body><div><font size=-1>
-<br><b>Doc number:</b> N4057
-<br><b>Revises:</b> N3973
-<br><b>Date:</b> 2014-07-02
+<br><b>Doc number:</b> DXXXX
+<br><b>Revises:</b> N4057, N3973
+<br><b>Date:</b> 2014-07-21
 <br><b>Project:</b> Programming Language C++, Library Evolution Working Group
 <br><b>Reply-to:</b> Jonathan Coe &lt;<a href="mailto:jbcoe@me.com" target="_blank">jbcoe@me.com</a>&gt;
 <br>Robert Mill &lt;<a href="mailto:rob.mill.uk@gmail.com" target="_blank">rob.mill.uk@gmail.com</a>&gt;
 </font>
     
 <H1>A Proposal to Add a Const-Propagating Wrapper to the Standard Library</H1>
-
+    
 <H2>I. Introduction</H2>
 <p>We propose the introduction of a <tt>propagate_const</tt> wrapper class that propagates <tt>const</tt>-ness to pointer-like member variables.</p>
+      
+<H2>II. Changes from previous versions</H2>
+<H4>Changes since N4057</H4>
+<p>Extended comparison operators to avoid reliance on implicit conversions. Minor cosmetic changes.</p>
+
+<H4>Changes since N3973</H4>
+<p>Renamed class from <tt>logical_const</tt> to <tt>propagate_const</tt> as the former is used with different meaning in the D community. Add <tt>enable_if</tt> to reference implementation to prevent some functions entering into an overload set.</p>
     
-<H2>II. Motivation</H2>
-<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many experienced C++ developers. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>consVcast</tt>.</p>
+<H2>III. Motivation</H2>
+<p>The behaviour of <tt>const</tt> member functions on objects with pointer-like data members is seen to be surprising by many experienced C++ developers. A <tt>const</tt> member function can call non-<tt>const</tt> functions on pointer-like data members and will do so by default without use of <tt>const_cast</tt>.</p>
 
 <p><b>Example:</b></p>
     
@@ -72,7 +79,7 @@
   bar (non-const)
 </pre></tt></blockquote>
     
-<p>The behaviour above can be amended by re-writing <tt>void B::foo() const</tt> using <tt>consVcast</tt> to explicitly call the <tt>const</tt> member function of <tt>A</tt>. Such a change is unnatural and not common practice. We propose the introduction of a wrapper class which can be used on pointer-like member data to ensure propagation of <tt>const</tt>-ness.</p>
+<p>The behaviour above can be amended by re-writing <tt>void B::foo() const</tt> using <tt>const_cast</tt> to explicitly call the <tt>const</tt> member function of <tt>A</tt>. Such a change is unnatural and not common practice. We propose the introduction of a wrapper class which can be used on pointer-like member data to ensure propagation of <tt>const</tt>-ness.</p>
  
 <h4>Introducing <tt>propagate_const</tt></h4>
 
@@ -124,7 +131,7 @@ void C::foo()
     
  <p>When using the pimpl idiom the compiler will not catch changes to member variables within <tt>const</tt> member functions. Member variables are kept in a separate object and the compiler only checks that the address of this object is unchanged. By introducing the pimpl idiom into a class to decouple interface and implementation, the author may have inadventantly lost compiler checks on <tt>const</tt>-correctness.</p>
     
-<p>When the pimpl object is wrapped in <tt>propagate_const</tt>, <tt>const</tt> member functions will only be able to call <tt>const</tt> functions on the pimpl object and will be unable to modify (non-<tt>mutable</tt>) member variables of the pimpl object without explicit <tt>consVcast</tt>s: <tt>const</tt>-correctness is restored. The class above would be modified as follows:</p>
+<p>When the pimpl object is wrapped in <tt>propagate_const</tt>, <tt>const</tt> member functions will only be able to call <tt>const</tt> functions on the pimpl object and will be unable to modify (non-<tt>mutable</tt>) member variables of the pimpl object without explicit <tt>const_cast</tt>s: <tt>const</tt>-correctness is restored. The class above would be modified as follows:</p>
 
 <blockquote><tt><pre>class C
 {
@@ -184,11 +191,11 @@ int main()
 
 <p>Introduction of <tt>propagate_const</tt> cannot automatically guarantee thread-safety but can allow <tt>const</tt>=>thread-safe to be locally verified during code review.</p>
 
-<H2>III. Impact On the Standard</H2>
+<H2>IV. Impact On the Standard</H2>
 
 <p>This proposal is a pure library extension. It does not require changes to any standard classes, functions or headers.</p>
 
-<H2>IV. Design Decisions</H2>
+<H2>V. Design Decisions</H2>
 
 <p>Given absolute freedom we would propose changing the <tt>const</tt> keyword to propagate <tt>const</tt>-ness. That would be impractical, however, as it would break existing code and change behaviour in potentially undesirable ways. A second approach would be the introduction of a new keyword to modify <tt>const</tt>, for instance, <tt>deep const</tt>, which enforces <tt>const</tt>-propagation. Although this change would maintain backward-compatibility, it would require enhancements to the C++ compiler.</p>
 
@@ -232,7 +239,7 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
 <p>We have omitted <tt>noexcept</tt> specifications until we have stronger guidelines from the Library Evolution Working group. The <tt>noexcept</tt> status of all functions will depend on the <tt>noexcept</tt> status of the corresponding functions on the underlying pointer.</p>
     
     
-<H2>V. Expository Implementation</h2>    
+<H2>VI. Expository Implementation</h2>    
     
 <p>A sample form of <tt>std::propagate_const</tt> is given below and makes use of 
 an overloaded templated helper function: <tt>underlying_pointer</tt>.</p> 
@@ -409,6 +416,78 @@ bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&l
 }
 
 template &lt;typename T, typename U&gt;
+bool operator == (const propagate_const&lt;T&gt;& pt, const U& pu)
+{   
+  return pt.t == pu; 
+}
+ 
+template &lt;typename T, typename U&gt;
+bool operator != (const propagate_const&lt;T&gt;& pt, const U& pu)
+{   
+  return pt.t != pu; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &lt; (const propagate_const&lt;T&gt;& pt, const U& pu)
+{   
+  return pt.t &lt; pu; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &gt; (const propagate_const&lt;T&gt;& pt, const U& pu)
+{   
+  return pt.t &gt; pu; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const U& pu)
+{   
+  return pt.t &lt;= pu; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const U& pu)
+{   
+  return pt.t &gt;= pu; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator == (const T& pt, const propagate_const&lt;U&gt;& pu)
+{   
+  return pt == pu.t; 
+}
+ 
+template &lt;typename T, typename U&gt;
+bool operator != (const T& pt, const propagate_const&lt;U&gt;& pu)
+{   
+  return pt != pu.t; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &lt; (const T& pt, const propagate_const&lt;U&gt;& pu)
+{   
+  return pt &lt; pu.t; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &gt; (const T& pt, const propagate_const&lt;U&gt;& pu)
+{   
+  return pt &gt; pu.t; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &lt;= (const T& pt, const propagate_const&lt;U&gt;& pu)
+{   
+  return pt &lt;= pu.t; 
+}
+
+template &lt;typename T, typename U&gt;
+bool operator &gt;= (const T& pt, const propagate_const&lt;U&gt;& pu)
+{   
+  return pt &gt;= pu.t; 
+}
+
+template &lt;typename T, typename U&gt;
 void swap (propagate_const&lt;T&gt;& pt1, propagate_const&lt;U&gt;& pt2)
 {   
   swap(pt1.t, pt2.t); 
@@ -435,10 +514,10 @@ struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
   }
 };</pre></tt></blockquote> 
 
-<H2>VI Acknowledgements</H2>
+<H2>VII Acknowledgements</H2>
 <p>Thanks to Walter Brown, Kevin Channon, Nick Maclaren, Roger Orr, Ville Voutilainen, Jonathan Wakely, David Ward and others for helpful discussion.</p>
 
-<H2>VII References</H2>
+<H2>VIII References</H2>
 <ul>
   <li>[1] Bjarne Stroustrup, The C++ Programming Language, 4th edition, 2013,
           Addison Wesley ISBN-10: 0321563840 p464</li>
