@@ -233,130 +233,99 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
     
     
 <H2>V. Technical Specification</h2>
-<p>FOR THE C++ STANDARD</p>
+<p>WORDING FOR THE C++ STANDARD</p>
     
 <blockquote><tt><pre>
-template &lt;typename T&gt;
-class propagate_const
-{ 
-  using reference_type = decltype(*declval&lt;T&gt;();); // Exposition only
-
-public:
- 
-  using value_type = remove_reference_t&lt;reference_type&gt;; // Exposition only
-     
-  ~propagate_const() = default;
+namespace std {
+  template &lt;typename T&gt; class propagate_const { 
+  public:
+    typedef see_below value_type;
+       
+    // Constructors
+    propagate_const() = default;
+    template &lt;typename U&gt; 
+    propagate_const(U&& u); 
+    template &lt;typename U&gt; 
+    propagate_const(const propagate_const&lt;U&gt;& pu);
+    template &lt;typename U&gt; 
+    propagate_const(propagate_const&lt;U&gt;&& pu);
+    
+    // Destructor
+    ~propagate_const() = default;
+    
+    // Assignment
+    propagate_const&lt;T&gt;& operator = (U&& u); 
+    template &lt;typename U&gt; 
+    propagate_const&lt;T&gt;& operator = (const propagate_const&lt;U&gt;& pt); 
+    template &lt;typename U&gt; 
+    propagate_const&lt;T&gt;& operator = (propagate_const&lt;U&gt;&& pt); 
+    
+    explicit operator bool () const;
+    
+    // Observers
+    const value_type* operator->() const;
+    operator const value_type*() const; 
+    const value_type& operator*() const;
+    const value_type* get() const;
+    
+    // Accessors
+    value_type* operator->();
+    operator value_type*(); 
+    value_type& operator*();
+    value_type* get();
+  };
   
-  propagate_const() = default;
+  template &lt;typename T, typename U&gt;
+  bool operator == (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator != (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
   
-  template &lt;typename U&gt; 
-  propagate_const(U&& u); 
-
-  template &lt;typename U&gt; 
-  propagate_const&lt;T&gt;& operator = (U&& u); 
+  template &lt;typename T, typename U&gt;
+  bool operator == (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator != (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt; (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt; (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
   
-  template &lt;typename U&gt; 
-  propagate_const(const propagate_const&lt;U&gt;& pu);
+  bool operator == (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator != (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt; (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt; (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt;= (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt;= (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  void swap (propagate_const&lt;T&gt;& pt1, propagate_const&lt;U&gt;& pt2);
   
-  template &lt;typename U&gt; 
-  propagate_const(propagate_const&lt;U&gt;&& pu);
+  template &lt;typename T&gt;
+  const T& get_underlying(const propagate_const&lt;T&gt;& pt);
+  template &lt;typename T&gt;
+  T& get_underlying(propagate_const&lt;T&gt;& pt);
   
-  template &lt;typename U&gt; 
-  propagate_const&lt;T&gt;& operator = (const propagate_const&lt;U&gt;& pt); 
-  
-  template &lt;typename U&gt; 
-  propagate_const&lt;T&gt;& operator = (propagate_const&lt;U&gt;&& pt); 
-  
-  value_type* operator->();
-
-  const value_type* operator->() const;
-  
-  value_type* get();
-
-  const value_type* get() const;
-  
-  operator value_type*(); 
-  
-  operator const value_type*() const; 
-  
-  value_type& operator*();
-
-  const value_type& operator*() const;
-  
-  explicit operator bool () const;
-  
-private:
-  T t; // Exposition only
-};
-
-template &lt;typename T, typename U&gt;
-bool operator == (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
- 
-template &lt;typename T, typename U&gt;
-bool operator != (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &lt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &gt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator == (const propagate_const&lt;T&gt;& pt, const U& pu);
- 
-template &lt;typename T, typename U&gt;
-bool operator != (const propagate_const&lt;T&gt;& pt, const U& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &lt; (const propagate_const&lt;T&gt;& pt, const U& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &gt; (const propagate_const&lt;T&gt;& pt, const U& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const U& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const U& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator == (const T& pt, const propagate_const&lt;U&gt;& pu);
- 
-template &lt;typename T, typename U&gt;
-bool operator != (const T& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &lt; (const T& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &gt; (const T& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &lt;= (const T& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-bool operator &gt;= (const T& pt, const propagate_const&lt;U&gt;& pu);
-
-template &lt;typename T, typename U&gt;
-void swap (propagate_const&lt;T&gt;& pt1, propagate_const&lt;U&gt;& pt2);
-
-template &lt;typename T&gt;
-const T& get_underlying(const propagate_const&lt;T&gt;& pt);
-
-template &lt;typename T&gt;
-T& get_underlying(propagate_const&lt;T&gt;& pt);
-
-template &lt;typename T&gt;
-struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
-{
-  size_t operator()(const propagate_const&lt;T&gt;& p) const;
-};</pre></tt></blockquote> 
+  template &lt;typename T&gt;
+  struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt; {
+    size_t operator()(const propagate_const&lt;T&gt;& p) const;
+  };
+}</pre></tt></blockquote> 
 
 <H2>VI. Expository Implementation</h2>    
     
