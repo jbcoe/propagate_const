@@ -232,7 +232,133 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
 <p>We have omitted <tt>noexcept</tt> specifications until we have stronger guidelines from the Library Evolution Working group. The <tt>noexcept</tt> status of all functions will depend on the <tt>noexcept</tt> status of the corresponding functions on the underlying pointer.</p>
     
     
-<H2>V. Expository Implementation</h2>    
+<H2>V. Technical Specification</h2>
+<p>FOR THE C++ STANDARD</p>
+    
+<blockquote><tt><pre>
+template &lt;typename T&gt;
+class propagate_const
+{ 
+  using reference_type = decltype(*declval&lt;T&gt;();); // Exposition only
+
+public:
+ 
+  using value_type = remove_reference_t&lt;reference_type&gt;; // Exposition only
+     
+  ~propagate_const() = default;
+  
+  propagate_const() = default;
+  
+  template &lt;typename U&gt; 
+  propagate_const(U&& u); 
+
+  template &lt;typename U&gt; 
+  propagate_const&lt;T&gt;& operator = (U&& u); 
+  
+  template &lt;typename U&gt; 
+  propagate_const(const propagate_const&lt;U&gt;& pu);
+  
+  template &lt;typename U&gt; 
+  propagate_const(propagate_const&lt;U&gt;&& pu);
+  
+  template &lt;typename U&gt; 
+  propagate_const&lt;T&gt;& operator = (const propagate_const&lt;U&gt;& pt); 
+  
+  template &lt;typename U&gt; 
+  propagate_const&lt;T&gt;& operator = (propagate_const&lt;U&gt;&& pt); 
+  
+  value_type* operator->();
+
+  const value_type* operator->() const;
+  
+  value_type* get();
+
+  const value_type* get() const;
+  
+  operator value_type*(); 
+  
+  operator const value_type*() const; 
+  
+  value_type& operator*();
+
+  const value_type& operator*() const;
+  
+  explicit operator bool () const;
+  
+private:
+  T t; // Exposition only
+};
+
+template &lt;typename T, typename U&gt;
+bool operator == (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+ 
+template &lt;typename T, typename U&gt;
+bool operator != (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &lt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &gt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator == (const propagate_const&lt;T&gt;& pt, const U& pu);
+ 
+template &lt;typename T, typename U&gt;
+bool operator != (const propagate_const&lt;T&gt;& pt, const U& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &lt; (const propagate_const&lt;T&gt;& pt, const U& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &gt; (const propagate_const&lt;T&gt;& pt, const U& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const U& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const U& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator == (const T& pt, const propagate_const&lt;U&gt;& pu);
+ 
+template &lt;typename T, typename U&gt;
+bool operator != (const T& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &lt; (const T& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &gt; (const T& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &lt;= (const T& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+bool operator &gt;= (const T& pt, const propagate_const&lt;U&gt;& pu);
+
+template &lt;typename T, typename U&gt;
+void swap (propagate_const&lt;T&gt;& pt1, propagate_const&lt;U&gt;& pt2);
+
+template &lt;typename T&gt;
+const T& get_underlying(const propagate_const&lt;T&gt;& pt);
+
+template &lt;typename T&gt;
+T& get_underlying(propagate_const&lt;T&gt;& pt);
+
+template &lt;typename T&gt;
+struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
+{
+  size_t operator()(const propagate_const&lt;T&gt;& p) const;
+};</pre></tt></blockquote> 
+
+<H2>VI. Expository Implementation</h2>    
     
 <p>A sample form of <tt>std::propagate_const</tt> is given below and makes use of 
 an overloaded templated helper function: <tt>underlying_pointer</tt>.</p> 
@@ -507,10 +633,10 @@ struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
   }
 };</pre></tt></blockquote> 
 
-<H2>VI. Acknowledgements</H2>
+<H2>VII. Acknowledgements</H2>
 <p>Thanks to Walter Brown, Kevin Channon, Nick Maclaren, Roger Orr, Ville Voutilainen, Jonathan Wakely, David Ward and others for helpful discussion.</p>
 
-<H2>VII. Revisions</H2>
+<H2>VIII. Revisions</H2>
 <p>This paper revises N4057</p>
 <ul>
 <li>Extended comparison operators to avoid reliance on implicit conversions. Minor cosmetic changes.</li>
@@ -522,7 +648,7 @@ struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
 <li>Add <tt>enable_if</tt> to reference implementation to prevent some functions entering into an overload set.</li>
 </ul>
     
-<H2>VIII. References</H2>
+<H2>IX. References</H2>
 <ul>
   <li>[1] Bjarne Stroustrup, The C++ Programming Language, 4th edition, 2013,
           Addison Wesley ISBN-10: 0321563840 p464</li>
