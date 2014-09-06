@@ -3,3 +3,11 @@
 *.ps
 *.sh
 propagate_const.pdf
+c++14_unique_ptr_tex/generalindex.idx
+c++14_unique_ptr_tex/grammarindex.idx
+c++14_unique_ptr_tex/impldefindex.idx
+c++14_unique_ptr_tex/libraryindex.idx
+c++14_unique_ptr_tex/std.aux
+c++14_unique_ptr_tex/std.out
+c++14_unique_ptr_tex/std.pdf
+c++14_unique_ptr_tex/utilities.aux
