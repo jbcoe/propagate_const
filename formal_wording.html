@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css"></style></head>
+    
+<H2>V. Technical Specification</h2>
+<h3>Class template <tt>propagate_const</tt></h3>    
+<h3>Class template <tt>propagate_const</tt> overview</h3>
+
+<p><tt>propagate_const</tt> is a wrapper around a pointer-type <tt>T</tt> which treats the wrapped
+pointer as a <tt>const</tt> pointer to <tt>const</tt> when it is used in a <tt>const</tt> context.
+It can be used to wrap member pointer-types of a class so that the non-<tt>const</tt> methods of their 
+pointees can only be used from non-<tt>const</tt> references to instances of the class.
+</p>
+
+<p><tt>T</tt> shall provide <tt>operator *</tt> which returns an lvalue-reference type.</p>
+
+<blockquote><tt><pre>
+namespace std {
+  template &lt;typename T&gt; class propagate_const { 
+  public:
+    typedef see_below value_type;
+       
+    // Constructors
+    propagate_const() = default;
+    template &lt;typename U&gt; 
+    propagate_const(U&& u); 
+    template &lt;typename U&gt; 
+    propagate_const(const propagate_const&lt;U&gt;& pu);
+    template &lt;typename U&gt; 
+    propagate_const(propagate_const&lt;U&gt;&& pu);
+    
+    // Destructor
+    ~propagate_const() = default;
+    
+    // Assignment
+    propagate_const&lt;T&gt;& operator = (U&& u); 
+    template &lt;typename U&gt; 
+    propagate_const&lt;T&gt;& operator = (const propagate_const&lt;U&gt;& pt); 
+    template &lt;typename U&gt; 
+    propagate_const&lt;T&gt;& operator = (propagate_const&lt;U&gt;&& pt); 
+    
+    explicit operator bool () const;
+    
+    // Observers
+    const value_type* operator->() const;
+    operator const value_type*() const; 
+    const value_type& operator*() const;
+    const value_type* get() const;
+    
+    // Accessors
+    value_type* operator->();
+    operator value_type*(); 
+    value_type& operator*();
+    value_type* get();
+
+    // Modifiers
+    template&lt;typename U&gt;
+    void swap(U& u);
+  };
+  
+  template &lt;typename T, typename U&gt;
+  bool operator == (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator != (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu);
+  
+  template &lt;typename T, typename U&gt;
+  bool operator == (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator != (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt; (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt; (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const U& pu);
+  template &lt;typename T, typename U&gt;
+  
+  bool operator == (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator != (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt; (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt; (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &lt;= (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  bool operator &gt;= (const T& pt, const propagate_const&lt;U&gt;& pu);
+  template &lt;typename T, typename U&gt;
+  void swap (propagate_const&lt;T&gt;& pt1, propagate_const&lt;U&gt;& pt2);
+  
+  template &lt;typename T&gt;
+  const T& get_underlying(const propagate_const&lt;T&gt;& pt);
+  template &lt;typename T&gt;
+  T& get_underlying(propagate_const&lt;T&gt;& pt);
+  
+  template &lt;typename T&gt;
+  struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt; {
+    size_t operator()(const propagate_const&lt;T&gt;& p) const;
+  };
+}</pre></tt></blockquote> 
+
+<h3><tt>propagate_const</tt> constructors</h3>
+<div style="margin-left:20px">
+<b><tt>propagate_const();</tt><br/></b>
+<!--<p style="margin-left:20px"><i>Requires:</i> T shall provide <tt>operator *</tt> which returns an lvalue-reference type.</p>-->
+  <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a default initialized <tt>T</tt>.</p>
+<b><tt>template &lt;typename U&gt; propagate_const(U&& u); </tt><br/></b>
+  <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
+  <p style="margin-left:20px"><i>Effects:</i> <tt>operator *()</tt> yields the value that <tt>*u</tt> yielded before construction.</p>
+<b><tt>template &lt;typename U&gt; propagate_const(const propagate_const&lt;U&gt;& pu);</tt><br/></b>
+  <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
+  <p style="margin-left:20px"><i>Effects:</i> <tt>operator *()</tt> yields the value that <tt>*pu</tt> yielded before construction.</p>
+<b><tt>template &lt;typename U&gt; propagate_const(propagate_const&lt;U&gt;&& pu);</tt><br/></b>
+  <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
+  <p style="margin-left:20px"><i>Effects:</i> <tt>operator *()</tt> yields the value that <tt>*pu</tt> yielded before construction.</p>
+</div>
+
+<h3><tt>propagate_const</tt> destructor</h3>
+
+<h3><tt>propagate_const</tt> assignment</h3>
+
+<h3><tt>propagate_const operator bool</tt></h3>
+
+<h3><tt>propagate_const</tt> observers</h3>
+
+<h3><tt>propagate_const</tt> accessors</h3>
+
+<h3><tt>propagate_const</tt> specialized algorithms</h3>
+
+</div></body></html>
