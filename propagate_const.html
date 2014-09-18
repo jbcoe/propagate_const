@@ -41,13 +41,13 @@
     void foo() const 
     { 
       std::cout &lt;&lt; "foo (const)" &lt;&lt; std::endl;
-      m_ptrA->bar(); 
-    }
+      m_ptrA-&gt;bar(); 
+    }           
     
     void foo() 
     { 
       std::cout &lt;&lt; "foo (non-const)" &lt;&lt; std::endl;
-      m_ptrA->bar(); 
+      m_ptrA-&gt;bar(); 
     }
 
     std::unique_ptr&lt;A&gt; m_ptrA;
@@ -58,8 +58,8 @@
     B b;
     b.foo();
     
-    const B consVb;
-    consVb.foo();
+    const B const_b;
+    const_b.foo();
   }
   
 </pre></tt></blockquote>
@@ -112,12 +112,12 @@ struct B
 
 void C::foo() const 
 { 
-  m_pimpl->foo(); 
+  m_pimpl-&gt;foo(); 
 }
 
 void C::foo() 
 { 
-  m_pimpl->foo(); 
+  m_pimpl-&gt;foo(); 
 }
 
 </pre></tt></blockquote> 
@@ -136,7 +136,7 @@ void C::foo()
     
 <h3>Thread-safety and <tt>propagate_const</tt></h3>
 
-<p>Herb Sutter introduced the appealing notion that <tt>const</tt> implies thread-safe [3]. Without <tt>propagate_const</tt>, changes outside a class with pointer-like members can render the <tt>const</tt> methods of that class non-thread-safe. This means that maintaining the rule <tt>const</tt>=>thread-safe requires a global review of the code base.</p>
+<p>Herb Sutter introduced the appealing notion that <tt>const</tt> implies thread-safe [3]. Without <tt>propagate_const</tt>, changes outside a class with pointer-like members can render the <tt>const</tt> methods of that class non-thread-safe. This means that maintaining the rule <tt>const</tt>=&gt;thread-safe requires a global review of the code base.</p>
 
 <p>With only the <tt>const</tt> version of <tt>foo()</tt> the code below is thread-safe. Introduction of a non-<tt>const</tt> (and non-thread-safe) <tt>foo()</tt> into <tt>D</tt> renders <tt>E</tt> non-thread-safe.</p>
 
@@ -148,11 +148,11 @@ void C::foo()
 
 struct E
 {
-  E(D& pD) : m_pD{&pD} {}
+  E(D&amp; pD) : m_pD{&amp;pD} {}
 
   void operator() () const
   {
-    m_pD->foo();
+    m_pD-&gt;foo();
   }
 
   D* m_pD;
@@ -171,18 +171,18 @@ int main()
 }
 </pre></tt></blockquote>
 
-<p>One solution to the above is to forbid pointer-like member variables in classes if <tt>const</tt>=>thread-safe. This is undesirably restrictive. If instead all pointer-like member variables are decorated with <tt>propagate_const</tt> then the compiler will catch violations of <tt>const</tt>-ness that could render code non-thread-safe.</p>
+<p>One solution to the above is to forbid pointer-like member variables in classes if <tt>const</tt>=&gt;thread-safe. This is undesirably restrictive. If instead all pointer-like member variables are decorated with <tt>propagate_const</tt> then the compiler will catch violations of <tt>const</tt>-ness that could render code non-thread-safe.</p>
 
 <blockquote><tt><pre>struct E
 {
-  E(D& pD);                 // unchanged
+  E(D&amp; pD);                 // unchanged
 
   void operator() () const; // unchanged
 
   <font color=blue><b>std::propagate_const&lt;</b></font>D*<font color=blue><b>&gt;</b></font> m_pD;
 };</pre></tt></blockquote>
 
-<p>Introduction of <tt>propagate_const</tt> cannot automatically guarantee thread-safety but can allow <tt>const</tt>=>thread-safe to be locally verified during code review.</p>
+<p>Introduction of <tt>propagate_const</tt> cannot automatically guarantee thread-safety but can allow <tt>const</tt>=&gt;thread-safe to be locally verified during code review.</p>
 
 <H2>III. Impact On the Standard</H2>
 
@@ -208,7 +208,7 @@ There should be no additional cost of construction for a <tt>propagate_const&lt;
 The wrapped <tt>T</tt> should not be value-initialized as this would incur a cost for raw pointers. If value-initialization is desirable then it can be accomplished with another wrapper class like <tt>boost::value_initialized</tt> [4].</p>
 
 <h3>Pointer-like functions</h3>
-<p><tt>operator*</tt> and <tt>operator-></tt> are defined to preserve <tt>const</tt>-propagation. When a <tt>const</tt> <tt>propagate_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
+<p><tt>operator*</tt> and <tt>operator-&gt;</tt> are defined to preserve <tt>const</tt>-propagation. When a <tt>const</tt> <tt>propagate_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
     
 <h3><tt>get</tt></h3>
 <p>The <tt>get</tt> function returns the address of the object pointed to by the wrapped pointer. <tt>get</tt> is intended to be used to ensure <tt>const</tt>-propagation is preserved when using interfaces which require raw C-style pointers</p>
@@ -253,53 +253,53 @@ public:
   propagate_const() = default;
   
   template &lt;typename U, 
-            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
-  propagate_const(U&& u) : t{std::forward&lt;U&gt;(u)}
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt;::value&gt;&gt;
+  propagate_const(U&amp;&amp; u) : t{std::forward&lt;U&gt;(u)}
   {
   }
 
   template &lt;typename U, 
-            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
-  propagate_const&lt;T&gt;& operator = (U&& u) 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt;::value&gt;&gt;
+  propagate_const&lt;T&gt;&amp; operator = (U&amp;&amp; u) 
   { 
     t = std::forward&lt;U&gt;(u); 
     return *this; 
   }
   
   template &lt;typename U, 
-            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
-  propagate_const(const propagate_const&lt;U&gt;& pu) : t{pu.t} 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt;::value&gt;&gt;
+  propagate_const(const propagate_const&lt;U&gt;&amp; pu) : t{pu.t} 
   {
   }
   
   template &lt;typename U, 
-            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
-  propagate_const(propagate_const&lt;U&gt;&& pu) : t{std::move(pu.t)} 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt;::value&gt;&gt;
+  propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu) : t{std::move(pu.t)} 
   {
   }
   
   template &lt;typename U, 
-            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
-  propagate_const&lt;T&gt;& operator = (const propagate_const&lt;U&gt;& pt) 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt;::value&gt;&gt;
+  propagate_const&lt;T&gt;&amp; operator = (const propagate_const&lt;U&gt;&amp; pt) 
   { 
     t = pt.t; 
     return *this; 
   }
   
   template &lt;typename U, 
-            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt::value&gt;&gt;
-  propagate_const&lt;T&gt;& operator = (propagate_const&lt;U&gt;&& pt) 
+            typename V = std::enable_if_t&lt;std::is_convertible&lt;U,T&gt;::value&gt;&gt;
+  propagate_const&lt;T&gt;&amp; operator = (propagate_const&lt;U&gt;&amp;&amp; pt) 
   { 
     t = std::move(pt.t); 
     return *this; 
   }
   
-  value_type* operator->()
+  value_type* operator-&gt;()
   {
     return underlying_pointer(t);
   }
 
-  const value_type* operator->() const
+  const value_type* operator-&gt;() const
   {
     return underlying_pointer(t);
   }
@@ -328,12 +328,12 @@ public:
     return underlying_pointer(t); 
   }
   
-  value_type& operator*()
+  value_type&amp; operator*()
   {
     return *t;
   }
 
-  const value_type& operator*() const
+  const value_type&amp; operator*() const
   {
     return *t;
   }
@@ -353,7 +353,7 @@ private:
   }
 
   template&lt;typename U&gt;
-  static value_type* underlying_pointer(U& p)
+  static value_type* underlying_pointer(U&amp; p)
   { 
     return p.get(); 
   }
@@ -365,134 +365,134 @@ private:
   }
 
   template&lt;typename U&gt;
-  static const value_type* underlying_pointer(const U& p)
+  static const value_type* underlying_pointer(const U&amp; p)
   { 
     return p.get(); 
   }
 };
 
 template &lt;typename T, typename U&gt;
-bool operator == (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu)
+bool operator == (const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt.t == pu.t; 
 }
  
 template &lt;typename T, typename U&gt;
-bool operator != (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu)
+bool operator != (const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt.t != pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu)
+bool operator &lt; (const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt.t &lt; pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &gt; (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu)
+bool operator &gt; (const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt.t &gt; pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu)
+bool operator &lt;= (const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt.t &lt;= pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const propagate_const&lt;U&gt;& pu)
+bool operator &gt;= (const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt.t &gt;= pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator == (const propagate_const&lt;T&gt;& pt, const U& pu)
+bool operator == (const propagate_const&lt;T&gt;&amp; pt, const U&amp; pu)
 {   
   return pt.t == pu; 
 }
  
 template &lt;typename T, typename U&gt;
-bool operator != (const propagate_const&lt;T&gt;& pt, const U& pu)
+bool operator != (const propagate_const&lt;T&gt;&amp; pt, const U&amp; pu)
 {   
   return pt.t != pu; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt; (const propagate_const&lt;T&gt;& pt, const U& pu)
+bool operator &lt; (const propagate_const&lt;T&gt;&amp; pt, const U&amp; pu)
 {   
   return pt.t &lt; pu; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &gt; (const propagate_const&lt;T&gt;& pt, const U& pu)
+bool operator &gt; (const propagate_const&lt;T&gt;&amp; pt, const U&amp; pu)
 {   
   return pt.t &gt; pu; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt;= (const propagate_const&lt;T&gt;& pt, const U& pu)
+bool operator &lt;= (const propagate_const&lt;T&gt;&amp; pt, const U&amp; pu)
 {   
   return pt.t &lt;= pu; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &gt;= (const propagate_const&lt;T&gt;& pt, const U& pu)
+bool operator &gt;= (const propagate_const&lt;T&gt;&amp; pt, const U&amp; pu)
 {   
   return pt.t &gt;= pu; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator == (const T& pt, const propagate_const&lt;U&gt;& pu)
+bool operator == (const T&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt == pu.t; 
 }
  
 template &lt;typename T, typename U&gt;
-bool operator != (const T& pt, const propagate_const&lt;U&gt;& pu)
+bool operator != (const T&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt != pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt; (const T& pt, const propagate_const&lt;U&gt;& pu)
+bool operator &lt; (const T&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt &lt; pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &gt; (const T& pt, const propagate_const&lt;U&gt;& pu)
+bool operator &gt; (const T&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt &gt; pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &lt;= (const T& pt, const propagate_const&lt;U&gt;& pu)
+bool operator &lt;= (const T&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt &lt;= pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-bool operator &gt;= (const T& pt, const propagate_const&lt;U&gt;& pu)
+bool operator &gt;= (const T&amp; pt, const propagate_const&lt;U&gt;&amp; pu)
 {   
   return pt &gt;= pu.t; 
 }
 
 template &lt;typename T, typename U&gt;
-void swap (propagate_const&lt;T&gt;& pt1, propagate_const&lt;U&gt;& pt2)
+void swap (propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;U&gt;&amp; pt2)
 {   
   swap(pt1.t, pt2.t); 
 }
 
 template &lt;typename T&gt;
-const T& get_underlying(const propagate_const&lt;T&gt;& pt)
+const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt)
 {
   return pt.t;
 }
 
 template &lt;typename T&gt;
-T& get_underlying(propagate_const&lt;T&gt;& pt)
+T&amp; get_underlying(propagate_const&lt;T&gt;&amp; pt)
 {
   return pt.t;
 }
@@ -500,7 +500,7 @@ T& get_underlying(propagate_const&lt;T&gt;& pt)
 template &lt;typename T&gt;
 struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt;
 {
-  size_t operator()(const propagate_const&lt;T&gt;& p) const
+  size_t operator()(const propagate_const&lt;T&gt;&amp; p) const
   {
     return operator()(get_underlying(p));
   }

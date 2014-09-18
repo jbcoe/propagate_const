@@ -24,31 +24,31 @@ namespace std {
     // Constructors
     propagate_const() = default;
     template &lt;typename U&gt; 
-    propagate_const(U&amp;&amp; u); 
+    propagate_const(U&amp; u); 
     template &lt;typename U&gt; 
     propagate_const(const propagate_const&lt;U&gt;&amp; pu);
     template &lt;typename U&gt; 
-    propagate_const(propagate_const&lt;U&gt;&amp;&amp;amp;&amp;&amp;amp; pu);
+    propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);
     
     // Destructor
     ~propagate_const() = default;
     
     // Assignment
-    propagate_const&lt;T&gt;&amp; operator = (U&amp;&amp;amp;&amp;&amp;amp; u); 
+    propagate_const&lt;T&gt;&amp; operator = (U&amp;&amp; u); 
     template &lt;typename U&gt; 
     propagate_const&lt;T&gt;&amp; operator = (const propagate_const&lt;U&gt;&amp; pt); 
     template &lt;typename U&gt; 
-    propagate_const&lt;T&gt;&amp; operator = (propagate_const&lt;U&gt;&amp;&amp;amp;&amp;&amp;amp; pt); 
+    propagate_const&lt;T&gt;&amp; operator = (propagate_const&lt;U&gt;&amp;&amp; pt); 
     
     // Observers
     explicit operator bool () const;
-    const value_type* operator->() const;
+    const value_type* operator-&gt;() const;
     operator const value_type*() const; 
     const value_type&amp; operator*() const;
     const value_type* get() const;
     
     // Accessors
-    value_type* operator->();
+    value_type* operator-&gt;();
     operator value_type*(); 
     value_type&amp; operator*();
     value_type* get();
@@ -115,7 +115,7 @@ namespace std {
 <b><tt>propagate_const();</tt><br/></b>
 <!--<p style="margin-left:20px"><i>Requires:</i> T shall provide <tt>operator *</tt> which returns an lvalue-reference type.</p>-->
   <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a default initialized <tt>T</tt>.</p>
-<b><tt>template &lt;typename U&gt; propagate_const(U&amp;&amp;amp;&amp;&amp;amp; u); </tt><br/></b>
+<b><tt>template &lt;typename U&gt; propagate_const(U&amp;&amp; u); </tt><br/></b>
   <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
   <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from a perfectly forwarded <tt>u</tt>.</p>
   <p style="margin-left:20px"><i>Post-conditions:</i> <tt>operator *()</tt> yields the value that <tt>*u</tt> yielded before construction.</p>
@@ -123,7 +123,7 @@ namespace std {
   <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
   <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from the pointer-type wrapped by <tt>pu</tt>.</p>
   <p style="margin-left:20px"><i>Post-conditions:</i> <tt>operator *()</tt> yields the value that <tt>*pu</tt> yielded before construction.</p>
-<b><tt>template &lt;typename U&gt; propagate_const(propagate_const&lt;U&gt;&amp;&amp;amp;&amp;&amp;amp; pu);</tt><br/></b>
+<b><tt>template &lt;typename U&gt; propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);</tt><br/></b>
   <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
   <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from the r-value pointer-type wrapped by <tt>pu</tt>.</p>
   <p style="margin-left:20px"><i>Post-conditions:</i> <tt>operator *()</tt> yields the value that <tt>*pu</tt> yielded before construction.</p>
