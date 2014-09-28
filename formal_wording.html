@@ -22,11 +22,10 @@ the wrapper is accessed as a <tt>const</tt> object.
 <p><tt>T</tt> is required to be a raw pointer to an object or a class type
 imitating a pointer to an object, anything else is ill-formed.</p>
 
-<p><tt>decltype(*declval<T&>())</tt> must be well-formed and must return an lvalue
+<p><tt>decltype(*declval&lt;T&amp;&gt;())</tt> must be well-formed and must return an lvalue
 reference, anything else is ill-formed.</p> 
 
-<p>If <tt>T</tt> is a pointer to const then <tt>propagate_const</tt> is not
-useful but the program remains well-formed.
+<p>If <tt>T</tt> is a pointer to const then <tt>propagate_const</tt> remains well-formed.
 
 <h3>Class template <tt>propagate_const</tt> noexcept</h3>
 <p>When <tt>T</tt> is a raw pointer then all member functions of <tt>propagate_const</tt>
@@ -37,7 +36,8 @@ of <tt>propagate_const</tt> may be conditionally <tt>noexcept</tt>.</p>
 namespace std {
   template &lt;class T&gt; class propagate_const { 
   public:                                                                                          
-    typedef <i>see below</i> element_type;
+    typedef decltype(*declval&lt;T&amp;&gt;()) element_type;
+    typedef element_type* pointer_type;
        
     // Constructors
     constexpr propagate_const();
