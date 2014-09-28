@@ -246,7 +246,7 @@ class propagate_const
  
 public:
 
-  using value_type = std::enable_if_t&lt;
+  using element_type = std::enable_if_t&lt;
      std::is_lvalue_reference&lt;reference_type&gt;::value,
      typename std::remove_reference&lt;reference_type&gt;::type&gt;::type;
      
@@ -296,51 +296,51 @@ public:
     return *this; 
   }
   
-  value_type* operator-&gt;()
+  element_type* operator-&gt;()
   {
     return underlying_pointer(t);
   }
 
-  const value_type* operator-&gt;() const
+  const element_type* operator-&gt;() const
   {
     return underlying_pointer(t);
   }
   
-  value_type* get()
+  element_type* get()
   {
     return underlying_pointer(t);
   }
 
-  const value_type* get() const
+  const element_type* get() const
   {
     return underlying_pointer(t);
   }
   
   template &lt;typename T_=T, 
             typename V = std::enable_if_t&lt;std::is_pointer&lt;T_&gt;::value&gt;&gt;
-  operator value_type*() 
+  operator element_type*() 
   { 
     return underlying_pointer(t); 
   }
 
   template &lt;typename T_=T, 
             typename V = std::enable_if_t&lt;std::is_pointer&lt;T_&gt;::value&gt;&gt;
-  operator const value_type*() const 
+  operator const element_type*() const 
   { 
     return underlying_pointer(t); 
   }
   
-  value_type&amp; operator*()
+  element_type&amp; operator*()
   {
     return *t;
   }
 
-  const value_type&amp; operator*() const
+  const element_type&amp; operator*() const
   {
     return *t;
   }
   
-  explicit operator bool () const
+  explicit operator bool() const
   {
     return static_cast&lt;bool&gt;(t);
   }
@@ -349,25 +349,25 @@ private:
   T t;
   
   template&lt;typename U&gt;
-  static value_type* underlying_pointer(U* p)
+  static element_type* underlying_pointer(U* p)
   { 
     return p; 
   }
 
   template&lt;typename U&gt;
-  static value_type* underlying_pointer(U&amp; p)
+  static element_type* underlying_pointer(U&amp; p)
   { 
     return p.get(); 
   }
 
   template&lt;typename U&gt;
-  static const value_type* underlying_pointer(const U* p)
+  static const element_type* underlying_pointer(const U* p)
   { 
     return p; 
   }
 
   template&lt;typename U&gt;
-  static const value_type* underlying_pointer(const U&amp; p)
+  static const element_type* underlying_pointer(const U&amp; p)
   { 
     return p.get(); 
   }
