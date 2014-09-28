@@ -2,7 +2,7 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="style.css" rel="stylesheet" type="text/css" />
 <style type="text/css"></style></head>
-<body>
+<body style="max-width:60em;">
 
 <H2>Technical Specification</h2>
 <h3>Class template <tt>propagate_const</tt></h3>    
@@ -18,12 +18,15 @@ the wrapper is accessed as a <tt>const</tt> object.
 <p>EXAMPLE</p>
 
 <h3>Class template <tt>propagate_const</tt> requirements on <tt>T</tt></h3>
+
 <p><tt>T</tt> is required to be a raw pointer to an object or a class type
-imitating a pointer to an object, anything else is ill-formed.
-<tt>decltype(*declval<T&>())</tt> must be well-formed and must return an lvalue
-reference, anything else is ill-formed.  If <tt>T</tt> is a pointer to const
-then <tt>propagate_const</tt> is not useful but the program remains
-well-formed.
+imitating a pointer to an object, anything else is ill-formed.</p>
+
+<p><tt>decltype(*declval<T&>())</tt> must be well-formed and must return an lvalue
+reference, anything else is ill-formed.</p> 
+
+<p>If <tt>T</tt> is a pointer to const then <tt>propagate_const</tt> is not
+useful but the program remains well-formed.
 
 <h3>Class template <tt>propagate_const</tt> noexcept</h3>
 <p>When <tt>T</tt> is a raw pointer then all member functions of <tt>propagate_const</tt>
@@ -33,28 +36,28 @@ of <tt>propagate_const</tt> may be conditionally <tt>noexcept</tt>.</p>
 <blockquote><tt><pre>
 namespace std {
   template &lt;class T&gt; class propagate_const { 
-  public:
+  public:                                                                                          
     typedef <i>see below</i> element_type;
        
     // Constructors
     constexpr propagate_const();
     template &lt;class U&gt; 
-    propagate_const(U&amp;&amp; u); 
+      propagate_const(U&amp;&amp; u); 
     template &lt;class U&gt; 
-    propagate_const(const propagate_const&lt;U&gt;&amp; pu);
+      propagate_const(const propagate_const&lt;U&gt;&amp; pu);
     template &lt;class U&gt; 
-    propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);
+      propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);
     
     // Destructor
     ~propagate_const() = default;
     
     // Assignment
     template &lt;class U&gt; 
-    propagate_const operator=(U&amp;&amp; u); 
+      propagate_const operator=(U&amp;&amp; u); 
     template &lt;class U&gt; 
-    propagate_const operator=(const propagate_const&lt;U&gt;&amp; pu); 
+      propagate_const operator=(const propagate_const&lt;U&gt;&amp; pu); 
     template &lt;class U&gt; 
-    propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu); 
+      propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu); 
     
     // Observers
     explicit operator bool() const;
@@ -70,79 +73,90 @@ namespace std {
     element_type* get();
 
     // Modifiers
-    template template&lt;lt;class U&gt;
-    void swap(propagate_const& p);
+    void swap(propagate_const&amp; t);
   };
   
   template &lt;class T, class U&gt;
-  bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator &gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator &gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   
   template &lt;class T, class U&gt;
-  bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-  bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-  bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-  bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-  bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-  bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   
   template &lt;class T, class U&gt;
-  bool operator==(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator==(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator!=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator!=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator&lt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator&lt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator&gt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator&gt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator&lt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    bool operator&lt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-  bool operator&gt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
-  
-  template &lt;class T, class U&gt;
-  void swap (propagate_const&lt;T&gt;&amp; pt, propagate_const&lt;U&gt;&amp; pu);
+    bool operator&gt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   
   template &lt;class T&gt;
-  const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt);
-  template &lt;class T&gt;
-  T&amp; get_underlying(propagate_const&lt;T&gt;&amp; pt);
+    void swap (propagate_const&lt;T&gt;&amp; pt, propagate_const&lt;T&gt;&amp; pt2);
   
   template &lt;class T&gt;
-  struct hash&lt;propagate_const&lt;T&gt;&gt; : std::hash&lt;T&gt; {
-    size_t operator()(const propagate_const&lt;T&gt;&amp; p) const;
-  };
+    const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt);
+  template &lt;class T&gt;
+    T&amp; get_underlying(propagate_const&lt;T&gt;&amp; pt);
+  
+  template &lt;class T&gt;
+    struct hash&lt;propagate_const&lt;T&gt;&gt;;
 }</pre></tt></blockquote> 
 
 <h3><tt>propagate_const</tt> constructors</h3>
 <div style="margin-left:20px">
 <b><tt>propagate_const();</tt><br/></b>
+<div>
   <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a default-initialized <tt>T</tt>.</p>
+</div>
 <b><tt>template &lt;class U&gt; propagate_const(U&amp;&amp; u); </tt><br/></b>
+<div>
   <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
-  <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from a perfectly forwarded <tt>u</tt>.</p>
-  <p style="margin-left:20px"><i>Post-conditions:</i> If <tt>u</tt> is a raw-pointer then <tt>get()</tt> yields <tt>u</tt> otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> yielded before construction.</p>
+  
+  <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt>.
+  If <tt>U</tt> is an rvalue reference then the wrapped <tt>T</tt> is move constructed from <tt>u</tt>, 
+    otherwise the wrapped <tt>T</tt> is copy constructed from <tt>u</tt>.</p>  
+  
+  <p style="margin-left:20px"><i>Post-conditions:</i> If <tt>u</tt> is a raw-pointer then <tt>get()</tt> yields <tt>u</tt> 
+    otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> yielded before construction.</p>
+</div>
+
 <b><tt>template &lt;class U&gt; propagate_const(const propagate_const&lt;U&gt;&amp; pu);</tt><br/></b>
+<div>
   <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
   <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from the  pointer type wrapped by <tt>pu</tt>.</p>
   <p style="margin-left:20px"><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</p>
+</div>
 <b><tt>template &lt;class U&gt; propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);</tt><br/></b>
+<div>
   <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
   <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps an rvalue constructed <tt>T</tt> from the pointer type wrapped by <tt>pu</tt>.</p>
   <p style="margin-left:20px"><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</p>
+</div>
 </div>
 
 <h3><tt>propagate_const</tt> destructor</h3>
@@ -158,7 +172,24 @@ namespace std {
 <p style="margin-left:20px"><i>Effects:</i> Return <tt>get()!=nullptr</tt>.</p>
 </div>
 <h3><tt>propagate_const</tt> accessors</h3>
+<div style="margin-left:20px">
+<b><tt>void swap(propagate_const&amp; t);</tt></b><br/>
+<p style="margin-left:20px"><i>Effects:</i> Swaps the wrapped pointer type of <tt>*this</tt> with the wrapped pointer type of t.</p>
+</div>
 
 <h3><tt>propagate_const</tt> specialized algorithms</h3>
 
-</div></body></html>
+<h3><tt>propagate_const</tt> hash support</h3>
+<div style="margin-left:20px">
+  <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
+  <div>
+    <p style="margin-left:20px">The template specialization shall meet the requirements of class template hash (20.9.12).</p> 
+    <p style="margin-left:20px">For an object p of type <tt>PC</tt>, where <tt>PC</tt> is propagate_const&lt;T&gt;, <tt>hash<PC>()(p)</tt>
+    shall evaluate to the same value as <tt>hash<T>()(p.get())</tt>.</p>
+    <p style="margin-left:20px"><i>Requires:</i> The specialization <tt>hash&lt;T&gt;</tt> shall be well-formed and well-defined, 
+      and shall meet the requirements of class template hash.</p>
+    </div>
+  </div>
+</div>
+
+</body></html>
