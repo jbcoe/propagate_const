@@ -135,7 +135,8 @@ namespace std {
 </div>
 <b><tt>template &lt;class U&gt; propagate_const(U&amp;&amp; u); </tt><br/></b>
 <div>
-  <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>T</tt> can be constructed from <tt>U</tt>.</p>
+  <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt>
+  is implicitly convertible to <tt>T</tt>.</p>
   
   <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt>.
   If <tt>U</tt> is an rvalue reference then the wrapped <tt>T</tt> is move constructed from <tt>u</tt>, 
