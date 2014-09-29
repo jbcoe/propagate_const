@@ -15,23 +15,20 @@
 treats the wrapped pointer as a <tt>const</tt> pointer to <tt>const</tt> when
 the wrapper is accessed as a <tt>const</tt> object. 
 
-<p>EXAMPLE</p>
-
 <h3>Class template <tt>propagate_const</tt> requirements on <tt>T</tt></h3>
 
 <p><tt>T</tt> is required to be a raw pointer to an object or a class type
-imitating a pointer to an object, anything else is ill-formed.</p>
+imitating a pointer to an object, anything else is ill-formed.
+<tt>decltype(*declval&lt;T&amp;&gt;())</tt> must be well-formed and must return
+an lvalue reference, anything else is ill-formed. If <tt>T</tt> is a pointer to
+const then <tt>propagate_const</tt> remains well-formed.
 
-<p><tt>decltype(*declval&lt;T&amp;&gt;())</tt> must be well-formed and must return an lvalue
-reference, anything else is ill-formed.</p> 
-
-<p>If <tt>T</tt> is a pointer to const then <tt>propagate_const</tt> remains well-formed.
-
-<h3>Class template <tt>propagate_const</tt> noexcept</h3>
+<h3>Class template <tt>propagate_const noexcept</tt> status</h3>
 <p>When <tt>T</tt> is a raw pointer then all member functions of <tt>propagate_const</tt>
 are <tt>noexcept</tt>. When <tt>T</tt> is a class type imitating a pointer then member functions
 of <tt>propagate_const</tt> may be conditionally <tt>noexcept</tt>.</p>
 
+<h3>Header <tt>&lt;propagate_const&gt;</tt> synopsis</h3>
 <blockquote><tt><pre>
 namespace std {
   template &lt;class T&gt; class propagate_const { 
@@ -39,7 +36,7 @@ namespace std {
     typedef decltype(*declval&lt;T&amp;&gt;()) element_type;
     typedef element_type* pointer_type;
        
-    // Constructors
+    //<i> Constructors</i>
     constexpr propagate_const();
     template &lt;class U&gt; 
       propagate_const(U&amp;&amp; u); 
@@ -48,10 +45,10 @@ namespace std {
     template &lt;class U&gt; 
       propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);
     
-    // Destructor
+    //<i> Destructor</i>
     ~propagate_const() = default;
     
-    // Assignment
+    //<i> Assignment</i>
     template &lt;class U&gt; 
       propagate_const operator=(U&amp;&amp; u); 
     template &lt;class U&gt; 
@@ -59,26 +56,27 @@ namespace std {
     template &lt;class U&gt; 
       propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu); 
     
-    // Observers
+    //<i> Observers</i>
     explicit operator bool() const;
     const element_type* operator-&gt;() const;
     operator const element_type*() const; 
     const element_type&amp; operator*() const;
     const element_type* get() const;
     
-    // Accessors
+    //<i> Accessors</i>
     element_type* operator-&gt;();
     operator element_type*(); 
     element_type&amp; operator*();
     element_type* get();
 
-    // Modifiers
+    //<i> Modifiers</i>
     void swap(propagate_const&amp; t);
  
   private:
     T t_; //<i>exposition only</i>
   };
   
+  //<i> Relational operators</i>
   template &lt;class T, class U&gt;
     bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
@@ -118,6 +116,7 @@ namespace std {
   template &lt;class T, class U&gt;
     bool operator&gt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   
+  //<i> Specialized algorithms</i>
   template &lt;class T&gt;
     void swap (propagate_const&lt;T&gt;&amp; pt, propagate_const&lt;T&gt;&amp; pt2);
   
@@ -234,7 +233,7 @@ namespace std {
 </div>
 </div>
 
-<h3><tt>propagate_const</tt> specialized algorithms</h3>
+<h3><tt>propagate_const</tt> relational operators</h3>
 
 <div style="margin-left:20px">
   
@@ -243,37 +242,123 @@ namespace std {
   <div>  
     <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()==pu.get()</tt>.</p>
   </div>  
-  
+
   <b><tt>template &lt;class T, class U&gt;
-    bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
     <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()!=pu.get()</tt>.</p>
   </div>  
-  
+
   <b><tt>template &lt;class T, class U&gt;
-    bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
     <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&lt;pu.get()</tt>.</p>
   </div>  
-  
+
   <b><tt>template &lt;class T, class U&gt;
-    bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
     <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&gt;pu.get()</tt>.</p>
   </div>  
-  
+
   <b><tt>template &lt;class T, class U&gt;
-    bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
     <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&lt;=pu.get()</tt>.</p>
   </div>  
-  
+
   <b><tt>template &lt;class T, class U&gt;
-    bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
     <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&gt;=pu.get()</tt>.</p>
   </div>  
-  
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()==u</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()!=u</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&lt;u</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&gt;u</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&lt;=u</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&gt;=u</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator==(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t==pu.get()</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator!=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t!=pu.get()</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator&lt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t&lt;pu.get()</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator&gt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t&gt;pu.get()</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator&lt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t&lt;=pu.get()</tt>.</p>
+  </div>
+
+
+  <b><tt>template &lt;class T, class U&gt; 
+      bool operator&gt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+  <div>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t&gt;=pu.get()</tt>.</p>
+  </div>
+</div>
+
+<h3><tt>propagate_const</tt> specialized algorithms</h3>
+<div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; void swap(&lt;propagate_const&lt;T&gt;&amp; pt1, &lt;propagate_const&lt;T&gt;&amp; pt2);</tt></b><br/>
   <div>                                                                                                                   
     <p style="margin-left:20px"><i>Effects:</i> Calls <tt>pt1.swap(pt2)</tt>.</p>
