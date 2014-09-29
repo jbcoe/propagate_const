@@ -404,7 +404,7 @@ namespace std {
   <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
   <div>
     <p style="margin-left:20px">The template specialization shall meet the requirements of class template hash (20.9.12).</p> 
-    <p style="margin-left:20px">For an object p of type <tt>PC</tt>, where <tt>PC</tt> is propagate_const&lt;T&gt;, <tt>hash<PC>()(p)</tt>
+    <p style="margin-left:20px">For an object <tt>p</tt> of type propagate_const&lt;T&gt;, <tt>hash<PC>()(p)</tt>
     shall evaluate to the same value as <tt>hash<T>()(p.get())</tt>.</p>
     <p style="margin-left:20px"><i>Requires:</i> The specialization <tt>hash&lt;T&gt;</tt> shall be well-formed and well-defined, 
       and shall meet the requirements of class template hash.</p>
