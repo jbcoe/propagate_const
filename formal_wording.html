@@ -195,25 +195,24 @@ namespace std {
   <div>
     <p style="margin-left:20px"><i>Effects:</i> Return <tt>get() != nullptr</tt>.</p>
   </div>
-  <b><tt>element_type* operator-&gt;() const;</tt></b><br/> 
+  <b><tt>const element_type* operator-&gt;() const;</tt></b><br/> 
   <div>
     <p style="margin-left:20px"><i>Requires:</i> <tt>get() != nullptr</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>*get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>get()</tt>.</p>
   </div>
-  <b><tt>operator element_type*() const;</tt></b><br/> 
+  <b><tt>operator const element_type*() const;</tt></b><br/> 
   <div>
-    <p style="margin-left:20px"><i>Requires:</i> <tt>get() != nullptr</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>*get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>get()</tt>.</p>
     <p style="margin-left:20px"><i>Remarks:</i> This function shall participate in overload resolution only if <tt>T</tt> 
     is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</p>
   </div>
-  <b><tt>element_type&amp; operator*() const;</tt></b><br/> 
+  <b><tt>const element_type&amp; operator*() const;</tt></b><br/> 
   <div>
     <p style="margin-left:20px"><i>Requires:</i> <tt>get() != nullptr</tt>.</p>
     <p style="margin-left:20px"><i>Returns:</i> <tt>*get()</tt>.</p>
     <p style="margin-left:20px"><i>Remarks:</i> This function shall not participate in overload resolution if <tt>element_type</tt> is <tt>void</tt>.</p>
   </div>
-  <b><tt>element_type* get() const;</tt></b><br/> 
+  <b><tt>const element_type* get() const;</tt></b><br/> 
   <div>  
     <p style="margin-left:20px"><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a raw pointer, otherwise <tt>t_.get()</tt>.</p>
   </div>  
@@ -224,12 +223,11 @@ namespace std {
   <b><tt>element_type* operator-&gt;();</tt></b><br/> 
   <div>
     <p style="margin-left:20px"><i>Requires:</i> <tt>get() != nullptr</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>*get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>get()</tt>.</p>
   </div>
   <b><tt>operator element_type*();</tt></b><br/> 
   <div>
-    <p style="margin-left:20px"><i>Requires:</i> <tt>get() != nullptr</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>*get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>get()</tt>.</p>
     <p style="margin-left:20px"><i>Remarks:</i> This function shall participate in overload resolution only if <tt>T</tt> 
     is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</p>
   </div>
@@ -260,120 +258,120 @@ namespace std {
   <b><tt>template &lt;class T, class U&gt;
       bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/>
   <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()==pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() == pu.get()</tt>.</p>
   </div>  
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()!=pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() != pu.get()</tt>.</p>
   </div>  
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&lt;pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &lt; pu.get()</tt>.</p>
   </div>  
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&gt;pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &gt; pu.get()</tt>.</p>
   </div>  
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&lt;=pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &lt;= pu.get()</tt>.</p>
   </div>  
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&gt;=pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &gt;= pu.get()</tt>.</p>
   </div>  
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()==u</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() == u</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()!=u</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() != u</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&lt;u</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &lt; u</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&gt;u</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &gt; u</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&lt;=u</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &lt;= u</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get()&gt;=u</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &gt;= u</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator==(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t==pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t == pu.get()</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator!=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t!=pu.get()</tt>.</p>
+  <div>                                               
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t != pu.get()</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&lt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t&lt;pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t &lt; pu.get()</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&gt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t&gt;pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t &gt; pu.get()</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&lt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t&lt;=pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t &lt;= pu.get()</tt>.</p>
   </div>
 
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&gt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t&gt;=pu.get()</tt>.</p>
+    <p style="margin-left:20px"><i>Returns:</i> <tt>t &gt;= pu.get()</tt>.</p>
   </div>
 </div>
 
