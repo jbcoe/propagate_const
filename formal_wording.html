@@ -18,9 +18,9 @@ the wrapper is accessed as a <tt>const</tt> object.
 <h3>Class template <tt>propagate_const</tt> requirements on <tt>T</tt></h3>
 
 <p><tt>T</tt> is required to be a raw pointer to an object or a class type
-imitating a pointer to an object, anything else is ill-formed.
+imitating a pointer to an object; anything else is ill-formed.
 <tt>decltype(*declval&lt;T&amp;&gt;())</tt> must be well-formed and must return
-an lvalue reference, anything else is ill-formed. If <tt>T</tt> is a pointer to
+an lvalue reference; anything else is ill-formed. If <tt>T</tt> is a pointer to
 const then <tt>propagate_const</tt> remains well-formed.
 
 <h3>Class template <tt>propagate_const noexcept</tt> status</h3>
@@ -141,9 +141,9 @@ namespace std {
 <div>
   <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</p>
   <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt>.
-  If <tt>U</tt> is an rvalue reference then the wrapped <tt>T</tt> is move constructed from <tt>u</tt>, 
+  If <tt>U</tt> is an rvalue reference, then the wrapped <tt>T</tt> is move constructed from <tt>u</tt>, 
     otherwise the wrapped <tt>T</tt> is copy constructed from <tt>u</tt>.</p>  
-  <p style="margin-left:20px"><i>Post-conditions:</i> If <tt>u</tt> is a raw-pointer then <tt>get()</tt> yields <tt>u</tt> 
+  <p style="margin-left:20px"><i>Post-conditions:</i> If <tt>u</tt> is a raw pointer, then <tt>get()</tt> yields <tt>u</tt>,
     otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> yielded before construction.</p>
 </div>
 
@@ -193,7 +193,7 @@ namespace std {
 <div style="margin-left:20px">
   <b><tt>explicit operator bool() const;</tt></b><br/>
   <div>
-    <p style="margin-left:20px"><i>Effects:</i> Return <tt>get()!=nullptr</tt>.</p>
+    <p style="margin-left:20px"><i>Effects:</i> Return <tt>get() != nullptr</tt>.</p>
   </div>
   <b><tt>element_type* operator-&gt;() const;</tt></b><br/> 
   <div>
@@ -379,15 +379,14 @@ namespace std {
 
 <h3><tt>propagate_const</tt> specialized algorithms</h3>
 <div style="margin-left:20px">
-  <b><tt>template &lt;class T&gt; void swap(&lt;propagate_const&lt;T&gt;&amp; pt1, &lt;propagate_const&lt;T&gt;&amp; pt2);</tt></b><br/>
+  <b><tt>template &lt;class T&gt; void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2);</tt></b><br/>
   <div>                                                                                                                   
     <p style="margin-left:20px"><i>Effects:</i> Calls <tt>pt1.swap(pt2)</tt>.</p>
   </div>
 </div>
 
 <h3><tt>propagate_const</tt> underlying pointer access</h3>
-<p style="margin-left:20px">Access to the underlying pointer type is through free functions not member functions as such access is 
-  discouraged and these functions are intended to resemble cast operations.</p> 
+<p style="margin-left:20px">Access to the underlying pointer type is through free functions rather than member functions. These functions are intended to resemble cast operations to encourage caution when using them.</p> 
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt);</tt></b><br/> 
   <div>
@@ -404,7 +403,7 @@ namespace std {
   <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
   <div>
     <p style="margin-left:20px">The template specialization shall meet the requirements of class template hash (20.9.12).</p> 
-    <p style="margin-left:20px">For an object <tt>p</tt> of type propagate_const&lt;T&gt;, <tt>hash<PC>()(p)</tt>
+    <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash<PC>()(p)</tt>
     shall evaluate to the same value as <tt>hash<T>()(p.get())</tt>.</p>
     <p style="margin-left:20px"><i>Requires:</i> The specialization <tt>hash&lt;T&gt;</tt> shall be well-formed and well-defined, 
       and shall meet the requirements of class template hash.</p>
