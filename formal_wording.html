@@ -1,34 +1,35 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="style.css" rel="stylesheet" type="text/css" />
 <style type="text/css"></style></head>
 <body style="max-width:60em;">
 
-<H2>Technical Specification</h2>
-<h3>Class template <tt>propagate_const</tt></h3>    
-<h3>Class template <tt>propagate_const</tt> general</h3>
+<!-- <H2>Technical Specification</h2>-->
+<H2>0.0.1&nbsp;&nbsp;&nbsp;Class template <tt>propagate_const</tt></H2>    
+
+<h3>0.0.1.1&nbsp;&nbsp;Class template <tt>propagate_const</tt> general</h3>
 <p>The header <tt>&lt;propagate_const&gt;</tt> defines a template class 
 <tt>propagate_const</tt> that imposes deep-const behaviour on pointer types.</p>
 
-<h3>Class template <tt>propagate_const</tt> overview</h3>
+<h3>0.0.1.2&nbsp;&nbsp;Class template <tt>propagate_const</tt> overview</h3>
 <p><tt>propagate_const</tt> is a wrapper around a pointer type <tt>T</tt> which
 treats the wrapped pointer as a <tt>const</tt> pointer to <tt>const</tt> when
 the wrapper is accessed as a <tt>const</tt> object. 
 
-<h3>Class template <tt>propagate_const</tt> requirements on <tt>T</tt></h3>
+<h3>0.0.1.3&nbsp;&nbsp;Class template <tt>propagate_const</tt> requirements on <tt>T</tt></h3>
 
-<p><tt>T</tt> is required to be a raw pointer to an object or a class type
+<tr><tt>T</tt> is required to be a raw pointer to an object or a class type
 imitating a pointer to an object; anything else is ill-formed.
 <tt>decltype(*declval&lt;T&amp;&gt;())</tt> must be well-formed and must return
 an lvalue reference; anything else is ill-formed. If <tt>T</tt> is a pointer to
 const then <tt>propagate_const</tt> remains well-formed.
 
-<h3>Class template <tt>propagate_const noexcept</tt> status</h3>
+<h3>0.0.1.4&nbsp;&nbsp;Class template <tt>propagate_const noexcept</tt> status</h3>
 <p>When <tt>T</tt> is a raw pointer then all member functions of <tt>propagate_const</tt>
 are <tt>noexcept</tt>. When <tt>T</tt> is a class type imitating a pointer then member functions
 of <tt>propagate_const</tt> may be conditionally <tt>noexcept</tt>.</p>
 
-<h3>Header <tt>&lt;propagate_const&gt;</tt> synopsis</h3>
+<h3>0.0.1.5&nbsp;&nbsp;Header <tt>&lt;propagate_const&gt;</tt> synopsis</h3>
 <blockquote><tt><pre>
 namespace std {
   template &lt;class T&gt; class propagate_const { 
@@ -70,7 +71,7 @@ namespace std {
     element_type* get();
 
     //<i> Modifiers</i>
-    void swap(propagate_const&amp; t);
+    void swap(propagate_const&lt;T&gt;&amp; t);
  
   private:
     T t_; //<i>exposition only</i>
@@ -89,7 +90,7 @@ namespace std {
     bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
     bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
-  
+
   template &lt;class T, class U&gt;
     bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
@@ -131,272 +132,274 @@ namespace std {
     struct hash&lt;propagate_const&lt;T&gt;&gt;;
 }</pre></tt></blockquote> 
 
-<h3><tt>propagate_const</tt> constructors</h3>
+
+<h3>0.0.1.6&nbsp;&nbsp;<tt>propagate_const</tt> constructors</h3>
+
 <div style="margin-left:20px">
 <b><tt>propagate_const();</tt><br/></b>
-<div>
-  <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a default-initialized <tt>T</tt>.</p>
-</div>
-<b><tt>template &lt;class U&gt; propagate_const(U&amp;&amp; u); </tt><br/></b>
-<div>
-  <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</p>
-  <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt>.
-  If <tt>U</tt> is an rvalue reference, then the wrapped <tt>T</tt> is move constructed from <tt>u</tt>, 
-    otherwise the wrapped <tt>T</tt> is copy constructed from <tt>u</tt>.</p>  
-  <p style="margin-left:20px"><i>Post-conditions:</i> If <tt>u</tt> is a raw pointer, then <tt>get()</tt> yields <tt>u</tt>,
-    otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> yielded before construction.</p>
-</div>
-
+<table cellpadding="6px">
+  <tr><td><sup>1</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a default-initialized <tt>T</tt>.</td></tr>
+</table>
+<b><tt>template &lt;class U&gt; propagate_const(U&amp;&amp; u);</tt><br/></b>
+<table cellpadding="6px">
+  <tr><td><sup>2</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
+  <tr><td><sup>3</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt>. If <tt>U</tt> is an rvalue reference, then the wrapped <tt>T</tt> is move constructed from <tt>u</tt>, otherwise the wrapped <tt>T</tt> is copy constructed from <tt>u</tt>.</td></tr>
+  <tr><td><sup>4</sup></td><td><i>Post-conditions:</i> If <tt>u</tt> is a raw pointer, then <tt>get()</tt> yields <tt>u</tt>, otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> yielded before construction.</td></tr>
+</table>
 <b><tt>template &lt;class U&gt; propagate_const(const propagate_const&lt;U&gt;&amp; pu);</tt><br/></b>
-<div>
-  <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</p>
-  <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from the  pointer type wrapped by <tt>pu</tt>.</p>
-  <p style="margin-left:20px"><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</p>
-</div>
+<table cellpadding="6px">
+  <tr><td><sup>5</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
+  <tr><td><sup>6</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from the  pointer type wrapped by <tt>pu</tt>.</td></tr>
+  <tr><td><sup>7</sup></td><td><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</td></tr>
+</table>
 <b><tt>template &lt;class U&gt; propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);</tt><br/></b>
-<div>
-  <p style="margin-left:20px"><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</p>
-  <p style="margin-left:20px"><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps an rvalue constructed <tt>T</tt> from the pointer type wrapped by <tt>pu</tt>.</p>
-  <p style="margin-left:20px"><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</p>
-</div>
+<table cellpadding="6px">
+  <tr><td><sup>8</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
+  <tr><td><sup>9</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps an rvalue constructed <tt>T</tt> from the pointer type wrapped by <tt>pu</tt>.</td></tr>
+  <tr><td><sup>10</sup></td><td><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</td></tr>
+</table>
 </div>
 
-<h3><tt>propagate_const</tt> destructor</h3>
+
+<h3>0.0.1.7&nbsp;&nbsp;<tt>propagate_const</tt> destructor</h3>
+
 <div style="margin-left:20px">
 <b><tt>~propagate_const();</tt></b><br/>
-  <p style="margin-left:20px"><i>Effects:</i> Destroys the wrapped object.</p>
+<table cellpadding="6px">
+  <tr><td><sup>1</sup></td><td><i>Effects:</i> Destroys the wrapped object.</td></tr>
+</table>
 </div>
-<h3><tt>propagate_const</tt> assignment</h3>
+
+
+<h3>0.0.1.8&nbsp;&nbsp;<tt>propagate_const</tt> assignment</h3>
 
 <div style="margin-left:20px">
   <b><tt>template &lt;class U&gt; propagate_const operator=(U&amp;&amp; u);</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</p>
-    <p style="margin-left:20px"><i>Effects:</i> The wrapped pointer type is assigned to <tt>forward&lt;U&gt;(u)</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>*this</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>1</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
+    <tr><td><sup>2</sup></td><td><i>Effects:</i> The wrapped pointer type is assigned to <tt>forward&lt;U&gt;(u)</tt>.</td></tr>
+    <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
+  </table>
   <b><tt>template &lt;class U&gt; propagate_const operator=(const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</p>
-    <p style="margin-left:20px"><i>Effects:</i> The wrapped pointer type is assigned to the wrapped pointer in <tt>pu</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>*this</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
+    <tr><td><sup>5</sup></td><td><i>Effects:</i> The wrapped pointer type is assigned to the wrapped pointer in <tt>pu</tt>.</td></tr>
+    <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
+  </table>
   <b><tt>template &lt;class U&gt; propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu);</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</p>
-    <p style="margin-left:20px"><i>Effects:</i> The wrapped pointer type is move-assigned to the wrapped pointer in <tt>pu</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>*this</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>7</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
+    <tr><td><sup>8</sup></td><td><i>Effects:</i> The wrapped pointer type is move-assigned to the wrapped pointer in <tt>pu</tt>.</td></tr>
+    <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
+  </table>
 </div>
 
-<h3><tt>propagate_const</tt> observers</h3>
+
+<h3>0.0.1.9&nbsp;&nbsp;<tt>propagate_const</tt> observers</h3>
+
 <div style="margin-left:20px">
   <b><tt>explicit operator bool() const;</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Effects:</i> Return <tt>get() != nullptr</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>1</sup></td><td><i>Effects:</i> Return <tt>get() != nullptr</tt>.</td></tr>
+  </table>
   <b><tt>const element_type* operator-&gt;() const;</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Requires:</i> <tt>get() != nullptr</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>get()</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>2</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
+    <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
+  </table>  
   <b><tt>operator const element_type*() const;</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>get()</tt>.</p>
-    <p style="margin-left:20px"><i>Remarks:</i> This function shall participate in overload resolution only if <tt>T</tt> 
-    is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>4</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
+    <tr><td><sup>5</sup></td><td><i>Remarks:</i> This function shall participate in overload resolution only if <tt>T</tt> is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
+  </table>  
   <b><tt>const element_type&amp; operator*() const;</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Requires:</i> <tt>get() != nullptr</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>*get()</tt>.</p>
-    <p style="margin-left:20px"><i>Remarks:</i> This function shall not participate in overload resolution if <tt>element_type</tt> is <tt>void</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>6</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
+    <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>*get()</tt>.</td></tr>
+    <tr><td><sup>8</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution if <tt>element_type</tt> is <tt>void</tt>.</td></tr>
+  </table>  
   <b><tt>const element_type* get() const;</tt></b><br/> 
-  <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a raw pointer, otherwise <tt>t_.get()</tt>.</p>
-  </div>  
+  <table cellpadding="6px">
+    <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a raw pointer, otherwise <tt>t_.get()</tt>.</td></tr>
+  </table>  
 </div>
 
-<h3><tt>propagate_const</tt> accessors</h3>
+
+<h3>0.0.1.10&nbsp;&nbsp;<tt>propagate_const</tt> accessors</h3>
+
 <div style="margin-left:20px">
   <b><tt>element_type* operator-&gt;();</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Requires:</i> <tt>get() != nullptr</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>get()</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>1</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
+    <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
+  </table>  
   <b><tt>operator element_type*();</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>get()</tt>.</p>
-    <p style="margin-left:20px"><i>Remarks:</i> This function shall participate in overload resolution only if <tt>T</tt> 
-    is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
+    <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function shall participate in overload resolution only if <tt>T</tt> is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
+  </table>  
   <b><tt>element_type&amp; operator*();</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Requires:</i> <tt>get() != nullptr</tt>.</p>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>*get()</tt>.</p>
-    <p style="margin-left:20px"><i>Remarks:</i> This function shall not participate in overload resolution if <tt>element_type</tt> is <tt>void</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>5</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
+    <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>*get()</tt>.</td></tr>
+    <tr><td><sup>7</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution if <tt>element_type</tt> is <tt>void</tt>.</td></tr>
+  </table>
   <b><tt>element_type* get();</tt></b><br/> 
-  <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a raw pointer, otherwise <tt>t_.get()</tt>.</p>
-  </div>  
+  <table cellpadding="6px">
+    <tr><td><sup>8</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a raw pointer, otherwise <tt>t_.get()</tt>.</td></tr>
+  </table>  
 </div>
 
-<h3><tt>propagate_const</tt> modifiers</h3>
+
+<h3>0.0.1.11&nbsp;&nbsp;<tt>propagate_const</tt> modifiers</h3>
+
 <div style="margin-left:20px">
 <b><tt>void swap(propagate_const&amp; t);</tt></b><br/>
-<div>
-<p style="margin-left:20px"><i>Effects:</i> Swaps the wrapped pointer type of <tt>*this</tt> with the wrapped pointer type of t.</p>
-</div>
+  <table cellpadding="6px">
+    <tr><td><sup>1</sup></td><td><i>Effects:</i> Swaps the wrapped pointer type of <tt>*this</tt> with the wrapped pointer type of <tt>t</tt>.</td></tr>
+  </table>
 </div>
 
-<h3><tt>propagate_const</tt> relational operators</h3>
+
+<h3>0.0.1.12&nbsp;&nbsp;<tt>propagate_const</tt> relational operators</h3>
 
 <div style="margin-left:20px">
   
   <b><tt>template &lt;class T, class U&gt;
       bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/>
-  <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() == pu.get()</tt>.</p>
-  </div>  
+  <table cellpadding="6px">
+    <tr><td><sup>1</sup></td><td><i>Returns:</i> <tt>pt.get() == pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
-  <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() != pu.get()</tt>.</p>
-  </div>  
+  <table cellpadding="6px">
+    <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>pt.get() != pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
-  <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &lt; pu.get()</tt>.</p>
-  </div>  
+  <table cellpadding="6px">
+    <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>pt.get() &lt; pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
-  <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &gt; pu.get()</tt>.</p>
-  </div>  
+  <table cellpadding="6px">
+    <tr><td><sup>4</sup></td><td><i>Returns:</i> <tt>pt.get() &gt; pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
-  <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &lt;= pu.get()</tt>.</p>
-  </div>  
+  <table cellpadding="6px">
+    <tr><td><sup>5</sup></td><td><i>Returns:</i> <tt>pt.get() &lt;= pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt;
       bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
-  <div>  
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &gt;= pu.get()</tt>.</p>
-  </div>  
+  <table cellpadding="6px">
+    <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>pt.get() &gt;= pu.get()</tt>.</p>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() == u</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>pt.get() == u</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() != u</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>8</sup></td><td><i>Returns:</i> <tt>pt.get() != u</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &lt; u</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>pt.get() &lt; u</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &gt; u</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>10</sup></td><td><i>Returns:</i> <tt>pt.get() &gt; u</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &lt;= u</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>11</sup></td><td><i>Returns:</i> <tt>pt.get() &lt;= u</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>pt.get() &gt;= u</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>12</sup></td><td><i>Returns:</i> <tt>pt.get() &gt;= u</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator==(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t == pu.get()</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>13</sup></td><td><i>Returns:</i> <tt>t == pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator!=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
-  <div>                                               
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t != pu.get()</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>14</sup></td><td><i>Returns:</i> <tt>t != pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&lt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t &lt; pu.get()</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>15</sup></td><td><i>Returns:</i> <tt>t &lt; pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&gt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t &gt; pu.get()</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>16</sup></td><td><i>Returns:</i> <tt>t &gt; pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&lt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t &lt;= pu.get()</tt>.</p>
-  </div>
-
+  <table cellpadding="6px">
+    <tr><td><sup>17</sup></td><td><i>Returns:</i> <tt>t &lt;= pu.get()</tt>.</td></tr>
+  </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       bool operator&gt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> <tt>t &gt;= pu.get()</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>18</sup></td><td><i>Returns:</i> <tt>t &gt;= pu.get()</tt>.</td></tr>
+  </table>
 </div>
 
-<h3><tt>propagate_const</tt> specialized algorithms</h3>
+
+<h3>0.0.1.13&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms</h3>
+
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2);</tt></b><br/>
-  <div>                                                                                                                   
-    <p style="margin-left:20px"><i>Effects:</i> Calls <tt>pt1.swap(pt2)</tt>.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>1</sup></td><td><i>Effects:</i> Calls <tt>pt1.swap(pt2)</tt>.</td></tr>
+  </table>
 </div>
 
-<h3><tt>propagate_const</tt> underlying pointer access</h3>
+
+<h3>0.0.1.14&nbsp;&nbsp;<tt>propagate_const</tt> underlying pointer access</h3>
 <p style="margin-left:20px">Access to the underlying pointer type is through free functions rather than member functions. These functions are intended to resemble cast operations to encourage caution when using them.</p> 
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt);</tt></b><br/> 
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> a reference to the underlying pointer type.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>1</sup></td><td><i>Returns:</i> a reference to the underlying pointer type.</td></tr>
+  </table>
   <b><tt>template &lt;class T&gt; T&amp; get_underlying(propagate_const&lt;T&gt;&amp; pt);</tt></b><br/>
-  <div>
-    <p style="margin-left:20px"><i>Returns:</i> a reference to the underlying pointer type.</p>
-  </div>
+  <table cellpadding="6px">
+    <tr><td><sup>2</sup></td><td><i>Returns:</i> a reference to the underlying pointer type.</td></tr>
+  </table>
 </div>
 
-<h3><tt>propagate_const</tt> hash support</h3>
+
+<h3>0.0.1.15&nbsp;&nbsp;<tt>propagate_const</tt> hash support</h3>
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
   <div>
