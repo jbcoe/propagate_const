@@ -71,7 +71,7 @@ namespace std {
     element_type* get();
 
     //<i> Modifiers</i>
-    void swap(propagate_const&lt;T&gt;&amp; t);
+    void swap(propagate_const&lt;T&gt;&amp; pt);
  
   private:
     T t_; //<i>exposition only</i>
@@ -254,9 +254,9 @@ namespace std {
 <h3>0.0.1.11&nbsp;&nbsp;<tt>propagate_const</tt> modifiers</h3>
 
 <div style="margin-left:20px">
-<b><tt>void swap(propagate_const&amp; t);</tt></b><br/>
+<b><tt>void swap(propagate_const&amp;&lt;T&gt; pt);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>1</sup></td><td><i>Effects:</i> Swaps the wrapped pointer type of <tt>*this</tt> with the wrapped pointer type of <tt>t</tt>.</td></tr>
+    <tr><td><sup>1</sup></td><td><i>Effects:</i> Swaps the wrapped pointer type of <tt>*this</tt> with the wrapped pointer type of <tt>pt</tt>.</td></tr>
   </table>
 </div>
 
