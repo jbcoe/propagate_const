@@ -11,9 +11,9 @@ body
 <body style="max-width:60em;">
     
 <body><div><font size=-1>
-<br><b>Doc number:</b> N4209
-<br><b>Revises:</b> N4057, N3973
-<br><b>Date:</b> 2014-10-9
+<br><b>Doc number:</b> DXXXX
+<br><b>Revises:</b> N4209, N4057, N3973
+<br><b>Date:</b> 2014-11-4
 <br><b>Project:</b> Programming Language C++, Library Evolution Working Group
 <br><b>Reply-to:</b> Jonathan Coe &lt;<a href="mailto:jbcoe@me.com" target="_blank">jbcoe@me.com</a>&gt;
 <br>Robert Mill &lt;<a href="mailto:rob.mill.uk@gmail.com" target="_blank">rob.mill.uk@gmail.com</a>&gt;
@@ -242,15 +242,11 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
 <H2>X.Y&nbsp;&nbsp;&nbsp;Class template <tt>propagate_const</tt> [propagate_const]</H2>    
 
 <h3>X.Y.1&nbsp;&nbsp;Class template <tt>propagate_const</tt> general [propagate_const.general]</h3>
-<p>The header <tt>&lt;propagate_const&gt;</tt> defines a template class 
-<tt>propagate_const</tt> that imposes deep-const behaviour on pointer types.</p>
-
-<h3>X.Y.2&nbsp;&nbsp;Class template <tt>propagate_const</tt> overview [propagate_const.overview]</h3>
 <p><tt>propagate_const</tt> is a wrapper around a pointer type <tt>T</tt> which
 treats the wrapped pointer as a <tt>const</tt> pointer to <tt>const</tt> when
 the wrapper is accessed as a <tt>const</tt> object. 
 
-<h3>X.Y.3&nbsp;&nbsp;Class template <tt>propagate_const</tt> requirements on <tt>T</tt> [propagate_const.requirements]</h3>
+<h3>X.Y.2&nbsp;&nbsp;Requirements on <tt>T</tt> [propagate_const.requirements]</h3>
 
 <tr><tt>T</tt> is required to be a raw pointer to an object or a class type
 imitating a pointer to an object; anything else is ill-formed.
@@ -258,54 +254,54 @@ imitating a pointer to an object; anything else is ill-formed.
 an lvalue reference; anything else is ill-formed. If <tt>T</tt> is a pointer to
 const then <tt>propagate_const</tt> remains well-formed.
 
-<h3>X.Y.4&nbsp;&nbsp;Class template <tt>propagate_const noexcept</tt> status [propagate_const.noexcept]</h3>
+<h3>X.Y.3&nbsp;&nbsp;Class template <tt>propagate_const noexcept</tt> status [propagate_const.noexcept]</h3>
 <p>When <tt>T</tt> is a raw pointer then all member functions of <tt>propagate_const</tt>
 are <tt>noexcept</tt>. When <tt>T</tt> is a class type imitating a pointer then member functions
 of <tt>propagate_const</tt> may be conditionally <tt>noexcept</tt>.</p>
 
-<h3>X.Y.5&nbsp;&nbsp;Header <tt>&lt;propagate_const&gt;</tt> synopsis [propagate_const.synopsis]</h3>
+<h3>X.Y.4&nbsp;&nbsp;Header <tt>&lt;propagate_const&gt;</tt> synopsis [propagate_const.synopsis]</h3>
 <blockquote><tt><pre>
 namespace std {
   template &lt;class T&gt; class propagate_const { 
   public:                                                                                          
-    typedef decltype(*declval&lt;T&amp;&gt;()) element_type;
+    typedef remove_ref_t<decltype(*declval&lt;T&amp;&gt;())> element_type;
     typedef element_type* pointer_type;
        
     //<i> Constructors</i>
     constexpr propagate_const();
     template &lt;class U&gt; 
-      propagate_const(U&amp;&amp; u); 
+      constexpr propagate_const(U&amp;&amp; u); 
     template &lt;class U&gt; 
-      propagate_const(const propagate_const&lt;U&gt;&amp; pu);
+      constexpr propagate_const(const propagate_const&lt;U&gt;&amp; pu);
     template &lt;class U&gt; 
-      propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);
+      constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);
     
     //<i> Destructor</i>
     ~propagate_const() = default;
     
     //<i> Assignment</i>
     template &lt;class U&gt; 
-      propagate_const operator=(U&amp;&amp; u); 
+      constexpr propagate_const operator=(U&amp;&amp; u); 
     template &lt;class U&gt; 
-      propagate_const operator=(const propagate_const&lt;U&gt;&amp; pu); 
+      constexpr propagate_const operator=(const propagate_const&lt;U&gt;&amp; pu); 
     template &lt;class U&gt; 
-      propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu); 
+      constexpr propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu); 
     
-    //<i> Observers</i>
-    explicit operator bool() const;
-    const element_type* operator-&gt;() const;
-    operator const element_type*() const; 
-    const element_type&amp; operator*() const;
-    const element_type* get() const;
+    //<i>const Observers</i>
+    explicit constexpr operator bool() const;
+    constexpr const element_type* operator-&gt;() const;
+    constexpr operator const element_type*() const; //<i>Conditionally defined: see below</i>
+    constexpr const element_type&amp; operator*() const;
+    constexpr const element_type* get() const;
     
-    //<i> Accessors</i>
-    element_type* operator-&gt;();
-    operator element_type*(); 
-    element_type&amp; operator*();
-    element_type* get();
+    //<i>Non-const Observers</i>
+    constexpr element_type* operator-&gt;();
+    constexpr operator element_type*(); //<i>Conditionally defined: see below</i> 
+    constexpr element_type&amp; operator*();
+    constexpr element_type* get();
 
     //<i> Modifiers</i>
-    void swap(propagate_const&lt;T&gt;&amp; pt);
+    constexpr void swap(propagate_const&lt;T&gt;&amp; pt);
  
   private:
     T t_; //<i>exposition only</i>
@@ -313,53 +309,53 @@ namespace std {
   
   //<i> Relational operators</i>
   template &lt;class T, class U&gt;
-    bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
 
   template &lt;class T, class U&gt;
-    bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    constexpr bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-    bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    constexpr bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-    bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    constexpr bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-    bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    constexpr bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-    bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    constexpr bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   template &lt;class T, class U&gt;
-    bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
+    constexpr bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);
   
   template &lt;class T, class U&gt;
-    bool operator==(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator==(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator!=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator!=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator&lt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator&lt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator&gt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator&gt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator&lt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator&lt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   template &lt;class T, class U&gt;
-    bool operator&gt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator&gt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu);
   
   //<i> Specialized algorithms</i>
   template &lt;class T&gt;
-    void swap (propagate_const&lt;T&gt;&amp; pt, propagate_const&lt;T&gt;&amp; pt2);
+    constexpr void swap (propagate_const&lt;T&gt;&amp; pt, propagate_const&lt;T&gt;&amp; pt2);
   
   //<i> Underlying pointer access</i>
   template &lt;class T&gt;
-    const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt);
+    constexpr const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt);
   template &lt;class T&gt;
-    T&amp; get_underlying(propagate_const&lt;T&gt;&amp; pt);
+    constexpr T&amp; get_underlying(propagate_const&lt;T&gt;&amp; pt);
   
   //<i> Hash support</i>
   template &lt;class T&gt;
@@ -367,26 +363,26 @@ namespace std {
 }</pre></tt></blockquote> 
 
 
-<h3>X.Y.6&nbsp;&nbsp;<tt>propagate_const</tt> constructors [propagate_const.ctor]</h3>
+<h3>X.Y.5&nbsp;&nbsp;<tt>propagate_const</tt> constructors [propagate_const.ctor]</h3>
 
 <div style="margin-left:20px">
-<b><tt>propagate_const();</tt><br/></b>
+<b><tt>constexpr propagate_const();</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>1</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a default-initialized <tt>T</tt>.</td></tr>
 </table>
-<b><tt>template &lt;class U&gt; propagate_const(U&amp;&amp; u);</tt><br/></b>
+<b><tt>template &lt;class U&gt; constexpr propagate_const(U&amp;&amp; u);</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>2</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
   <tr><td><sup>3</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt>. If <tt>U</tt> is an rvalue reference, then the wrapped <tt>T</tt> is move constructed from <tt>u</tt>, otherwise the wrapped <tt>T</tt> is copy constructed from <tt>u</tt>.</td></tr>
   <tr><td><sup>4</sup></td><td><i>Post-conditions:</i> If <tt>u</tt> is a raw pointer, then <tt>get()</tt> yields <tt>u</tt>, otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> yielded before construction.</td></tr>
 </table>
-<b><tt>template &lt;class U&gt; propagate_const(const propagate_const&lt;U&gt;&amp; pu);</tt><br/></b>
+<b><tt>template &lt;class U&gt; constexpr propagate_const(const propagate_const&lt;U&gt;&amp; pu);</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>5</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
   <tr><td><sup>6</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from the  pointer type wrapped by <tt>pu</tt>.</td></tr>
   <tr><td><sup>7</sup></td><td><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</td></tr>
 </table>
-<b><tt>template &lt;class U&gt; propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);</tt><br/></b>
+<b><tt>template &lt;class U&gt; constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>8</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
   <tr><td><sup>9</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps an rvalue constructed <tt>T</tt> from the pointer type wrapped by <tt>pu</tt>.</td></tr>
@@ -395,7 +391,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.7&nbsp;&nbsp;<tt>propagate_const</tt> destructor [propagate_const.dtor]</h3>
+<h3>X.Y.6&nbsp;&nbsp;<tt>propagate_const</tt> destructor [propagate_const.dtor]</h3>
 
 <div style="margin-left:20px">
 <b><tt>~propagate_const();</tt></b><br/>
@@ -405,22 +401,22 @@ namespace std {
 </div>
 
 
-<h3>X.Y.8&nbsp;&nbsp;<tt>propagate_const</tt> assignment [propagate_const.assignment]</h3>
+<h3>X.Y.7&nbsp;&nbsp;<tt>propagate_const</tt> assignment [propagate_const.assignment]</h3>
 
 <div style="margin-left:20px">
-  <b><tt>template &lt;class U&gt; propagate_const operator=(U&amp;&amp; u);</tt></b><br/> 
+  <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(U&amp;&amp; u);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
     <tr><td><sup>2</sup></td><td><i>Effects:</i> The wrapped pointer type is assigned to <tt>forward&lt;U&gt;(u)</tt>.</td></tr>
     <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
   </table>
-  <b><tt>template &lt;class U&gt; propagate_const operator=(const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+  <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
     <tr><td><sup>5</sup></td><td><i>Effects:</i> The wrapped pointer type is assigned to the wrapped pointer in <tt>pu</tt>.</td></tr>
     <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
   </table>
-  <b><tt>template &lt;class U&gt; propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu);</tt></b><br/> 
+  <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>7</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
     <tr><td><sup>8</sup></td><td><i>Effects:</i> The wrapped pointer type is move-assigned to the wrapped pointer in <tt>pu</tt>.</td></tr>
@@ -429,211 +425,211 @@ namespace std {
 </div>
 
 
-<h3>X.Y.9&nbsp;&nbsp;<tt>propagate_const</tt> observers [propagate_const.observers]</h3>
+<h3>X.Y.8&nbsp;&nbsp;<tt>propagate_const</tt> const observers [propagate_const.const_observers]</h3>
 
 <div style="margin-left:20px">
-  <b><tt>explicit operator bool() const;</tt></b><br/>
+  <b><tt>explicit constexpr operator bool() const;</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Effects:</i> Return <tt>get() != nullptr</tt>.</td></tr>
   </table>
-  <b><tt>const element_type* operator-&gt;() const;</tt></b><br/> 
+  <b><tt>constexpr const element_type* operator-&gt;() const;</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>2</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
     <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
   </table>  
-  <b><tt>operator const element_type*() const;</tt></b><br/> 
+  <b><tt>constexpr operator const element_type*() const;</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>4</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
-    <tr><td><sup>5</sup></td><td><i>Remarks:</i> This function shall participate in overload resolution only if <tt>T</tt> is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
+    <tr><td><sup>5</sup></td><td><i>Remarks:</i> This function is only defined if <tt>T</tt> is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
   </table>  
-  <b><tt>const element_type&amp; operator*() const;</tt></b><br/> 
+  <b><tt>constexpr const element_type&amp; operator*() const;</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>6</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
     <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>*get()</tt>.</td></tr>
     <tr><td><sup>8</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution if <tt>element_type</tt> is <tt>void</tt>.</td></tr>
   </table>  
-  <b><tt>const element_type* get() const;</tt></b><br/> 
+  <b><tt>constexpr const element_type* get() const;</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a raw pointer, otherwise <tt>t_.get()</tt>.</td></tr>
   </table>  
 </div>
 
 
-<h3>X.Y.10&nbsp;&nbsp;<tt>propagate_const</tt> accessors [propagate_const.accessors]</h3>
+<h3>X.Y.9&nbsp;&nbsp;<tt>propagate_const</tt> non-const observers [propagate_const.non_const_observers]</h3>
 
 <div style="margin-left:20px">
-  <b><tt>element_type* operator-&gt;();</tt></b><br/> 
+  <b><tt>constexpr element_type* operator-&gt;();</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
     <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
   </table>  
-  <b><tt>operator element_type*();</tt></b><br/> 
+  <b><tt>constexpr operator element_type*();</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
-    <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function shall participate in overload resolution only if <tt>T</tt> is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
+    <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function is only defined if <tt>T</tt> is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
   </table>  
-  <b><tt>element_type&amp; operator*();</tt></b><br/> 
+  <b><tt>constexpr element_type&amp; operator*();</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>5</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
     <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>*get()</tt>.</td></tr>
     <tr><td><sup>7</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution if <tt>element_type</tt> is <tt>void</tt>.</td></tr>
   </table>
-  <b><tt>element_type* get();</tt></b><br/> 
+  <b><tt>constexpr element_type* get();</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>8</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a raw pointer, otherwise <tt>t_.get()</tt>.</td></tr>
   </table>  
 </div>
 
 
-<h3>X.Y.11&nbsp;&nbsp;<tt>propagate_const</tt> modifiers [propagate_const.modifiers]</h3>
+<h3>X.Y.10&nbsp;&nbsp;<tt>propagate_const</tt> modifiers [propagate_const.modifiers]</h3>
 
 <div style="margin-left:20px">
-<b><tt>void swap(propagate_const&amp;&lt;T&gt; pt);</tt></b><br/>
+<b><tt>constexpr void swap(propagate_const&amp;&lt;T&gt; pt);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Effects:</i> Swaps the wrapped pointer type of <tt>*this</tt> with the wrapped pointer type of <tt>pt</tt>.</td></tr>
   </table>
 </div>
 
 
-<h3>X.Y.12&nbsp;&nbsp;<tt>propagate_const</tt> relational operators [propagate_const.relational]</h3>
+<h3>X.Y.11&nbsp;&nbsp;<tt>propagate_const</tt> relational operators [propagate_const.relational]</h3>
 
 <div style="margin-left:20px">
   
   <b><tt>template &lt;class T, class U&gt;
-      bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/>
+      constexpr bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Returns:</i> <tt>pt.get() == pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;
-      bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      constexpr bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>pt.get() != pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;
-      bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      constexpr bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>pt.get() &lt; pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;
-      bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      constexpr bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>4</sup></td><td><i>Returns:</i> <tt>pt.get() &gt; pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;
-      bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      constexpr bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>5</sup></td><td><i>Returns:</i> <tt>pt.get() &lt;= pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;
-      bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
+      constexpr bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>pt.get() &gt;= pu.get()</tt>.</td></tr>
   </table><br/>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+      constexpr bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>pt.get() == u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+      constexpr bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>8</sup></td><td><i>Returns:</i> <tt>pt.get() != u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+      constexpr bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>pt.get() &lt; u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+      constexpr bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>10</sup></td><td><i>Returns:</i> <tt>pt.get() &gt; u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+      constexpr bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>11</sup></td><td><i>Returns:</i> <tt>pt.get() &lt;= u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
+      constexpr bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>12</sup></td><td><i>Returns:</i> <tt>pt.get() &gt;= u</tt>.</td></tr>
   </table><br/>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator==(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+      constexpr bool operator==(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>13</sup></td><td><i>Returns:</i> <tt>t == pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator!=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+      constexpr bool operator!=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>14</sup></td><td><i>Returns:</i> <tt>t != pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator&lt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+      constexpr bool operator&lt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>15</sup></td><td><i>Returns:</i> <tt>t &lt; pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator&gt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+      constexpr bool operator&gt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>16</sup></td><td><i>Returns:</i> <tt>t &gt; pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator&lt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+      constexpr bool operator&lt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>17</sup></td><td><i>Returns:</i> <tt>t &lt;= pu.get()</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      bool operator&gt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
+      constexpr bool operator&gt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>18</sup></td><td><i>Returns:</i> <tt>t &gt;= pu.get()</tt>.</td></tr>
   </table>
 </div>
 
 
-<h3>X.Y.13&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms [propagate_const.algorithms]</h3>
+<h3>X.Y.12&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms [propagate_const.algorithms]</h3>
 
 <div style="margin-left:20px">
-  <b><tt>template &lt;class T&gt; void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2);</tt></b><br/>
+  <b><tt>template &lt;class T&gt; constexpr void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Effects:</i> Calls <tt>pt1.swap(pt2)</tt>.</td></tr>
   </table>
 </div>
 
 
-<h3>X.Y.14&nbsp;&nbsp;<tt>propagate_const</tt> underlying pointer access [propagate_const.underlying]</h3>
+<h3>X.Y.13&nbsp;&nbsp;<tt>propagate_const</tt> underlying pointer access [propagate_const.underlying]</h3>
 <p style="margin-left:20px">Access to the underlying pointer type is through free functions rather than member functions. These functions are intended to resemble cast operations to encourage caution when using them.</p> 
 <div style="margin-left:20px">
-  <b><tt>template &lt;class T&gt; const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt);</tt></b><br/> 
+  <b><tt>template &lt;class T&gt; constexpr const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Returns:</i> a reference to the underlying pointer type.</td></tr>
   </table>
-  <b><tt>template &lt;class T&gt; T&amp; get_underlying(propagate_const&lt;T&gt;&amp; pt);</tt></b><br/>
+  <b><tt>template &lt;class T&gt; constexpr T&amp; get_underlying(propagate_const&lt;T&gt;&amp; pt);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>2</sup></td><td><i>Returns:</i> a reference to the underlying pointer type.</td></tr>
   </table>
 </div>
 
 
-<h3>X.Y.15&nbsp;&nbsp;<tt>propagate_const</tt> hash support [propagate_const.hash]</h3>
+<h3>X.Y.14&nbsp;&nbsp;<tt>propagate_const</tt> hash support [propagate_const.hash]</h3>
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
   <div>
@@ -651,7 +647,12 @@ namespace std {
 <p>Thanks to Walter Brown, Kevin Channon, Nick Maclaren, Roger Orr, Ville Voutilainen, Jonathan Wakely, David Ward and others for helpful discussion.</p>
 
 <H2>VII. Revisions</H2>
-<p>This paper revises N4057</p>
+<p>This paper revises N4209</p>
+<ul>
+<li>Added constexpr. Minor editorial changes to wording following meeting in Urbana.</li>
+</ul>
+
+<p>N4209 revises N4057</p>
 <ul>
 <li>Extended comparison operators to avoid reliance on implicit conversions. Minor cosmetic changes.</li>
 </ul>
