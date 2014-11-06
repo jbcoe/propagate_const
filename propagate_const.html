@@ -243,30 +243,21 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
 
 <h3>X.Y.1&nbsp;&nbsp;Class template <tt>propagate_const</tt> general [propagate_const.general]</h3>
 <p><tt>propagate_const</tt> is a wrapper around a pointer type <tt>T</tt> which
-treats the wrapped pointer as a <tt>const</tt> pointer to <tt>const</tt> when
-the wrapper is accessed as a <tt>const</tt> object. 
+treats the wrapped pointer as a pointer to <tt>const</tt> when
+the wrapper is accessed through a <tt>const</tt> access path. 
 
-<h3>X.Y.2&nbsp;&nbsp;Requirements on <tt>T</tt> [propagate_const.requirements]</h3>
-
-<tr><tt>T</tt> is required to be a pointer type to an object or a class type
+<p><tt>T</tt> is required to be a pointer type to an object or a class type
 imitating a pointer to an object; anything else is ill-formed.
 <tt>decltype(*declval&lt;T&amp;&gt;())</tt> must be well-formed and must return
 an lvalue reference; anything else is ill-formed. If <tt>T</tt> is a pointer to
 const then <tt>propagate_const</tt> remains well-formed.
 
-<h3>X.Y.3&nbsp;&nbsp;Class template <tt>propagate_const noexcept</tt> status [propagate_const.noexcept]</h3>
-<p>When <tt>T</tt> is a pointer type then all member functions of <tt>propagate_const</tt>
-are <tt>noexcept</tt>. When <tt>T</tt> is a class type imitating a pointer then member functions
-of <tt>propagate_const</tt> may be conditionally <tt>noexcept</tt>.</p>
-
-<h3>X.Y.4&nbsp;&nbsp;Header <tt>&lt;propagate_const&gt;</tt> synopsis [propagate_const.synopsis]</h3>
 <blockquote><tt><pre>
 namespace std {
   template &lt;class T&gt; class propagate_const { 
   public:                                                                                          
-    typedef remove_ref_t<decltype(*declval&lt;T&amp;&gt;())> element_type;
-    typedef element_type* pointer_type;
-       
+    typedef remove_reference_t<decltype(*declval&lt;T&amp;&gt;())> element_type;
+
     //<i> Constructors</i>
     constexpr propagate_const();
     template &lt;class U&gt; 
@@ -373,7 +364,7 @@ namespace std {
 <b><tt>template &lt;class U&gt; constexpr propagate_const(U&amp;&amp; u);</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>2</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-  <tr><td><sup>3</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt>. If <tt>U</tt> is an rvalue reference, then the wrapped <tt>T</tt> is move constructed from <tt>u</tt>, otherwise the wrapped <tt>T</tt> is copy constructed from <tt>u</tt>.</td></tr>
+  <tr><td><sup>3</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> initialized with <tt>std::forward&lt;U>()</tt>.</td></tr>
   <tr><td><sup>4</sup></td><td><i>Post-conditions:</i> If <tt>u</tt> is a pointer type, then <tt>get()</tt> yields <tt>u</tt>, otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> yielded before construction.</td></tr>
 </table>
 <b><tt>template &lt;class U&gt; constexpr propagate_const(const propagate_const&lt;U&gt;&amp; pu);</tt><br/></b>
@@ -385,7 +376,7 @@ namespace std {
 <b><tt>template &lt;class U&gt; constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>8</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-  <tr><td><sup>9</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps an rvalue constructed <tt>T</tt> from the object wrapped by <tt>pu</tt>.</td></tr>
+  <tr><td><sup>9</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> initialized with <tt>std::move(*pu.get())</tt>.</td></tr>
   <tr><td><sup>10</sup></td><td><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</td></tr>
 </table>
 </div>
@@ -407,19 +398,19 @@ namespace std {
   <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(U&amp;&amp; u);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-    <tr><td><sup>2</sup></td><td><i>Effects:</i> The wrapped pointer type is assigned to <tt>forward&lt;U&gt;(u)</tt>.</td></tr>
+    <tr><td><sup>2</sup></td><td><i>Effects:</i> The wrapped pointer is assigned to <tt>forward&lt;U&gt;(u)</tt>.</td></tr>
     <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
   </table>
   <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-    <tr><td><sup>5</sup></td><td><i>Effects:</i> The wrapped pointer type is assigned to the wrapped pointer in <tt>pu</tt>.</td></tr>
+    <tr><td><sup>5</sup></td><td><i>Effects:</i> The wrapped pointer is assigned to the wrapped pointer in <tt>pu</tt>.</td></tr>
     <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
   </table>
   <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu);</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>7</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-    <tr><td><sup>8</sup></td><td><i>Effects:</i> The wrapped pointer type is move-assigned to the wrapped pointer in <tt>pu</tt>.</td></tr>
+    <tr><td><sup>8</sup></td><td><i>Effects:</i> The wrapped pointer is move-assigned to the wrapped pointer in <tt>pu</tt>.</td></tr>
     <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
   </table>
 </div>
@@ -446,7 +437,7 @@ namespace std {
   <table cellpadding="6px">
     <tr><td><sup>6</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
     <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>*get()</tt>.</td></tr>
-    <tr><td><sup>8</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution if <tt>element_type</tt> is <tt>void</tt>.</td></tr>
+    <tr><td><sup>8</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>element_type</tt> is not <tt>void</tt>.</td></tr>
   </table>  
   <b><tt>constexpr const element_type* get() const;</tt></b><br/> 
   <table cellpadding="6px">
@@ -460,7 +451,6 @@ namespace std {
 <div style="margin-left:20px">
   <b><tt>constexpr element_type* operator-&gt;();</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>1</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
     <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
   </table>  
   <b><tt>constexpr operator element_type*();</tt></b><br/> 
@@ -486,7 +476,7 @@ namespace std {
 <div style="margin-left:20px">
 <b><tt>constexpr void swap(propagate_const&amp;&lt;T&gt; pt);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>1</sup></td><td><i>Effects:</i> Swaps the wrapped pointer type of <tt>*this</tt> with the wrapped pointer type of <tt>pt</tt>.</td></tr>
+    <tr><td><sup>1</sup></td><td><i>Effects:</i> Swaps the wrapped pointer of <tt>*this</tt> with the wrapped pointer of <tt>pt</tt>.</td></tr>
   </table>
 </div>
 
@@ -633,9 +623,9 @@ namespace std {
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
   <div>
-    <p style="margin-left:20px">The template specialization shall meet the requirements of class template hash (20.9.12).</p> 
-    <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash<PC>()(p)</tt>
-    shall evaluate to the same value as <tt>hash<T>()(p.get())</tt>.</p>
+    <p style="margin-left:20px">The template specialization shall meet the requirements of class template <tt>hash</tt> (20.9.12).</p> 
+    <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash&lt;propagate_const&lt;T&gt;>()(p)</tt>
+    shall evaluate to the same value as <tt>hash&lt;T>()(p.get())</tt>.</p>
     <p style="margin-left:20px"><i>Requires:</i> The specialization <tt>hash&lt;T&gt;</tt> shall be well-formed and well-defined, 
       and shall meet the requirements of class template hash.</p>
     </div>
