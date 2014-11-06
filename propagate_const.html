@@ -349,7 +349,7 @@ namespace std {
   
   //<i> Specialized algorithms</i>
   template &lt;class T&gt;
-    constexpr void swap (propagate_const&lt;T&gt;&amp; pt, propagate_const&lt;T&gt;&amp; pt2);
+    void swap (propagate_const&lt;T&gt;&amp; pt, propagate_const&lt;T&gt;&amp; pt2);
   
   //<i> Underlying pointer access</i>
   template &lt;class T&gt;
@@ -608,7 +608,7 @@ namespace std {
 <h3>X.Y.12&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms [propagate_const.algorithms]</h3>
 
 <div style="margin-left:20px">
-  <b><tt>template &lt;class T&gt; constexpr void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2);</tt></b><br/>
+  <b><tt>template &lt;class T&gt; void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2);</tt></b><br/>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Effects:</i> Calls <tt>pt1.swap(pt2)</tt>.</td></tr>
   </table>
