@@ -250,13 +250,19 @@ the wrapper is accessed through a <tt>const</tt> access path.
 imitating a pointer to an object; anything else is ill-formed.
 <tt>decltype(*declval&lt;T&amp;&gt;())</tt> must be well-formed and must return
 an lvalue reference; anything else is ill-formed. If <tt>T</tt> is a pointer to
-const then <tt>propagate_const</tt> remains well-formed.
+const then <tt>propagate_const</tt> remains well-formed.</p>
 
+<h3>X.Y.2&nbsp;&nbsp;Class template <tt>propagate_const noexcept</tt> status [propagate_const.noexcept]</h3>
+<p>When <tt>T</tt> is a pointer type then all member functions of <tt>propagate_const</tt>
+are <tt>noexcept</tt>. When <tt>T</tt> is a class type imitating a pointer then member functions
+of <tt>propagate_const</tt> may be conditionally <tt>noexcept</tt>.</p>
+
+<h3>X.Y.3&nbsp;&nbsp;Header <tt>&lt;propagate_const&gt;</tt> synopsis [propagate_const.synopsis]</h3>
 <blockquote><tt><pre>
 namespace std {
   template &lt;class T&gt; class propagate_const { 
   public:                                                                                          
-    typedef remove_reference_t<decltype(*declval&lt;T&amp;&gt;())> element_type;
+    typedef remove_reference_t&lt;decltype(*declval&lt;T&amp;&gt;())&gt; element_type;
 
     //<i> Constructors</i>
     constexpr propagate_const();
@@ -354,7 +360,7 @@ namespace std {
 }</pre></tt></blockquote> 
 
 
-<h3>X.Y.5&nbsp;&nbsp;<tt>propagate_const</tt> constructors [propagate_const.ctor]</h3>
+<h3>X.Y.4&nbsp;&nbsp;<tt>propagate_const</tt> constructors [propagate_const.ctor]</h3>
 
 <div style="margin-left:20px">
 <b><tt>constexpr propagate_const();</tt><br/></b>
@@ -382,7 +388,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.6&nbsp;&nbsp;<tt>propagate_const</tt> destructor [propagate_const.dtor]</h3>
+<h3>X.Y.5&nbsp;&nbsp;<tt>propagate_const</tt> destructor [propagate_const.dtor]</h3>
 
 <div style="margin-left:20px">
 <b><tt>~propagate_const();</tt></b><br/>
@@ -392,7 +398,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.7&nbsp;&nbsp;<tt>propagate_const</tt> assignment [propagate_const.assignment]</h3>
+<h3>X.Y.6&nbsp;&nbsp;<tt>propagate_const</tt> assignment [propagate_const.assignment]</h3>
 
 <div style="margin-left:20px">
   <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(U&amp;&amp; u);</tt></b><br/> 
@@ -416,7 +422,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.8&nbsp;&nbsp;<tt>propagate_const</tt> const observers [propagate_const.const_observers]</h3>
+<h3>X.Y.7&nbsp;&nbsp;<tt>propagate_const</tt> const observers [propagate_const.const_observers]</h3>
 
 <div style="margin-left:20px">
   <b><tt>explicit constexpr operator bool() const;</tt></b><br/>
@@ -446,7 +452,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.9&nbsp;&nbsp;<tt>propagate_const</tt> non-const observers [propagate_const.non_const_observers]</h3>
+<h3>X.Y.8&nbsp;&nbsp;<tt>propagate_const</tt> non-const observers [propagate_const.non_const_observers]</h3>
 
 <div style="margin-left:20px">
   <b><tt>constexpr element_type* operator-&gt;();</tt></b><br/> 
@@ -471,7 +477,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.10&nbsp;&nbsp;<tt>propagate_const</tt> modifiers [propagate_const.modifiers]</h3>
+<h3>X.Y.9&nbsp;&nbsp;<tt>propagate_const</tt> modifiers [propagate_const.modifiers]</h3>
 
 <div style="margin-left:20px">
 <b><tt>constexpr void swap(propagate_const&amp;&lt;T&gt; pt);</tt></b><br/>
@@ -481,7 +487,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.11&nbsp;&nbsp;<tt>propagate_const</tt> relational operators [propagate_const.relational]</h3>
+<h3>X.Y.10&nbsp;&nbsp;<tt>propagate_const</tt> relational operators [propagate_const.relational]</h3>
 
 <div style="margin-left:20px">
   
@@ -595,7 +601,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.12&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms [propagate_const.algorithms]</h3>
+<h3>X.Y.11&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms [propagate_const.algorithms]</h3>
 
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; constexpr void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2);</tt></b><br/>
@@ -605,7 +611,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.13&nbsp;&nbsp;<tt>propagate_const</tt> underlying pointer access [propagate_const.underlying]</h3>
+<h3>X.Y.12&nbsp;&nbsp;<tt>propagate_const</tt> underlying pointer access [propagate_const.underlying]</h3>
 <p style="margin-left:20px">Access to the underlying pointer type is through free functions rather than member functions. These functions are intended to resemble cast operations to encourage caution when using them.</p> 
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; constexpr const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt);</tt></b><br/> 
@@ -619,13 +625,13 @@ namespace std {
 </div>
 
 
-<h3>X.Y.14&nbsp;&nbsp;<tt>propagate_const</tt> hash support [propagate_const.hash]</h3>
+<h3>X.Y.13&nbsp;&nbsp;<tt>propagate_const</tt> hash support [propagate_const.hash]</h3>
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
   <div>
     <p style="margin-left:20px">The template specialization shall meet the requirements of class template <tt>hash</tt> (20.9.12).</p> 
     <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash&lt;propagate_const&lt;T&gt;>()(p)</tt>
-    shall evaluate to the same value as <tt>hash&lt;T>()(p.get())</tt>.</p>
+    shall evaluate to the same value as <tt>hash&lt;T&gt;()(p.get())</tt>.</p>
     <p style="margin-left:20px"><i>Requires:</i> The specialization <tt>hash&lt;T&gt;</tt> shall be well-formed and well-defined, 
       and shall meet the requirements of class template hash.</p>
     </div>
