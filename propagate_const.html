@@ -214,16 +214,16 @@ int main()
 <h3>Construction and assignment</h3>
 <p> A <tt>propagate_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>propagate_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from. 
 There should be no additional cost of construction for a <tt>propagate_const&lt;T&gt;</tt> beyond that for construction of a <tt>T</tt>. 
-The wrapped <tt>T</tt> should not be value-initialized as this would incur a cost for raw pointers. If value-initialization is desirable then it can be accomplished with another wrapper class like <tt>boost::value_initialized</tt> [4].</p>
+The wrapped <tt>T</tt> should not be value-initialized as this would incur a cost for pointer types. If value-initialization is desirable then it can be accomplished with another wrapper class like <tt>boost::value_initialized</tt> [4].</p>
 
 <h3>Pointer-like functions</h3>
 <p><tt>operator*</tt> and <tt>operator-&gt;</tt> are defined to preserve <tt>const</tt>-propagation. When a <tt>const</tt> <tt>propagate_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
     
 <h3><tt>get</tt></h3>
-<p>The <tt>get</tt> function returns the address of the object pointed to by the wrapped pointer. <tt>get</tt> is intended to be used to ensure <tt>const</tt>-propagation is preserved when using interfaces which require raw C-style pointers</p>
+<p>The <tt>get</tt> function returns the address of the object pointed to by the wrapped pointer. <tt>get</tt> is intended to be used to ensure <tt>const</tt>-propagation is preserved when using interfaces which require C-style pointers</p>
     
 <h3><tt>operator value*</tt></h3>
-<p>When <tt>T</tt> is a raw pointer <tt>operator value*</tt> exists and allows implicit conversion to a raw pointer. This avoids using <tt>get</tt> to access the raw pointer in contexts where it was unnecesary before addition of the <tt>propagate_const</tt> wrapper.</p>
+<p>When <tt>T</tt> is a pointer type <tt>operator value*</tt> exists and allows implicit conversion to a pointer. This avoids using <tt>get</tt> to access the pointer in contexts where it was unnecesary before addition of the <tt>propagate_const</tt> wrapper.</p>
     
 <h3>Equality, inequality and comparison</h3>    
 <p>Free-standing equality, inequality and comparison operators are provided so that a <tt>propagate_const&lt;T&gt;</tt> can be used in any equality, inequality or comparison where a <tt>T</tt> could be used. <tt>const</tt>-propagation should not alter the result of any equality, inequality or comparison operation.</p>
@@ -248,14 +248,14 @@ the wrapper is accessed as a <tt>const</tt> object.
 
 <h3>X.Y.2&nbsp;&nbsp;Requirements on <tt>T</tt> [propagate_const.requirements]</h3>
 
-<tr><tt>T</tt> is required to be a raw pointer to an object or a class type
+<tr><tt>T</tt> is required to be a pointer type to an object or a class type
 imitating a pointer to an object; anything else is ill-formed.
 <tt>decltype(*declval&lt;T&amp;&gt;())</tt> must be well-formed and must return
 an lvalue reference; anything else is ill-formed. If <tt>T</tt> is a pointer to
 const then <tt>propagate_const</tt> remains well-formed.
 
 <h3>X.Y.3&nbsp;&nbsp;Class template <tt>propagate_const noexcept</tt> status [propagate_const.noexcept]</h3>
-<p>When <tt>T</tt> is a raw pointer then all member functions of <tt>propagate_const</tt>
+<p>When <tt>T</tt> is a pointer type then all member functions of <tt>propagate_const</tt>
 are <tt>noexcept</tt>. When <tt>T</tt> is a class type imitating a pointer then member functions
 of <tt>propagate_const</tt> may be conditionally <tt>noexcept</tt>.</p>
 
@@ -374,7 +374,7 @@ namespace std {
 <table cellpadding="6px">
   <tr><td><sup>2</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
   <tr><td><sup>3</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt>. If <tt>U</tt> is an rvalue reference, then the wrapped <tt>T</tt> is move constructed from <tt>u</tt>, otherwise the wrapped <tt>T</tt> is copy constructed from <tt>u</tt>.</td></tr>
-  <tr><td><sup>4</sup></td><td><i>Post-conditions:</i> If <tt>u</tt> is a raw pointer, then <tt>get()</tt> yields <tt>u</tt>, otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> yielded before construction.</td></tr>
+  <tr><td><sup>4</sup></td><td><i>Post-conditions:</i> If <tt>u</tt> is a pointer type, then <tt>get()</tt> yields <tt>u</tt>, otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> yielded before construction.</td></tr>
 </table>
 <b><tt>template &lt;class U&gt; constexpr propagate_const(const propagate_const&lt;U&gt;&amp; pu);</tt><br/></b>
 <table cellpadding="6px">
@@ -440,7 +440,7 @@ namespace std {
   <b><tt>constexpr operator const element_type*() const;</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>4</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
-    <tr><td><sup>5</sup></td><td><i>Remarks:</i> This function is only defined if <tt>T</tt> is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
+    <tr><td><sup>5</sup></td><td><i>Remarks:</i> This function is only defined if <tt>T</tt> is a pointer type or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
   </table>  
   <b><tt>constexpr const element_type&amp; operator*() const;</tt></b><br/> 
   <table cellpadding="6px">
@@ -450,7 +450,7 @@ namespace std {
   </table>  
   <b><tt>constexpr const element_type* get() const;</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a raw pointer, otherwise <tt>t_.get()</tt>.</td></tr>
+    <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a pointer type, otherwise <tt>t_.get()</tt>.</td></tr>
   </table>  
 </div>
 
@@ -466,7 +466,7 @@ namespace std {
   <b><tt>constexpr operator element_type*();</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
-    <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function is only defined if <tt>T</tt> is a raw pointer or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
+    <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function is only defined if <tt>T</tt> is a pointer type or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
   </table>  
   <b><tt>constexpr element_type&amp; operator*();</tt></b><br/> 
   <table cellpadding="6px">
@@ -476,7 +476,7 @@ namespace std {
   </table>
   <b><tt>constexpr element_type* get();</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>8</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a raw pointer, otherwise <tt>t_.get()</tt>.</td></tr>
+    <tr><td><sup>8</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is a pointer type, otherwise <tt>t_.get()</tt>.</td></tr>
   </table>  
 </div>
 
