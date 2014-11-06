@@ -287,14 +287,14 @@ namespace std {
     template &lt;class U&gt; 
       constexpr propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu); 
     
-    //<i>const Observers</i>
+    //<i> const Observers</i>
     explicit constexpr operator bool() const;
     constexpr const element_type* operator-&gt;() const;
     constexpr operator const element_type*() const; //<i>Conditionally defined: see below</i>
     constexpr const element_type&amp; operator*() const;
     constexpr const element_type* get() const;
     
-    //<i>Non-const Observers</i>
+    //<i> Non-const Observers</i>
     constexpr element_type* operator-&gt;();
     constexpr operator element_type*(); //<i>Conditionally defined: see below</i> 
     constexpr element_type&amp; operator*();
