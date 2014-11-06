@@ -251,8 +251,8 @@ the wrapper is accessed through a <tt>const</tt> access path.
 If <tt>T</tt> is an array type or pointer to function type then the program is ill-formed.
 [<i>Note:</i> propagate_const&lt;const int*&gt; is well-formed <i>- End note</i>]</p>
 
-<p>In the following sections let <i>PT</i> = <tt>is_pointer&lt;T&gt;::value</tt> and
-let <i>PTU</i> = <tt>is_pointer&lt;T&gt;::value &amp;&amp; is_pointer&lt;U&gt;::value</tt>.</p>
+<p>In the following sections let <i>PT</i> be <tt>is_pointer&lt;T&gt;::value</tt> and
+let <i>PTU</i> be <tt>is_pointer&lt;T&gt;::value &amp;&amp; is_pointer&lt;U&gt;::value</tt>.</p>
 
 <h3>X.Y.2&nbsp;&nbsp;Header <tt>&lt;propagate_const&gt;</tt> synopsis [propagate_const.synopsis]</h3>
 <blockquote><tt><pre>
