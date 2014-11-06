@@ -379,13 +379,13 @@ namespace std {
 <b><tt>template &lt;class U&gt; constexpr propagate_const(const propagate_const&lt;U&gt;&amp; pu);</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>5</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-  <tr><td><sup>6</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from the  pointer type wrapped by <tt>pu</tt>.</td></tr>
+  <tr><td><sup>6</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> constructed from the object wrapped by <tt>pu</tt>.</td></tr>
   <tr><td><sup>7</sup></td><td><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</td></tr>
 </table>
 <b><tt>template &lt;class U&gt; constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>8</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-  <tr><td><sup>9</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps an rvalue constructed <tt>T</tt> from the pointer type wrapped by <tt>pu</tt>.</td></tr>
+  <tr><td><sup>9</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps an rvalue constructed <tt>T</tt> from the object wrapped by <tt>pu</tt>.</td></tr>
   <tr><td><sup>10</sup></td><td><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</td></tr>
 </table>
 </div>
