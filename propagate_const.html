@@ -233,7 +233,7 @@ The wrapped <tt>T</tt> should not be value-initialized as this would incur a cos
 <p>Free-standing equality, inequality and comparison operators are provided so that a <tt>propagate_const&lt;T&gt;</tt> can be used in any equality, inequality or comparison where a <tt>T</tt> could be used. <tt>const</tt>-propagation should not alter the result of any equality, inequality or comparison operation.</p>
     
 <h3><tt>swap</tt></h3>    
-<p>Neither the member <tt>swap</tt> function nor the free-standing <tt>swap</tt> function should add or remove <tt>const</tt>-ness but should not unduly restrict the types with which <tt>propagate_const&lt;T&gt;</tt> can be swapped. If <tt>T</tt> and <tt>U</tt> can be swapped then <tt>const</tt>-propagating <tt>T</tt> and <tt>U</tt> can be swapped.</p>
+<p><tt>swap</tt> will swap the underlying pointers.</p>
     
 <h3><tt>get_underlying</tt></h3>
 <p><tt>get_underlying</tt> is a free-standing function which allows the underlying pointer to be accessed. The use of this function allows <tt>const</tt>-propagation to be dropped and is therefore discouraged. The function is named such that it will be easy to find in code review.</p>
@@ -291,7 +291,7 @@ namespace std {
     //<i> [propagate_const.non_const_observers], non-const observers</i>
     constexpr element_type* operator-&gt;() noexcept(<i>PT</i>);
     constexpr operator element_type*() noexcept(<i>PT</i>); //<i>Not always defined: see below</i> 
-    constexpr element_type&amp; operator*() noexcept(<i>PT</i>);
+  constexpr element_type&amp; operator*() noexcept(<i>PT</i>);
     constexpr element_type* get() noexcept(<i>PT</i>);
 
     //<i> [propagate_const.modifiers], modifiers</i>
@@ -428,7 +428,6 @@ namespace std {
   </table>
   <b><tt>constexpr const element_type* operator-&gt;() const noexcept(<i>PT</i>);</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>2</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
     <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
   </table>  
   <b><tt>constexpr operator const element_type*() const noexcept(<i>PT</i>);</tt></b><br/> 
@@ -479,7 +478,7 @@ namespace std {
 <div style="margin-left:20px">
 <b><tt>constexpr void swap(propagate_const&amp;&lt;T&gt; pt) noexcept;</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>1</sup></td><td><i>Effects:</i> Swaps the wrapped pointer of <tt>*this</tt> with the wrapped pointer of <tt>pt</tt>.</td></tr>
+    <tr><td><sup>1</sup></td><td><i>Effects:</i> <tt>t_.swap(pt.t_)</tt>.</td></tr>
   </table>
 </div>
 
@@ -491,132 +490,132 @@ namespace std {
   <b><tt>template &lt;class T&gt;
       constexpr bool operator==(const propagate_const&lt;T&gt;&amp; pt, nullptr_t) noexcept(<i>PT</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>1</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) == nullptr</tt>.</td></tr>
+    <tr><td><sup>1</sup></td><td><i>Returns:</i> <tt>pt.t_ == nullptr</tt>.</td></tr>
   </table>
   
   <b><tt>template &lt;class T&gt;
       constexpr bool operator==(nullptr_t, const propagate_const&lt;U&gt;&amp; pt) noexcept(<i>PT</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>nullptr == get_underlying(pt)</tt>.</td></tr>
+    <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>nullptr == pt.t_</tt>.</td></tr>
   </table>
   
   <b><tt>template &lt;class T&gt;
       constexpr bool operator!=(const propagate_const&lt;T&gt;&amp; pt, nullptr_t) noexcept(<i>PT</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) != nullptr</tt>.</td></tr>
+    <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>pt.t_ != nullptr</tt>.</td></tr>
   </table>
   <b><tt>template &lt;class T&gt;
       constexpr bool operator!=(nullptr_t, const propagate_const&lt;T&gt;&amp; pt) noexcept(<i>PT</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>4</sup></td><td><i>Returns:</i> <tt>nullptr != get_underlying(pt)</tt>.</td></tr>
+    <tr><td><sup>4</sup></td><td><i>Returns:</i> <tt>nullptr != pt.t_</tt>.</td></tr>
   </table>
   <p/>
   <b><tt>template &lt;class T, class U&gt;<br/>
       &nbsp;&nbsp;constexpr bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>5</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) == get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>5</sup></td><td><i>Returns:</i> <tt>pt.t_ == pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;<br/>
      &nbsp;&nbsp;constexpr bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) != get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>pt.t_ != pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;<br/> 
       &nbsp;&nbsp;constexpr bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) &lt; get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>pt.t_ &lt; pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;<br/>
       &nbsp;&nbsp;constexpr bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>8</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) &gt; get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>8</sup></td><td><i>Returns:</i> <tt>pt.t_ &gt; pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;<br/>
       &nbsp;&nbsp;constexpr bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) &lt;= get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>9</sup></td><td><i>Returns:</i> <tt>pt.t_ &lt;= pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt;<br/>
       &nbsp;&nbsp;constexpr bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>10</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) &gt;= get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>10</sup></td><td><i>Returns:</i> <tt>pt.t_ &gt;= pu.t_</tt>.</td></tr>
   </table>
   <p/>
   <b><tt>template &lt;class T, class U&gt; 
       constexpr bool operator==(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>11</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) == u</tt>.</td></tr>
+    <tr><td><sup>11</sup></td><td><i>Returns:</i> <tt>pt.t_ == u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       constexpr bool operator!=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>12</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) != u</tt>.</td></tr>
+    <tr><td><sup>12</sup></td><td><i>Returns:</i> <tt>pt.t_ != u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       constexpr bool operator&lt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>13</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) &lt; u</tt>.</td></tr>
+    <tr><td><sup>13</sup></td><td><i>Returns:</i> <tt>pt.t_ &lt; u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       constexpr bool operator&gt;(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>14</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) &gt; u</tt>.</td></tr>
+    <tr><td><sup>14</sup></td><td><i>Returns:</i> <tt>pt.t_ &gt; u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       constexpr bool operator&lt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>15</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) &lt;= u</tt>.</td></tr>
+    <tr><td><sup>15</sup></td><td><i>Returns:</i> <tt>pt.t_ &lt;= u</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
       constexpr bool operator&gt;=(const propagate_const&lt;T&gt;&amp; pt, const U&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>16</sup></td><td><i>Returns:</i> <tt>get_underlying(pt) &gt;= u</tt>.</td></tr>
+    <tr><td><sup>16</sup></td><td><i>Returns:</i> <tt>pt.t_ &gt;= u</tt>.</td></tr>
   </table>
   <p/>
   <b><tt>template &lt;class T, class U&gt; 
-      constexpr bool operator==(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
+      constexpr bool operator==(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>17</sup></td><td><i>Returns:</i> <tt>t == get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>17</sup></td><td><i>Returns:</i> <tt>t == pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      constexpr bool operator!=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
+      constexpr bool operator!=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>18</sup></td><td><i>Returns:</i> <tt>t != get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>18</sup></td><td><i>Returns:</i> <tt>t != pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      constexpr bool operator&lt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
+      constexpr bool operator&lt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>19</sup></td><td><i>Returns:</i> <tt>t &lt; get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>19</sup></td><td><i>Returns:</i> <tt>t &lt; pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      constexpr bool operator&gt;(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
+      constexpr bool operator&gt;(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>20</sup></td><td><i>Returns:</i> <tt>t &gt; get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>20</sup></td><td><i>Returns:</i> <tt>t &gt; pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      constexpr bool operator&lt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
+      constexpr bool operator&lt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>21</sup></td><td><i>Returns:</i> <tt>t &lt;= get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>21</sup></td><td><i>Returns:</i> <tt>t &lt;= pu.t_</tt>.</td></tr>
   </table>
 
   <b><tt>template &lt;class T, class U&gt; 
-      constexpr bool operator&gt;=(const T&amp; pt, const propagate_const&lt;U&gt;&amp; u) noexcept(<i>PTU</i>);</tt></b><br/>
+      constexpr bool operator&gt;=(const T&amp; t, const propagate_const&lt;U&gt;&amp; pu) noexcept(<i>PTU</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>22</sup></td><td><i>Returns:</i> <tt>t &gt;= get_underlying(pu)</tt>.</td></tr>
+    <tr><td><sup>22</sup></td><td><i>Returns:</i> <tt>t &gt;= pu.t_</tt>.</td></tr>
   </table>
 </div>
 
@@ -626,7 +625,7 @@ namespace std {
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; constexpr void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2) noexcept(<i>PT</i>);</tt></b><br/>
   <table cellpadding="6px">
-    <tr><td><sup>1</sup></td><td><i>Effects:</i> Calls <tt>pt1.swap(pt2)</tt>.</td></tr>
+    <tr><td><sup>1</sup></td><td><i>Effects:</i><tt>swap(pt1.t_, pt2.t_)</tt>.</td></tr>
   </table>
 </div>
 
@@ -650,7 +649,7 @@ namespace std {
   <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
   <div>
     <p style="margin-left:20px">The template specialization shall meet the requirements of class template <tt>hash</tt> (20.9.12).</p> 
-    <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash&lt;propagate_const&lt;T&gt;>()(p)</tt>
+    <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash&lt;propagate_const&lt;T&gt;()(p)</tt>
     shall evaluate to the same value as <tt>hash&lt;T&gt;()(p.get())</tt>.</p>
     <p style="margin-left:20px"><i>Requires:</i> The specialization <tt>hash&lt;T&gt;</tt> shall be well-formed and well-defined, 
       and shall meet the requirements of class template hash.</p>
@@ -660,12 +659,12 @@ namespace std {
 
 
 <H2>VI. Acknowledgements</H2>
-<p>Thanks to Walter Brown, Kevin Channon, Nick Maclaren, Roger Orr, Ville Voutilainen, Jonathan Wakely, David Ward and others for helpful discussion.</p>
+<p>Thanks to Walter Brown, Kevin Channon, Stephan T. Lavavej, Nick Maclaren, Roger Orr, Ville Voutilainen, Jonathan Wakely, David Ward and others for helpful discussion.</p>
 
 <H2>VII. Revisions</H2>
 <p>This paper revises N4209</p>
 <ul>
-<li>Added constexpr. Minor editorial changes to wording following meeting in Urbana.</li>
+  <li>Added constexpr. Added <tt>noexcept</tt>. Altered relational operators to use <tt>t_</tt> not <tt>get()<tt>.</li>
 </ul>
 
 <p>N4209 revises N4057</p>
