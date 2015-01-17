@@ -216,10 +216,43 @@ int main()
 <p>Inheritance from the wrapped pointer-like object (where it is a class type) was considered but ruled out. The purpose of this wrapper is to help the author ensure <tt>const</tt>-propagation; if <tt>propagate_const&lt;T&gt;</tt> were to inherit from <tt>T</tt>, then it would allow potentially non-<tt>const</tt> member functions of <tt>T</tt> to be called in a <tt>const</tt> context.</p>
     
 <h3>Construction and assignment</h3>
-<p> A <tt>propagate_const&lt;T&gt;</tt> should be constructable and assignable from a <tt>U</tt> or a <tt>propagate_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from. 
+<p> A <tt>propagate_const&lt;T&gt;</tt> should be move-constructable and move-assignable from a <tt>U</tt> or a <tt>propagate_const&lt;U&gt;</tt> where <tt>U</tt> is any type that <tt>T</tt> can be constructed or assigned from. 
 There should be no additional cost of construction for a <tt>propagate_const&lt;T&gt;</tt> beyond that for construction of a <tt>T</tt>. 
 The wrapped <tt>T</tt> should not be value-initialized as this would incur a cost for pointer types. 
 If value-initialization is desirable then it can be accomplished with another wrapper class like <tt>boost::value_initialized</tt> [4].</p>
+
+<h3>Non-copyable</h3>
+<p> A <tt>propagate_const&lt;T&gt;</tt> cannot be copied or assigned from a <tt>const propagate_const&lt;T&gt;&amp;</tt>. 
+This is to prevent unintentional removal of <tt>const-safety</tt> through copying. For instance:
+</p>
+<blockquote><tt><pre>
+struct G;
+struct F
+{
+  void const_method() const; // calls only const methods of m_g;
+  
+  void non_const_method(); // calls methods of m_g
+  
+  propagate_const&lt;G*&gt; m_g;
+};
+
+void some_function(const F&amp; f) // const-ref passed in, no resources should be accessed in a non-const manner
+{
+  F copy_f = f;
+  f.non_const_method();
+}
+</blockquote></tt></pre>
+
+<p>As <tt>propagate_const</tt> cannot be copied, the default copy and assignment operators will not be generated for <tt>F</tt>.
+This will prevent the code above from compiling.
+</p>
+<p>If copy-construction (or assignment) from a non-<tt>const F&amp;</tt> were desirable, then functions would need to be user-implemented.
+</p>
+<p><tt>propagate_const</tt> is intended to decorate class members, not to be used as a vocabulary type, so does not provide
+copy or assignment member functions taking a non-<tt>const</tt> reference (which would be unusable by other 
+compiler-generated copy and assignment member functions). 
+</p>
+
 
 <h3>Pointer-like functions</h3>
 <p><tt>operator*</tt> and <tt>operator-&gt;</tt> are defined to preserve <tt>const</tt>-propagation. When a <tt>const</tt> <tt>propagate_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
@@ -236,6 +269,9 @@ If value-initialization is desirable then it can be accomplished with another wr
 <h3><tt>swap</tt></h3>    
 <p><tt>swap</tt> will swap the underlying pointers.</p>
     
+<h3><tt>delete</tt></h3>    
+<p>When <tt>T</tt> is a raw pointer, <tt>delete propagate_const&lt;T&gt;</tt> will delete the underlying pointer without the need for explicit extraction of the raw pointer.</p>
+
 <h3><tt>get_underlying</tt></h3>
 <p><tt>get_underlying</tt> is a free-standing function which allows the underlying pointer to be accessed. The use of this function allows <tt>const</tt>-propagation to be dropped and is therefore discouraged. The function is named such that it will be easy to find in code review.</p>
     
@@ -269,35 +305,36 @@ namespace std {
     constexpr propagate_const() = default;
     template &lt;class U&gt; 
       constexpr propagate_const(U&amp;&amp; u); 
-    template &lt;class U&gt; 
-      constexpr propagate_const(const propagate_const&lt;U&gt;&amp; pu);
+    propagate_const(const propagate_const&amp; pu) = delete;
     template &lt;class U&gt; 
       constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu) noexcept(<i>see below</i>);
     
     //<i> [propagate_const.assignment], assignment</i>
     template &lt;class U&gt; 
       constexpr propagate_const&amp; operator=(U&amp;&amp; u); 
-    template &lt;class U&gt; 
-      constexpr propagate_const&amp; operator=(const propagate_const&lt;U&gt;&amp; pu); 
+    propagate_const&amp; operator=(const propagate_const&amp; pu) = delete; 
     template &lt;class U&gt; 
       constexpr propagate_const&amp; operator=(propagate_const&lt;U&gt;&amp;&amp; pu) noexcept; 
     
     //<i> [propagate_const.const_observers], const observers</i>
     explicit constexpr operator bool() const;
     constexpr const element_type* operator-&gt;() const;
-    constexpr operator const element_type*() const; //<i>Not always defined: see below</i>
+    constexpr operator const element_type*() const; //<i>Not always defined</i>
     constexpr const element_type&amp; operator*() const;
     constexpr const element_type* get() const;
     
     //<i> [propagate_const.non_const_observers], non-const observers</i>
     constexpr element_type* operator-&gt;();
-    constexpr operator element_type*(); //<i>Not always defined: see below</i> 
+    constexpr operator element_type*(); //<i>Not always defined</i> 
     constexpr element_type&amp; operator*();
     constexpr element_type* get();
 
     //<i> [propagate_const.modifiers], modifiers</i>
     constexpr void swap(propagate_const&lt;T&gt;&amp; pt) noexcept(<i>see below</i>);
  
+    //<i> [propagate_const.delete], delete</i>
+    void operator delete(void*); //<i>Not always defined</i> 
+
   private:
     T t_; //<i>exposition only</i>
   };
@@ -355,7 +392,7 @@ namespace std {
   //<i> [propagate_const.algorithms], specialized algorithms</i>
   template &lt;class T&gt;
     constexpr void swap(propagate_const&lt;T&gt;&amp; pt, propagate_const&lt;T&gt;&amp; pt2) noexcept(<i>see below</i>);
-  
+
   //<i> [propagate_const.underlying], underlying pointer access</i>
   template &lt;class T&gt;
     constexpr const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt) noexcept;
@@ -377,12 +414,6 @@ namespace std {
   <tr><td><sup>2</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> initialized with <tt>std::forward&lt;U&gt;(u)</tt>.</td></tr>
   <tr><td><sup>3</sup></td><td><i>Post-conditions:</i> If <tt>U</tt> is a pointer type, then <tt>get()</tt> yields the value of <tt>u</tt> implicitly converted to <tt>T</tt>, otherwise <tt>get()</tt> yields the value that <tt>u.get()</tt> implicitly converted to <tt>T</tt> yielded before construction.</td></tr>
 </table><p/>
-<b><tt>template &lt;class U&gt; constexpr propagate_const(const propagate_const&lt;U&gt;&amp; pu);</tt><br/></b>
-<table cellpadding="6px">
-  <tr><td><sup>4</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-  <tr><td><sup>5</sup></td><td><i>Effects:</i> Constructs a <tt>propagate_const&lt;T&gt;</tt> that wraps a <tt>T</tt> initialized with <tt>pui.t_</tt>.</td></tr>
-  <tr><td><sup>6</sup></td><td><i>Post-conditions:</i> <tt>get()</tt> yields the value that <tt>pu.get()</tt> yielded before construction.</td></tr>
-</table><p/>
 <b><tt>template &lt;class U&gt; constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu) noexcept(<i>see below</i>);</tt><br/></b>
 <p>The constant-expression in the exception-specification is <tt>is_same&lt;T,U&gt;::value &amp;&amp; is_nothrow_move_constructable&lt;T&gt;::value</tt></p>
 <table cellpadding="6px">
@@ -401,12 +432,6 @@ namespace std {
     <tr><td><sup>1</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
     <tr><td><sup>2</sup></td><td><i>Effects:</i> <tt>t_=forward&lt;U&gt;(u)</tt>.</td></tr>
     <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
-  </table><p/>
-  <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(const propagate_const&lt;U&gt;&amp; pu);</tt></b><br/> 
-  <table cellpadding="6px">
-    <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-    <tr><td><sup>5</sup></td><td><i>Effects:</i> <tt>t_=pu.t_</tt>.</td></tr>
-    <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
   </table><p/>
   <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu) noexcept(<i>see below</i>);</tt></b><br/> 
   <p>The constant-expression in the exception-specification is <tt>is_same&lt;T,U&gt;::value &amp;&amp; is_nothrow_move_assignable&lt;T&gt;::value</tt></p>
@@ -482,8 +507,16 @@ namespace std {
   </table>
 </div>
 
+<div style="margin-left:20px">
+<h3>X.Y.8&nbsp;&nbsp;<tt>propagate_const</tt> delete [propagate_const.delete]</h3>
+  <table cellpadding="6px">
+    <tr><td><sup>1</sup></td><td><i>Remarks:</i> This function is only defined if <tt>T</tt> is a pointer type.</td></tr>
+    <tr><td><sup>2</sup></td><td><i>Effects:</i> <tt>delete t_</tt>.</td></tr>
+  </table>
+</div>
 
-<h3>X.Y.8&nbsp;&nbsp;<tt>propagate_const</tt> relational operators [propagate_const.relational]</h3>
+
+<h3>X.Y.9&nbsp;&nbsp;<tt>propagate_const</tt> relational operators [propagate_const.relational]</h3>
 
 <div style="margin-left:20px">
   
@@ -620,7 +653,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.9&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms [propagate_const.algorithms]</h3>
+<h3>X.Y.10&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms [propagate_const.algorithms]</h3>
 
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; constexpr void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2) noexcept(<i>see below</i>);</tt></b><br/>
@@ -631,7 +664,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.10&nbsp;&nbsp;<tt>propagate_const</tt> underlying pointer access [propagate_const.underlying]</h3>
+<h3>X.Y.11&nbsp;&nbsp;<tt>propagate_const</tt> underlying pointer access [propagate_const.underlying]</h3>
 <p style="margin-left:20px">Access to the underlying pointer type is through free functions rather than member functions. These functions are intended to resemble cast operations to encourage caution when using them.</p> 
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; constexpr const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt) noexcept;</tt></b><br/> 
@@ -645,7 +678,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.11&nbsp;&nbsp;<tt>propagate_const</tt> hash support [propagate_const.hash]</h3>
+<h3>X.Y.12&nbsp;&nbsp;<tt>propagate_const</tt> hash support [propagate_const.hash]</h3>
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
   <div>
@@ -661,17 +694,23 @@ namespace std {
 
 
 <H2>VI. Acknowledgements</H2>
-<p>Thanks to Walter Brown, Kevin Channon, Stephan T. Lavavej, Nick Maclaren, Roger Orr, Ville Voutilainen, Jonathan Wakely, David Ward and others for helpful discussion.</p>
+<p>Thanks to Walter Brown, Kevin Channon, Stephan T. Lavavej, Nick Maclaren, Roger Orr, Ville Voutilainen, Jonathan Wakely, David Ward, the staff of the Creative Assembly and others for helpful discussion.</p>
 
 <H2>VII. Revisions</H2>
 <p>This paper revises N4209</p>
 <ul>
-  <li>Default constructor is now defaulted. Added <tt>constexpr</tt>. Added <tt>noexcept</tt>. Altered relational operators, assignement and swap to use <tt>t_</tt>.</li>
+  <li>Default constructor is now defaulted.</li>
+  <li>Added <tt>constexpr</tt>.</li>
+  <li>Added <tt>noexcept</tt>.</li>
+  <li>Altered relational operators, assignement and swap to use <tt>t_</tt>.</li>
+  <li>Copy and assignement from const reference are now deleted.</li>
+  <li>delete function provided when <tt>T</tt> is a pointer.</li>
 </ul>
 
 <p>N4209 revises N4057</p>
 <ul>
-<li>Extended comparison operators to avoid reliance on implicit conversions. Minor cosmetic changes.</li>
+  <li>Extended comparison operators to avoid reliance on implicit conversions.</li>
+  <li>Minor cosmetic changes.</li>
 </ul>
     
 <p>N4057 revises N3973</p>
