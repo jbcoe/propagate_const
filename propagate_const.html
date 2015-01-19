@@ -269,9 +269,6 @@ compiler-generated copy and assignment member functions).
 <h3><tt>swap</tt></h3>    
 <p><tt>swap</tt> will swap the underlying pointers.</p>
     
-<h3><tt>delete</tt></h3>    
-<p>When <tt>T</tt> is a raw pointer, <tt>delete propagate_const&lt;T&gt;</tt> will delete the underlying pointer without the need for explicit extraction of the raw pointer.</p>
-
 <h3><tt>get_underlying</tt></h3>
 <p><tt>get_underlying</tt> is a free-standing function which allows the underlying pointer to be accessed. The use of this function allows <tt>const</tt>-propagation to be dropped and is therefore discouraged. The function is named such that it will be easy to find in code review.</p>
     
@@ -305,14 +302,14 @@ namespace std {
     constexpr propagate_const() = default;
     template &lt;class U&gt; 
       constexpr propagate_const(U&amp;&amp; u); 
-    propagate_const(const propagate_const&amp; pu) = delete;
+    propagate_const(const propagate_const&amp; p) = delete;
     template &lt;class U&gt; 
       constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu) noexcept(<i>see below</i>);
     
     //<i> [propagate_const.assignment], assignment</i>
     template &lt;class U&gt; 
       constexpr propagate_const&amp; operator=(U&amp;&amp; u); 
-    propagate_const&amp; operator=(const propagate_const&amp; pu) = delete; 
+    propagate_const&amp; operator=(const propagate_const&amp; p) = delete; 
     template &lt;class U&gt; 
       constexpr propagate_const&amp; operator=(propagate_const&lt;U&gt;&amp;&amp; pu) noexcept; 
     
@@ -332,9 +329,6 @@ namespace std {
     //<i> [propagate_const.modifiers], modifiers</i>
     constexpr void swap(propagate_const&lt;T&gt;&amp; pt) noexcept(<i>see below</i>);
  
-    //<i> [propagate_const.delete], delete</i>
-    void operator delete(void*); //<i>Not always defined</i> 
-
   private:
     T t_; //<i>exposition only</i>
   };
@@ -507,16 +501,8 @@ namespace std {
   </table>
 </div>
 
-<div style="margin-left:20px">
-<h3>X.Y.8&nbsp;&nbsp;<tt>propagate_const</tt> delete [propagate_const.delete]</h3>
-  <table cellpadding="6px">
-    <tr><td><sup>1</sup></td><td><i>Remarks:</i> This function is only defined if <tt>T</tt> is a pointer type.</td></tr>
-    <tr><td><sup>2</sup></td><td><i>Effects:</i> <tt>delete t_</tt>.</td></tr>
-  </table>
-</div>
 
-
-<h3>X.Y.9&nbsp;&nbsp;<tt>propagate_const</tt> relational operators [propagate_const.relational]</h3>
+<h3>X.Y.8&nbsp;&nbsp;<tt>propagate_const</tt> relational operators [propagate_const.relational]</h3>
 
 <div style="margin-left:20px">
   
@@ -653,7 +639,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.10&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms [propagate_const.algorithms]</h3>
+<h3>X.Y.9&nbsp;&nbsp;<tt>propagate_const</tt> specialized algorithms [propagate_const.algorithms]</h3>
 
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; constexpr void swap(propagate_const&lt;T&gt;&amp; pt1, propagate_const&lt;T&gt;&amp; pt2) noexcept(<i>see below</i>);</tt></b><br/>
@@ -664,7 +650,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.11&nbsp;&nbsp;<tt>propagate_const</tt> underlying pointer access [propagate_const.underlying]</h3>
+<h3>X.Y.10&nbsp;&nbsp;<tt>propagate_const</tt> underlying pointer access [propagate_const.underlying]</h3>
 <p style="margin-left:20px">Access to the underlying pointer type is through free functions rather than member functions. These functions are intended to resemble cast operations to encourage caution when using them.</p> 
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; constexpr const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt) noexcept;</tt></b><br/> 
@@ -678,7 +664,7 @@ namespace std {
 </div>
 
 
-<h3>X.Y.12&nbsp;&nbsp;<tt>propagate_const</tt> hash support [propagate_const.hash]</h3>
+<h3>X.Y.11&nbsp;&nbsp;<tt>propagate_const</tt> hash support [propagate_const.hash]</h3>
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;;</tt></b><br/>
   <div>
