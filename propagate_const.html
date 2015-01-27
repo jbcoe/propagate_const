@@ -246,12 +246,6 @@ void some_function(const F&amp; f) // const-ref passed in, no resources should b
 <p>As <tt>propagate_const</tt> cannot be copied, the default copy and assignment operators will not be generated for <tt>F</tt>.
 This will prevent the code above from compiling.
 </p>
-<p>If copy-construction (or assignment) from a non-<tt>const F&amp;</tt> were desirable, then functions would need to be user-implemented.
-</p>
-<p><tt>propagate_const</tt> is intended to decorate class members, not to be used as a vocabulary type, so does not provide
-copy or assignment member functions taking a non-<tt>const</tt> reference (which would be unusable by other 
-compiler-generated copy and assignment member functions). 
-</p>
 
 
 <h3>Pointer-like functions</h3>
