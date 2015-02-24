@@ -415,28 +415,141 @@ namespace std {
 
 <h3>X.Y.3&nbsp;&nbsp;<tt>propagate_const</tt> requirements on <tt>T</tt> [propagate_const.requirements]</h3>
 
-<p><tt>T</tt> shall be an object pointer type or a class type for which
-<tt>decltype(*declval&lt;T&amp;&gt;())</tt> is an lvalue reference; otherwise
-the program is ill-formed.</p>
+<p>
+<tt>T</tt> shall be an object pointer type or a class type for which
+<tt>decltype(*declval&lt;T&amp;&gt;())</tt> is an lvalue reference;
+otherwise the program is ill-formed.
+</p>
+<p>
+Given <tt>T</tt> is class type, in this sub-clause
+[propagate_const.requirements] <tt>t</tt> denotes a
+non-<tt>const</tt> lvalue of type <tt>T</tt>, <tt>ct</tt> denotes an
+lvalue of type <tt>const T</tt>,
+<tt>reference</tt> and <tt>const_reference</tt> denote lvalue
+reference types, <tt>pointer</tt> and
+<tt>const_pointer</tt> denote object types.
+<p/>
+A value <tt>t</tt> and <tt>ct</tt> shall be contextually convertible to
+<tt>bool</tt>,
+the result of these conversions shall be equivalent to the result
+value of evaluating the expressions
+<tt>t.get() != nullptr</tt> and <tt>ct.get() != nullptr</tt>, respectively.
+<p/>
+If a value <tt>t</tt> is implicitly convertible to <tt>pointer</tt>,
+<tt>(pointer)t</tt> shall return the same value as
+<tt>t.get()</tt>.
+<p/>
+If a value <tt>ct</tt> is implicitly convertible to
+<tt>const_pointer</tt>, <tt>(const_pointer)ct</tt> shall return the
+same value as
+<tt>ct.get()</tt>.
+</p>
 
-<p>If <tt>T</tt> is a class type it shall define:</p>
-<ul>
-  <li>A const and a non-const member function <tt>operator*()</tt> returning a (possibly cv-qualified) type <tt>reference</tt>.</li>
-  <li>A const and a non-const member function <tt>operator-&gt;()</tt> returning a (possibly cv-qualified) type <tt>pointer</tt>.</li> 
-  <li>A const and a non-const member function <tt>get()</tt> returning a (possibly cv-qualified) type <tt>pointer</tt>.</li> 
-  <li>A const member function <tt>operator bool()</tt>.</li> 
-</ul>
+<blockquote>
+  <table border="1">
+    <caption>Table XX &mdash; Requirements on class types <tt>T</tt></caption>
+    <tr>
+      <th>Expression</th>
+      <th>Return type</th>
+      <th>Operational<br/>semantics</th>
+    </tr>
 
-<p>If <tt>t</tt> is an instance of <tt>T</tt>, it is required that:</p>
-<ul>
-  <li><tt>std::remove_reference_t&lt;reference&gt;</tt> and <tt>std::remove_pointer_t&lt;pointer&gt;</tt> shall be the same type.</li>
-  <li><tt>*t</tt>, <tt>*t.operator-&gt;()</tt> and <tt>*t.get()</tt> shall be references to the same object.</li>
-  <li><tt>operator bool()</tt> shall return the same value as <tt>get()!=nullptr</tt>.</li>
-  <li>If <tt>T</tt> is implicitly convertible to <tt>pointer</tt>, <tt>(pointer)t</tt> shall return the same value as <tt>t.get()</tt>.</li>
-</ul>
-<p>If <tt>T</tt> is an array type, reference type, pointer to function type or pointer to (possibly cv-qualified) <tt>void</tt>, then the program is ill-formed.</p> 
+    <tr>
+      <td>
+        <tt>*t</tt>
+      </td>
+      <td>
+        <tt>reference</tt>
+      </td>
+      <td>
+        <tt></tt>
+      </td>
+    </tr>
 
-[<i>Note:</i> <tt>propagate_const&lt;const int*&gt;</tt> is well-formed <i>-end note</i>]</p>
+    <tr>
+      <td>
+        <tt>*ct</tt>
+      </td>
+      <td>
+        <tt>const_reference</tt>
+      </td>
+      <td>
+        <tt>*t</tt> and <tt>*ct</tt> shall be references to the same object.<br/>
+        <tt>remove_const_t&lt;remove_reference_t&lt;reference&gt;&gt;</tt> and
+        <tt>remove_const_t&lt;remove_reference_t&lt;const_reference&gt;&gt;</tt>
+        shall be the same type.<br/> 
+        Either <tt>reference</tt> and <tt>const_reference</tt> shall be the same type or
+        <tt>add_const_t&lt;remove_reference_t&lt;reference&gt;&gt;</tt> and
+        <tt>remove_reference_t&lt;const_reference&gt;</tt> shall be the same type.
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <tt>t.operator-&gt;()</tt>
+      </td>
+      <td>
+        <tt>pointer</tt>
+      </td>
+      <td>
+        <tt>*t</tt> and <tt>*t.operator-&gt;()</tt> shall be references to the
+        same object.
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <tt>ct.operator-&gt;()</tt>
+      </td>
+      <td>
+        <tt>const_pointer</tt>
+      </td>
+      <td>
+        <tt>*t</tt> and <tt>*ct.operator-&gt;()</tt> shall be references to the
+        same object.
+        <tt>remove_const_t&lt;remove_pointer_t&lt;pointer&gt;&gt;</tt> and
+        <tt>remove_const_t&lt;remove_pointer_t&lt;const_pointer&gt;&gt;</tt>
+        shall be the same type.<br/>
+        Either <tt>pointer</tt> and <tt>const_pointer</tt> shall be the same type or
+        <tt>add_const_t&lt;remove_pointer_t&lt;pointer&gt;&gt;</tt> and 
+        <tt>remove_pointer_t&lt;const_pointer&gt;</tt> shall be the same type.
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <tt>t.get()</tt>
+      </td>
+      <td>
+        <tt>pointer</tt>
+      </td>
+      <td>
+        <tt>*t</tt> and <tt>*t.get()</tt> shall be references to the same object.
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <tt>ct.get()</tt>
+      </td>
+      <td>
+        <tt>const_pointer</tt>
+      </td>
+      <td>
+        <tt>*t</tt>, and <tt>*ct.get()</tt> shall be references to the same object.
+      </td>
+    </tr>
+
+  </table>
+</blockquote>
+
+<p>
+If <tt>T</tt> is an array type, reference type, pointer to function
+type or (possibly cv-qualified) void*, then the program is ill-formed.
+<p/>
+[<i>Note</i>: <tt>propagate_const&lt;const int*&gt;</tt> is
+well-formed &mdash; <i>end note</i>]
+</p>
 
 <h3>X.Y.4&nbsp;&nbsp;<tt>propagate_const</tt> constructors [propagate_const.ctor]</h3>
 
