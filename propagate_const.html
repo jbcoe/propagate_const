@@ -220,7 +220,7 @@ int main()
 There should be no additional cost of construction for a <tt>propagate_const&lt;T&gt;</tt> beyond that for construction of a <tt>T</tt>. 
 The wrapped <tt>T</tt> should not be value-initialized as this would incur a cost for object pointer types. 
 If value-initialization is desirable then it can be accomplished with another wrapper class like <tt>boost::value_initialized</tt> [4].</p>
-<p>The constructors should be revised to use <i><tt>EXPLICIT</tt></i> from NXXXX (Daniel Krugler: Improving <tt>pair</tt> and <tt>tuple</tt>) 
+<p>The constructors should be revised to use <i><tt>EXPLICIT</tt></i> from N4387 (Daniel Krugler: Improving <tt>pair</tt> and <tt>tuple</tt>) 
 once the Library Fundamentals TS references C++17.</p>
 
 <h3>Non-copyable</h3>
