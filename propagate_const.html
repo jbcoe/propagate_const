@@ -425,22 +425,19 @@ Given <tt>T</tt> is class type, in this sub-clause
 [propagate_const.requirements] <tt>t</tt> denotes a
 non-<tt>const</tt> lvalue of type <tt>T</tt>, <tt>ct</tt> denotes an
 lvalue of type <tt>const T</tt>,
-<tt>reference</tt> and <tt>const_reference</tt> denote lvalue
-reference types, <tt>pointer</tt> and
-<tt>const_pointer</tt> denote object types.
+<tt>element_type</tt> denotes an object type.
 <p/>
 A value <tt>t</tt> and <tt>ct</tt> shall be contextually convertible to
 <tt>bool</tt>,
-the result of these conversions shall be equivalent to the result
-value of evaluating the expressions
+the result of these conversions shall be equivalent to the result of evaluating the expressions
 <tt>t.get() != nullptr</tt> and <tt>ct.get() != nullptr</tt>, respectively.
 <p/>
-If a value <tt>t</tt> is implicitly convertible to <tt>pointer</tt>,
-<tt>(pointer)t</tt> shall return the same value as
+If a value <tt>t</tt> is implicitly convertible to <tt>element_type*</tt>,
+<tt>(element_type*)t</tt> shall return the same value as
 <tt>t.get()</tt>.
 <p/>
 If a value <tt>ct</tt> is implicitly convertible to
-<tt>const_pointer</tt>, <tt>(const_pointer)ct</tt> shall return the
+<tt>const element_type*</tt>, <tt>(const element_type*)ct</tt> shall return the
 same value as
 <tt>ct.get()</tt>.
 </p>
@@ -459,7 +456,7 @@ same value as
         <tt>*t</tt>
       </td>
       <td>
-        <tt>reference</tt>
+        <tt>element_type&amp;</tt>
       </td>
       <td>
         <tt></tt>
@@ -471,16 +468,10 @@ same value as
         <tt>*ct</tt>
       </td>
       <td>
-        <tt>const_reference</tt>
+        <tt>const element_type&amp;</tt> or <tt>element_type&amp;</tt>
       </td>
       <td>
         <tt>*t</tt> and <tt>*ct</tt> shall be references to the same object.<br/>
-        <tt>remove_const_t&lt;remove_reference_t&lt;reference&gt;&gt;</tt> and
-        <tt>remove_const_t&lt;remove_reference_t&lt;const_reference&gt;&gt;</tt>
-        shall be the same type.<br/> 
-        Either <tt>reference</tt> and <tt>const_reference</tt> shall be the same type or
-        <tt>add_const_t&lt;remove_reference_t&lt;reference&gt;&gt;</tt> and
-        <tt>remove_reference_t&lt;const_reference&gt;</tt> shall be the same type.
       </td>
     </tr>
 
@@ -489,7 +480,7 @@ same value as
         <tt>t.operator-&gt;()</tt>
       </td>
       <td>
-        <tt>pointer</tt>
+        <tt>element_type*</tt>
       </td>
       <td>
         <tt>*t</tt> and <tt>*t.operator-&gt;()</tt> shall be references to the
@@ -502,17 +493,11 @@ same value as
         <tt>ct.operator-&gt;()</tt>
       </td>
       <td>
-        <tt>const_pointer</tt>
+        <tt>const element_type*</tt> or <tt>element_type*</tt>
       </td>
       <td>
         <tt>*t</tt> and <tt>*ct.operator-&gt;()</tt> shall be references to the
         same object.
-        <tt>remove_const_t&lt;remove_pointer_t&lt;pointer&gt;&gt;</tt> and
-        <tt>remove_const_t&lt;remove_pointer_t&lt;const_pointer&gt;&gt;</tt>
-        shall be the same type.<br/>
-        Either <tt>pointer</tt> and <tt>const_pointer</tt> shall be the same type or
-        <tt>add_const_t&lt;remove_pointer_t&lt;pointer&gt;&gt;</tt> and 
-        <tt>remove_pointer_t&lt;const_pointer&gt;</tt> shall be the same type.
       </td>
     </tr>
 
@@ -521,7 +506,7 @@ same value as
         <tt>t.get()</tt>
       </td>
       <td>
-        <tt>pointer</tt>
+        <tt>element_type*</tt>
       </td>
       <td>
         <tt>*t</tt> and <tt>*t.get()</tt> shall be references to the same object.
@@ -533,7 +518,7 @@ same value as
         <tt>ct.get()</tt>
       </td>
       <td>
-        <tt>const_pointer</tt>
+        <tt>const element_type*</tt> or <tt>element_type*</tt>
       </td>
       <td>
         <tt>*t</tt>, and <tt>*ct.get()</tt> shall be references to the same object.
