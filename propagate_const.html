@@ -410,11 +410,12 @@ the program is ill-formed.</p>
   <li>A const member function <tt>operator bool()</tt>.</li> 
 </ul>
 
-<p>For the above member functions of <tt>T</tt> it is required that:</p>
+<p>If <tt>t</tt> is an instance of <tt>T</tt>, it is required that:</p>
 <ul>
   <li><tt>std::remove_reference_t&lt;reference&gt;</tt> and <tt>std::remove_pointer_t&lt;pointer&gt;</tt> shall be the same type.</li>
-  <li><tt>reference</tt> and <tt>*pointer</tt> shall be references to the same object.</li>
+  <li><tt>*t</tt>, <tt>*t.operator-&gt;()</tt> and <tt>*t.get()</tt> shall be references to the same object.</li>
   <li><tt>operator bool()</tt> shall return the same value as <tt>get()!=nullptr</tt>.</li>
+  <li>If <tt>T</tt> is implicitly convertible to <tt>pointer</tt>, <tt>(pointer)t</tt> shall return the same value as <tt>t.get()</tt>.</li>
 </ul>
 <p>If <tt>T</tt> is an array type, reference type, pointer to function type or (possibly cv-qualified) <tt>void*</tt>, then the program is ill-formed.</p> 
 
