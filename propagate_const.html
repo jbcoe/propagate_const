@@ -407,9 +407,15 @@ the program is ill-formed.</p>
   <li>A const and a non-const member function <tt>operator*()</tt> returning a (possibly cv-qualified) type <tt>reference</tt>.</li>
   <li>A const and a non-const member function <tt>operator-&gt;()</tt> returning a (possibly cv-qualified) type <tt>pointer</tt>.</li> 
   <li>A const and a non-const member function <tt>get()</tt> returning a (possibly cv-qualified) type <tt>pointer</tt>.</li> 
+  <li>A const member function <tt>operator bool()</tt>.</li> 
 </ul>
-<tt>reference</tt> and <tt>std::remove_pointer_t&lt;pointer&gt;</tt> shall be the same type.</p>
 
+<p>For the above member functions of <tt>T</tt> it is required that:</p>
+<ul>
+  <li><tt>std::remove_reference_t&lt;reference&gt;</tt> and <tt>std::remove_pointer_t&lt;pointer&gt;</tt> shall be the same type.</li>
+  <li><tt>reference</tt> and <tt>*pointer</tt> shall be references to the same object.</li>
+  <li><tt>operator bool()</tt> shall return the same value as <tt>get()!=nullptr</tt>.</li>
+</ul>
 <p>If <tt>T</tt> is an array type, reference type, pointer to function type or (possibly cv-qualified) <tt>void*</tt>, then the program is ill-formed.</p> 
 
 [<i>Note:</i> <tt>propagate_const&lt;const int*&gt;</tt> is well-formed <i>-end note</i>]</p>
