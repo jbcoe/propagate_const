@@ -220,8 +220,7 @@ int main()
 There should be no additional cost of construction for a <tt>propagate_const&lt;T&gt;</tt> beyond that for construction of a <tt>T</tt>. 
 The wrapped <tt>T</tt> should not be value-initialized as this would incur a cost for object pointer types. 
 If value-initialization is desirable then it can be accomplished with another wrapper class like <tt>boost::value_initialized</tt> [4].</p>
-<p>The constructors should be revised to use <i><tt>EXPLICIT</tt></i> from N4387 (Daniel Krugler: Improving <tt>pair</tt> and <tt>tuple</tt>) 
-once the Library Fundamentals TS references C++17.</p>
+<p>The constructors should be revised to use <i><tt>EXPLICIT</tt></i> from N4387 once the Library Fundamentals TS references C++17.</p>
 
 <h3>Non-copyable</h3>
 <p> A <tt>propagate_const&lt;T&gt;</tt> cannot be copied or assigned from a <tt>const propagate_const&lt;T&gt;&amp;</tt>. 
@@ -291,7 +290,7 @@ namespace std {
     //<i> [propagate_const.ctor], constructors</i>
     constexpr propagate_const() = default;
     propagate_const(const propagate_const&amp; p) = delete;
-    constexpr propagate_const(propagate_const&lt;T&gt;&amp;&amp; p) = default;
+    constexpr propagate_const(propagate_const&amp;&amp; p) = default;
     template &lt;class U&gt; 
       <i>see below</i> constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu);
     template &lt;class U&gt; 
@@ -299,7 +298,7 @@ namespace std {
     
     //<i> [propagate_const.assignment], assignment</i>
     propagate_const&amp; operator=(const propagate_const&amp; p) = delete; 
-    constexpr propagate_const&amp; operator=(propagate_const&lt;T&gt;&amp;&amp; p) = default; 
+    constexpr propagate_const&amp; operator=(propagate_const&amp;&amp; p) = default; 
     template &lt;class U&gt; 
       constexpr propagate_const&amp; operator=(propagate_const&lt;U&gt;&amp;&amp; pu);
     template &lt;class U&gt; 
@@ -319,7 +318,7 @@ namespace std {
     constexpr element_type* get();
 
     //<i> [propagate_const.modifiers], modifiers</i>
-    constexpr void swap(propagate_const&lt;T&gt;&amp; pt) noexcept(<i>see below</i>);
+    constexpr void swap(propagate_const&amp; pt) noexcept(<i>see below</i>);
  
   private:
     T t_; //<i>exposition only</i>
@@ -421,19 +420,18 @@ otherwise the program is ill-formed.
 <p>
 Given <tt>T</tt> is class type, in this sub-clause
 [propagate_const.requirements] <tt>t</tt> denotes a
-non-<tt>const</tt> lvalue of type <tt>T</tt>, <tt>ct</tt> denotes a const lvalue reference to <tt>t</tt>,
+non-<tt>const</tt> lvalue of type <tt>T</tt>, <tt>ct</tt> is a <tt>const T&amp;</tt> bound to <tt>t</tt>,
 <tt>element_type</tt> denotes an object type.
-<p/>
-A value <tt>t</tt> and <tt>ct</tt> shall be contextually convertible to
-<tt>bool</tt>,
-the result of these conversions shall be equivalent to the result of evaluating the expressions
-<tt>t.get() != nullptr</tt> and <tt>ct.get() != nullptr</tt>, respectively.
-<p/>
-If a value <tt>t</tt> is implicitly convertible to <tt>element_type*</tt>,
+<p/>                                                                                
+<p>
+  <tt>const T</tt> shall be contextually convertible to <tt>bool</tt>.
+</p>
+
+<p>If <tt>T</tt> is implicitly convertible to <tt>element_type*</tt>,
 <tt>(element_type*)t</tt> shall return the same value as
 <tt>t.get()</tt>.
 <p/>
-If a value <tt>ct</tt> is implicitly convertible to
+<p>If <tt>const T</tt> is implicitly convertible to
 <tt>const element_type*</tt>, <tt>(const element_type*)ct</tt> shall return the
 same value as
 <tt>ct.get()</tt>.
@@ -468,7 +466,7 @@ same value as
         <tt>const element_type&amp;</tt> or <tt>element_type&amp;</tt>
       </td>
       <td>
-        <tt>*t</tt> and <tt>*ct</tt> shall be references to the same object.<br/>
+        <tt>*t</tt> refers to the same object as <tt>*ct</tt>.
       </td>
     </tr>
 
@@ -480,8 +478,7 @@ same value as
         <tt>element_type*</tt>
       </td>
       <td>
-        <tt>*t</tt> and <tt>*t.operator-&gt;()</tt> shall be references to the
-        same object.
+        <tt>*t</tt> refers to the same object as <tt>*t.operator-&gt;()</tt>.
       </td>
     </tr>
 
@@ -493,8 +490,7 @@ same value as
         <tt>const element_type*</tt> or <tt>element_type*</tt>
       </td>
       <td>
-        <tt>*t</tt> and <tt>*ct.operator-&gt;()</tt> shall be references to the
-        same object.
+        <tt>*t</tt> refers to the same object as <tt>*ct.operator-&gt;()</tt>.
       </td>
     </tr>
 
@@ -506,7 +502,7 @@ same value as
         <tt>element_type*</tt>
       </td>
       <td>
-        <tt>*t</tt> and <tt>*t.get()</tt> shall be references to the same object.
+        <tt>*t</tt> refers to the same object as <tt>*t.get()</tt>.
       </td>
     </tr>
 
@@ -518,16 +514,39 @@ same value as
         <tt>const element_type*</tt> or <tt>element_type*</tt>
       </td>
       <td>
-        <tt>*t</tt>, and <tt>*ct.get()</tt> shall be references to the same object.
+        <tt>*t</tt> refers to the same object as <tt>*ct.get()</tt>.
       </td>
     </tr>
 
+    <tr>
+      <td>
+        <tt>(bool)t</tt>
+      </td>
+      <td>
+        <tt>bool</tt>
+      </td>
+      <td>
+        <tt>(bool)t</tt> equivalent to <tt>t.get()!=nullptr</tt>.
+      </td>
+    </tr>
+    
+    <tr>
+      <td>
+        <tt>(bool)ct</tt>
+      </td>
+      <td>
+        <tt>bool</tt>
+      </td>
+      <td>
+        <tt>(bool)ct</tt> equivalent to <tt>ct.get()!=nullptr</tt>.
+      </td>
+    </tr>
   </table>
 </blockquote>
 
 <p>
 If <tt>T</tt> is an array type, reference type, pointer to function
-type or (possibly cv-qualified) void*, then the program is ill-formed.
+type or pointer to (possibly cv-qualified) <tt>void</tt>, then the program is ill-formed.
 <p/>
 [<i>Note</i>: <tt>propagate_const&lt;const int*&gt;</tt> is
 well-formed &mdash; <i>end note</i>]
@@ -542,17 +561,17 @@ participates in overload resolution. &mdash; <i>end note</i>] </p>
 <b><tt>template &lt;class U&gt; <i>see below</i> constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu)</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>1</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless 
-      <tt>is_constructible_t&lt;T,U&amp;&amp;&gt;</tt>. The constructor is specified as <tt>explicit</tt> if and only if 
-      <tt>!is_convertible_t&lt;U&amp;&amp;,T&gt;.</tt></td></tr>
+      <tt>is_constructible_v&lt;T,U&amp;&amp;&gt;</tt>. The constructor is specified as <tt>explicit</tt> if and only if 
+      <tt>!is_convertible_v&lt;U&amp;&amp;,T&gt;.</tt></td></tr>
   <tr><td><sup>2</sup></td><td><i>Effects:</i> Initializes <tt>t_</tt> as if direct-non-list-initializing an object of type 
       <tt>T</tt> with the expression <tt>std::move(pu.t_)</tt>.</td></tr>
 </table><p/>
 <b><tt>template &lt;class U&gt; <i>see below</i> constexpr propagate_const(U&amp;&amp; u)</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>3</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless 
-      <tt>is_constructible_t&lt;T,U&amp;&amp;&gt;</tt> and <tt>decay_t&lt;U&gt;</tt> is not a specialization of 
+      <tt>is_constructible_v&lt;T,U&amp;&amp;&gt;</tt> and <tt>decay_t&lt;U&gt;</tt> is not a specialization of 
       <tt>propagate_const</tt>. The constructor is specified as <tt>explicit</tt> if and only if 
-      <tt>!is_convertible_t&lt;U&amp;&amp;,T&gt;.</tt></td></tr>
+      <tt>!is_convertible_v&lt;U&amp;&amp;,T&gt;.</tt></td></tr>
   <tr><td><sup>4</sup></td><td><i>Effects:</i> Initializes <tt>t_</tt> as if direct-non-list-initializing an object of type 
       <tt>T</tt> with the expression <tt>std::forward&lt;U&gt;(u)</tt>.</td></tr>
 </table>
@@ -632,7 +651,7 @@ participates in overload resolution. &mdash; <i>end note</i>] </p>
 <h3>X.Y.8&nbsp;&nbsp;<tt>propagate_const</tt> modifiers [propagate_const.modifiers]</h3>
 
 <div style="margin-left:20px">
-<b><tt>constexpr void swap(propagate_const&lt;T&gt;&amp; pt) noexcept(<i>see below</i>)</tt></b><br/>
+<b><tt>constexpr void swap(propagate_const&amp; pt) noexcept(<i>see below</i>)</tt></b><br/>
 <p>The constant-expression in the exception-specification is <tt>noexcept(swap(t_, pt.t_))</tt>.</p>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Effects:</i> <tt>swap(t_, pt.t_)</tt>.</td></tr>
@@ -875,7 +894,7 @@ These functions are intended to resemble cast operations to encourage caution wh
 </div>
 
 <H2>VI. Acknowledgements</H2>
-<p>Thanks to Walter Brown, Kevin Channon, Stephan T. Lavavej, Nick Maclaren, Roger Orr, Geoffrey Romer, Ville Voutilainen, Jonathan Wakely, David Ward, the staff of the Creative Assembly and others for helpful discussion.</p>
+<p>Thanks to Walter Brown, Kevin Channon, Daniel Krugler, Stephan T. Lavavej, Nick Maclaren, Roger Orr, Geoffrey Romer, Ville Voutilainen, Jonathan Wakely, David Ward, the staff of the Creative Assembly and others for helpful discussion.</p>
 
 <H2>VII. Revisions</H2>
 <p>This paper revises N4372</p>
