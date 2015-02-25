@@ -391,27 +391,27 @@ inline namespace fundamentals_v2 {
   //<i> [propagate_const.hash], hash support</i>
   template &lt;class T&gt; struct hash;
   template &lt;class T&gt;
-    struct hash&lt;propagate_const&lt;T&gt;&gt;;
+    struct hash&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;;
   
   //<i> [propagate_const.comparison_function_objects], comparison function objects</i>
   template &lt;class T&gt; struct equal_to;
   template &lt;class T&gt;
-    struct equal_to&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
+    struct equal_to&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct not_equal_to;
   template &lt;class T&gt;
-    struct not_equal_to&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
+    struct not_equal_to&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct less;
   template &lt;class T&gt;
-    struct less&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
+    struct less&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct greater;
   template &lt;class T&gt;
-    struct greater&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
+    struct greater&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct less_equal;
   template &lt;class T&gt;
-    struct less_equal&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
+    struct less_equal&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct greater_equal;
   template &lt;class T&gt;
-    struct greater_equal&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
+    struct greater_equal&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;;
 } // <i>end namespace std</i></pre></tt></blockquote> 
 
 <h3>X.Y.3&nbsp;&nbsp;<tt>propagate_const</tt> requirements on <tt>T</tt> [propagate_const.requirements]</h3>
@@ -433,23 +433,19 @@ well-formed &mdash; <i>end note</i>]
 
 <p>
 <h4>X.Y.3.1&nbsp;&nbsp;<tt>propagate_const</tt> requirements on class type <tt>T</tt> [propagate_const.class_type_requirements]</h4>
-If <tt>T</tt> is class type then it shall satisfy the following requirements. In this sub-clause
-[propagate_const.class_type_requirements] <tt>t</tt> denotes a
-non-<tt>const</tt> lvalue of type <tt>T</tt>, <tt>ct</tt> is a <tt>const T&amp;</tt> bound to <tt>t</tt>,
+If <tt>T</tt> is class type then it shall satisfy the following requirements. In this sub-clause <tt>t</tt> denotes a
+non-<tt>const</tt> lvalue of type <tt>T</tt>, <tt>ct</tt> is a <tt>const T&amp;</tt> bound to <tt>t</tt>, 
 <tt>element_type</tt> denotes an object type.
 <p/>                                                                                
 <p>
   <tt>T</tt> and <tt>const T</tt> shall be contextually convertible to <tt>bool</tt>.
 </p>
 
-<p>If <tt>T</tt> is implicitly convertible to <tt>element_type*</tt>,
-<tt>(element_type*)t</tt> shall return the same value as
-<tt>t.get()</tt>.
+<p>If <tt>T</tt> is implicitly convertible to <tt>element_type*</tt>, 
+<tt>(element_type*)t == t.get()</tt> shall be true.
 <p/>
 <p>If <tt>const T</tt> is implicitly convertible to
-<tt>const element_type*</tt>, <tt>(const element_type*)ct</tt> shall return the
-same value as
-<tt>ct.get()</tt>.
+<tt>const element_type*</tt>, <tt>(const element_type*)ct == ct.get()</tt> shall be true.
 </p>
 
 <blockquote>
@@ -498,7 +494,7 @@ same value as
         <tt>element_type&amp;</tt>
       </td>
       <td>
-        <tt>t</tt> is dereferenceable
+        <tt>t.get() != nullptr</tt>
       </td>
       <td>
         <tt>*t</tt> refers to the same object as <tt>*(t.get())</tt>
@@ -513,7 +509,7 @@ same value as
         <tt>const element_type&amp;</tt> or <tt>element_type&amp;</tt>
       </td>
       <td>
-        <tt>ct</tt> is dereferenceable
+        <tt>ct.get() != nullptr</tt>
       </td>
       <td>
         <tt>*ct</tt> refers to the same object as <tt>*(ct.get())</tt>
@@ -528,7 +524,7 @@ same value as
         <tt>element_type*</tt>
       </td>
       <td>
-        <tt>t</tt> is dereferenceable
+        <tt>t.get() != nullptr</tt>
       </td>
       <td>
         <tt>t.operator-&gt;() == t.get()</tt>
@@ -543,7 +539,7 @@ same value as
         <tt>const element_type*</tt> or <tt>element_type*</tt>
       </td>
       <td>
-        <tt>ct</tt> is dereferenceable
+        <tt>ct.get() != nullptr</tt>
       </td>
       <td>
         <tt>ct.operator-&gt;() == ct.get()</tt>
@@ -561,7 +557,7 @@ same value as
         <tt></tt>
       </td>
       <td>
-        <tt>(bool)t</tt> is equivalent to <tt>t.get()!=nullptr</tt>
+        <tt>(bool)t</tt> is equivalent to <tt>t.get() != nullptr</tt>
       </td>
     </tr>
     
@@ -576,7 +572,7 @@ same value as
         <tt></tt>
       </td>
       <td>
-        <tt>(bool)ct</tt> is equivalent to <tt>ct.get()!=nullptr</tt>
+        <tt>(bool)ct</tt> is equivalent to <tt>ct.get() != nullptr</tt>
       </td>
     </tr>
   </table>
@@ -591,17 +587,17 @@ participates in overload resolution. &mdash; <i>end note</i>] </p>
 <b><tt>template &lt;class U&gt; <i>see below</i> constexpr propagate_const(propagate_const&lt;U&gt;&amp;&amp; pu)</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>1</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless 
-      <tt>is_constructible_v&lt;T,U&amp;&amp;&gt;</tt>. The constructor is specified as <tt>explicit</tt> if and only if 
-      <tt>!is_convertible_v&lt;U&amp;&amp;,T&gt;.</tt></td></tr>
+      <tt>is_constructible_v&lt;T, U&amp;&amp;&gt;</tt>. The constructor is specified as <tt>explicit</tt> if and only if 
+      <tt>!is_convertible_v&lt;U&amp;&amp;, T&gt;.</tt></td></tr>
   <tr><td><sup>2</sup></td><td><i>Effects:</i> Initializes <tt>t_</tt> as if direct-non-list-initializing an object of type 
       <tt>T</tt> with the expression <tt>std::move(pu.t_)</tt>.</td></tr>
 </table><p/>
 <b><tt>template &lt;class U&gt; <i>see below</i> constexpr propagate_const(U&amp;&amp; u)</tt><br/></b>
 <table cellpadding="6px">
   <tr><td><sup>3</sup></td><td><i>Remarks:</i> This constructor shall not participate in overload resolution unless 
-      <tt>is_constructible_v&lt;T,U&amp;&amp;&gt;</tt> and <tt>decay_t&lt;U&gt;</tt> is not a specialization of 
+      <tt>is_constructible_v&lt;T, U&amp;&amp;&gt;</tt> and <tt>decay_t&lt;U&gt;</tt> is not a specialization of 
       <tt>propagate_const</tt>. The constructor is specified as <tt>explicit</tt> if and only if 
-      <tt>!is_convertible_v&lt;U&amp;&amp;,T&gt;.</tt></td></tr>
+      <tt>!is_convertible_v&lt;U&amp;&amp;, T&gt;.</tt></td></tr>
   <tr><td><sup>4</sup></td><td><i>Effects:</i> Initializes <tt>t_</tt> as if direct-non-list-initializing an object of type 
       <tt>T</tt> with the expression <tt>std::forward&lt;U&gt;(u)</tt>.</td></tr>
 </table>
@@ -614,13 +610,13 @@ participates in overload resolution. &mdash; <i>end note</i>] </p>
   <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(propagate_const&lt;U&gt;&amp;&amp; pu)</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt>.</td></tr>
-    <tr><td><sup>2</sup></td><td><i>Effects:</i> <tt>t_=std::move(pu.t_)</tt>.</td></tr>
+    <tr><td><sup>2</sup></td><td><i>Effects:</i> <tt>t_ = std::move(pu.t_)</tt>.</td></tr>
     <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
   </table><p/>
   <b><tt>template &lt;class U&gt; constexpr propagate_const operator=(U&amp;&amp; u)</tt></b><br/> 
   <table cellpadding="6px">
     <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>U</tt> is implicitly convertible to <tt>T</tt> and <tt>decay_t&lt;U&gt;</tt> is not a specialization of <tt>propagate_const</tt>.</td></tr>
-    <tr><td><sup>5</sup></td><td><i>Effects:</i> <tt>t_=std::forward&lt;U&gt;(u)</tt>.</td></tr>
+    <tr><td><sup>5</sup></td><td><i>Effects:</i> <tt>t_ = std::forward&lt;U&gt;(u)</tt>.</td></tr>
     <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>*this</tt>.</td></tr>
   </table>
 </div>
@@ -856,9 +852,9 @@ These functions are intended to resemble cast operations to encourage caution wh
 
 <h3>X.Y.12&nbsp;&nbsp;<tt>propagate_const</tt> hash support [propagate_const.hash]</h3>
 <div style="margin-left:20px">
-  <b><tt>template &lt;class T&gt; struct hash&lt;propagate_const&lt;T&gt;&gt;</tt></b><br/>
+  <b><tt>template &lt;class T&gt; struct hash&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;</tt></b><br/>
   <div>
-    <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash&lt;propagate_const&lt;T&gt;()(p)</tt>
+    <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;()(p)</tt>
     shall evaluate to the same value as <tt>hash&lt;T&gt;()(p.t_)</tt>.</p>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Requires:</i> The specialization <tt>hash&lt;T&gt;
@@ -869,55 +865,55 @@ These functions are intended to resemble cast operations to encourage caution wh
 
 <h3>X.Y.13&nbsp;&nbsp;<tt>propagate_const</tt> comparison function objects [propagate_const.comparison_function_objects]</h3>
 <div style="margin-left:20px">
-  <b><tt>template &lt;class T&gt; struct equal_to&lt;propagate_const&lt;T&gt;&gt;</b></tt>
+  <b><tt>template &lt;class T&gt; struct equal_to&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;</b></tt>
   <div>
-    <p style="margin-left:20px">For objects <tt>p,q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>equal_to&lt;propagate_const&lt;T&gt;&gt;()(p,q)</tt>
-    shall evaluate to the same value as <tt>equal_to&lt;T&gt;()(p.t_,q.t_)</tt>.</p>
+    <p style="margin-left:20px">For objects <tt>p, q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>equal_to&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;()(p, q)</tt>
+    shall evaluate to the same value as <tt>equal_to&lt;T&gt;()(p.t_, q.t_)</tt>.</p>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Requires:</i> The specialization <tt>equal_to&lt;T&gt;
       </tt> shall be well-formed and well-defined.</td></tr>
   </table>
   </div>
-  <b><tt>template &lt;class T&gt; struct not_equal_to&lt;propagate_const&lt;T&gt;&gt;</b></tt>
+  <b><tt>template &lt;class T&gt; struct not_equal_to&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;</b></tt>
   <div>
-    <p style="margin-left:20px">For objects <tt>p,q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>not_equal_to&lt;propagate_const&lt;T&gt;&gt;()(p,q)</tt>
-    shall evaluate to the same value as <tt>not_equal_to&lt;T&gt;()(p.t_,q.t_)</tt>.</p>
+    <p style="margin-left:20px">For objects <tt>p, q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>not_equal_to&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;()(p, q)</tt>
+    shall evaluate to the same value as <tt>not_equal_to&lt;T&gt;()(p.t_, q.t_)</tt>.</p>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Requires:</i> The specialization <tt>not_equal_to&lt;T&gt;
       </tt> shall be well-formed and well-defined.</td></tr>
   </table>
   </div>
-  <b><tt>template &lt;class T&gt; struct less&lt;propagate_const&lt;T&gt;&gt;</b></tt>
+  <b><tt>template &lt;class T&gt; struct less&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;</b></tt>
   <div>
-    <p style="margin-left:20px">For objects <tt>p,q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>less&lt;propagate_const&lt;T&gt;&gt;()(p,q)</tt>
-    shall evaluate to the same value as <tt>less&lt;T&gt;()(p.t_,q.t_)</tt>.</p>
+    <p style="margin-left:20px">For objects <tt>p, q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>less&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;()(p, q)</tt>
+    shall evaluate to the same value as <tt>less&lt;T&gt;()(p.t_, q.t_)</tt>.</p>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Requires:</i> The specialization <tt>less&lt;T&gt;
       </tt> shall be well-formed and well-defined.</td></tr>
   </table>
   </div>
-  <b><tt>template &lt;class T&gt; struct greater&lt;propagate_const&lt;T&gt;&gt;</b></tt>
+  <b><tt>template &lt;class T&gt; struct greater&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;</b></tt>
   <div>
-    <p style="margin-left:20px">For objects <tt>p,q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>greater&lt;propagate_const&lt;T&gt;&gt;()(p,q)</tt>
-    shall evaluate to the same value as <tt>greater&lt;T&gt;()(p.t_,q.t_)</tt>.</p>
+    <p style="margin-left:20px">For objects <tt>p, q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>greater&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;()(p, q)</tt>
+    shall evaluate to the same value as <tt>greater&lt;T&gt;()(p.t_, q.t_)</tt>.</p>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Requires:</i> The specialization <tt>greater&lt;T&gt;
       </tt> shall be well-formed and well-defined.</td></tr>
   </table>
   </div>
-  <b><tt>template &lt;class T&gt; struct less_equal&lt;propagate_const&lt;T&gt;&gt;</b></tt>
+  <b><tt>template &lt;class T&gt; struct less_equal&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;</b></tt>
   <div>
-    <p style="margin-left:20px">For objects <tt>p,q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>less_equal&lt;propagate_const&lt;T&gt;&gt;()(p,q)</tt>
-    shall evaluate to the same value as <tt>less_equal&lt;T&gt;()(p.t_,q.t_)</tt>.</p>
+    <p style="margin-left:20px">For objects <tt>p, q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>less_equal&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;()(p, q)</tt>
+    shall evaluate to the same value as <tt>less_equal&lt;T&gt;()(p.t_, q.t_)</tt>.</p>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Requires:</i> The specialization <tt>less_equal&lt;T&gt;
       </tt> shall be well-formed and well-defined.</td></tr>
   </table>
   </div>
-  <b><tt>template &lt;class T&gt; struct greater_equal&lt;propagate_const&lt;T&gt;&gt;</b></tt>
+  <b><tt>template &lt;class T&gt; struct greater_equal&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;</b></tt>
   <div>
-    <p style="margin-left:20px">For objects <tt>p,q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>greater_equal&lt;propagate_const&lt;T&gt;&gt;()(p,q)</tt>
-    shall evaluate to the same value as <tt>greater_equal&lt;T&gt;()(p.t_,q.t_)</tt>.</p>
+    <p style="margin-left:20px">For objects <tt>p, q</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>greater_equal&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;()(p, q)</tt>
+    shall evaluate to the same value as <tt>greater_equal&lt;T&gt;()(p.t_, q.t_)</tt>.</p>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Requires:</i> The specialization <tt>greater_equal&lt;T&gt;
       </tt> shall be well-formed and well-defined.</td></tr>
@@ -960,7 +956,7 @@ These functions are intended to resemble cast operations to encourage caution wh
     
 <H2>VIII. References</H2>
 <ul>
-  <li>[1] Bjarne Stroustrup, The C++ Programming Language, 4th edition, 2013,
+  <li>[1] Bjarne Stroustrup, The C++ Programming Language, 4th edition, 2013, 
           Addison Wesley ISBN-10: 0321563840 p464</li>
 
   <li>[2] Martin Reddy, API design for C++, 2011, Elsevier ISBN-10: 0123850037, Section 3.1</li>
