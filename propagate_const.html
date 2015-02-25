@@ -250,7 +250,13 @@ This will prevent the code above from compiling.
 
 
 <h3>Pointer-like functions</h3>
-<p><tt>operator*</tt> and <tt>operator-&gt;</tt> are defined to preserve <tt>const</tt>-propagation. When a <tt>const</tt> <tt>propagate_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions of <tt>T</tt> can be used without explicit casts.</p>
+<p><tt>operator*</tt> and <tt>operator-&gt;</tt> are defined to preserve <tt>const</tt>-propagation. 
+When a <tt>const</tt> <tt>propagate_const&lt;T&gt;</tt> is used only <tt>const</tt> member functions 
+of <tt>T</tt> can be used without explicit casts.</p>
+<p>The wrapped pointer in <tt>propagate_const&lt;T&gt;</tt> 
+is only required to be non-null, not dereferenceable, for <tt>operator*</tt> and <tt>operator-&gt;</tt> 
+as past-the-end-of-array pointers are not considered. Pointer arithemtic is not supported, this is 
+consistent with existing practice for standard library smart pointers.</p>
     
 <h3><tt>get</tt></h3>
 <p>The <tt>get</tt> function returns the address of the object pointed to by the wrapped pointer. <tt>get</tt> is intended to be used to ensure <tt>const</tt>-propagation is preserved when using interfaces which require C-style pointers</p>
