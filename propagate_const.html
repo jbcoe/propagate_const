@@ -283,6 +283,8 @@ the wrapper is accessed through a <tt>const</tt> access path.
 <h3>X.Y.2&nbsp;&nbsp;Header <tt>&lt;propagate_const&gt;</tt> synopsis [propagate_const.synopsis]</h3>
 <blockquote style="margin-left:0em"><tt><pre>
 namespace std {
+namespace experimental {
+inline namespace fundamentals_v2 {
   template &lt;class T&gt; class propagate_const { 
   public:                                                                                          
     typedef remove_reference_t&lt;decltype(*declval&lt;T&amp;&gt;())&gt; element_type;
@@ -333,7 +335,7 @@ namespace std {
   template &lt;class T&gt;
     constexpr bool operator!=(const propagate_const&lt;T&gt;&amp; pt, nullptr_t);
   template &lt;class T&gt;
-    constexpr bool operator!=(nullptr_t, const propagate_const&lt;U&gt;&amp; pu);
+    constexpr bool operator!=(nullptr_t, const propagate_const&lt;T&gt;&amp; pu);
   
   template &lt;class T, class U&gt;
     constexpr bool operator==(const propagate_const&lt;T&gt;&amp; pt, const propagate_const&lt;U&gt;&amp; pu);
@@ -383,7 +385,9 @@ namespace std {
     constexpr const T&amp; get_underlying(const propagate_const&lt;T&gt;&amp; pt) noexcept;
   template &lt;class T&gt;
     constexpr T&amp; get_underlying(propagate_const&lt;T&gt;&amp; pt) noexcept;
-  
+} // <i> end namespace fundamentals_v2</i>   
+} // <i> end namespace experimental</i>
+
   //<i> [propagate_const.hash], hash support</i>
   template &lt;class T&gt; struct hash;
   template &lt;class T&gt;
@@ -392,22 +396,22 @@ namespace std {
   //<i> [propagate_const.comparison_function_objects], comparison function objects</i>
   template &lt;class T&gt; struct equal_to;
   template &lt;class T&gt;
-    struct equal_to&lt;propagate_const&lt;T&gt;&gt;;
+    struct equal_to&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct not_equal_to;
   template &lt;class T&gt;
-    struct not_equal_to&lt;propagate_const&lt;T&gt;&gt;;
+    struct not_equal_to&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct less;
   template &lt;class T&gt;
-    struct less&lt;propagate_const&lt;T&gt;&gt;;
+    struct less&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct greater;
   template &lt;class T&gt;
-    struct greater&lt;propagate_const&lt;T&gt;&gt;;
+    struct greater&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct less_equal;
   template &lt;class T&gt;
-    struct less_equal&lt;propagate_const&lt;T&gt;&gt;;
+    struct less_equal&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
   template &lt;class T&gt; struct greater_equal;
   template &lt;class T&gt;
-    struct greater_equal&lt;propagate_const&lt;T&gt;&gt;;
+    struct greater_equal&lt;experimental::fundamentals_vs::propagate_const&lt;T&gt;&gt;;
 } // <i>end namespace std</i></pre></tt></blockquote> 
 
 <h3>X.Y.3&nbsp;&nbsp;<tt>propagate_const</tt> requirements on <tt>T</tt> [propagate_const.requirements]</h3>
@@ -417,14 +421,25 @@ namespace std {
 <tt>decltype(*declval&lt;T&amp;&gt;())</tt> is an lvalue reference;
 otherwise the program is ill-formed.
 </p>
+
 <p>
-Given <tt>T</tt> is class type, in this sub-clause
-[propagate_const.requirements] <tt>t</tt> denotes a
+If <tt>T</tt> is an array type, reference type, pointer to function
+type or pointer to (possibly cv-qualified) <tt>void</tt>, then the program is ill-formed.
+<p/>
+<p>
+[<i>Note</i>: <tt>propagate_const&lt;const int*&gt;</tt> is
+well-formed &mdash; <i>end note</i>]
+</p>
+
+<p>
+<h4>X.Y.3.1&nbsp;&nbsp;<tt>propagate_const</tt> requirements on class type <tt>T</tt> [propagate_const.class_type_requirements]</h4>
+If <tt>T</tt> is class type then it shall satisfy the following requirements. In this sub-clause
+[propagate_const.class_type_requirements] <tt>t</tt> denotes a
 non-<tt>const</tt> lvalue of type <tt>T</tt>, <tt>ct</tt> is a <tt>const T&amp;</tt> bound to <tt>t</tt>,
 <tt>element_type</tt> denotes an object type.
 <p/>                                                                                
 <p>
-  <tt>const T</tt> shall be contextually convertible to <tt>bool</tt>.
+  <tt>T</tt> and <tt>const T</tt> shall be contextually convertible to <tt>bool</tt>.
 </p>
 
 <p>If <tt>T</tt> is implicitly convertible to <tt>element_type*</tt>,
@@ -443,55 +458,8 @@ same value as
     <tr>
       <th>Expression</th>
       <th>Return type</th>
+      <th>Pre-conditions</th>
       <th>Operational<br/>semantics</th>
-    </tr>
-
-    <tr>
-      <td>
-        <tt>*t</tt>
-      </td>
-      <td>
-        <tt>element_type&amp;</tt>
-      </td>
-      <td>
-        <tt></tt>
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <tt>*ct</tt>
-      </td>
-      <td>
-        <tt>const element_type&amp;</tt> or <tt>element_type&amp;</tt>
-      </td>
-      <td>
-        <tt>*t</tt> refers to the same object as <tt>*ct</tt>.
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <tt>t.operator-&gt;()</tt>
-      </td>
-      <td>
-        <tt>element_type*</tt>
-      </td>
-      <td>
-        <tt>*t</tt> refers to the same object as <tt>*t.operator-&gt;()</tt>.
-      </td>
-    </tr>
-
-    <tr>
-      <td>
-        <tt>ct.operator-&gt;()</tt>
-      </td>
-      <td>
-        <tt>const element_type*</tt> or <tt>element_type*</tt>
-      </td>
-      <td>
-        <tt>*t</tt> refers to the same object as <tt>*ct.operator-&gt;()</tt>.
-      </td>
     </tr>
 
     <tr>
@@ -502,7 +470,9 @@ same value as
         <tt>element_type*</tt>
       </td>
       <td>
-        <tt>*t</tt> refers to the same object as <tt>*t.get()</tt>.
+        <tt></tt>
+      </td>
+      <td>
       </td>
     </tr>
 
@@ -514,7 +484,69 @@ same value as
         <tt>const element_type*</tt> or <tt>element_type*</tt>
       </td>
       <td>
-        <tt>*t</tt> refers to the same object as <tt>*ct.get()</tt>.
+        <tt></tt>
+      </td>
+      <td>
+        <tt>t.get() == ct.get()</tt>.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <tt>*t</tt>
+      </td>
+      <td>
+        <tt>element_type&amp;</tt>
+      </td>
+      <td>
+        <tt>t</tt> is dereferenceable
+      </td>
+      <td>
+        <tt>*t</tt> refers to the same object as <tt>*(t.get())</tt>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <tt>*ct</tt>
+      </td>
+      <td>
+        <tt>const element_type&amp;</tt> or <tt>element_type&amp;</tt>
+      </td>
+      <td>
+        <tt>ct</tt> is dereferenceable
+      </td>
+      <td>
+        <tt>*ct</tt> refers to the same object as <tt>*(ct.get())</tt>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <tt>t.operator-&gt;()</tt>
+      </td>
+      <td>
+        <tt>element_type*</tt>
+      </td>
+      <td>
+        <tt>t</tt> is dereferenceable
+      </td>
+      <td>
+        <tt>t.operator-&gt;() == t.get()</tt>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <tt>ct.operator-&gt;()</tt>
+      </td>
+      <td>
+        <tt>const element_type*</tt> or <tt>element_type*</tt>
+      </td>
+      <td>
+        <tt>ct</tt> is dereferenceable
+      </td>
+      <td>
+        <tt>ct.operator-&gt;() == ct.get()</tt>
       </td>
     </tr>
 
@@ -526,7 +558,10 @@ same value as
         <tt>bool</tt>
       </td>
       <td>
-        <tt>(bool)t</tt> equivalent to <tt>t.get()!=nullptr</tt>.
+        <tt></tt>
+      </td>
+      <td>
+        <tt>(bool)t</tt> is equivalent to <tt>t.get()!=nullptr</tt>
       </td>
     </tr>
     
@@ -538,19 +573,14 @@ same value as
         <tt>bool</tt>
       </td>
       <td>
-        <tt>(bool)ct</tt> equivalent to <tt>ct.get()!=nullptr</tt>.
+        <tt></tt>
+      </td>
+      <td>
+        <tt>(bool)ct</tt> is equivalent to <tt>ct.get()!=nullptr</tt>
       </td>
     </tr>
   </table>
 </blockquote>
-
-<p>
-If <tt>T</tt> is an array type, reference type, pointer to function
-type or pointer to (possibly cv-qualified) <tt>void</tt>, then the program is ill-formed.
-<p/>
-[<i>Note</i>: <tt>propagate_const&lt;const int*&gt;</tt> is
-well-formed &mdash; <i>end note</i>]
-</p>
 
 <h3>X.Y.4&nbsp;&nbsp;<tt>propagate_const</tt> constructors [propagate_const.ctor]</h3>
 <p> [<i>Note</i>: The following constructors are conditionally specified as <tt>explicit</tt>. 
@@ -605,21 +635,22 @@ participates in overload resolution. &mdash; <i>end note</i>] </p>
   </table><p/>
   <b><tt>constexpr const element_type* operator-&gt;() const</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
+    <tr><td><sup>2</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
+    <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
   </table><p/> 
   <b><tt>constexpr operator const element_type*() const</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
-    <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>T</tt> is an object pointer type or has an implicit conversion to <tt>const element_type*</tt>.</td></tr>
+    <tr><td><sup>4</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
+    <tr><td><sup>5</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>T</tt> is an object pointer type or has an implicit conversion to <tt>const element_type*</tt>.</td></tr>
   </table><p/>  
   <b><tt>constexpr const element_type&amp; operator*() const</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>5</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
-    <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>*get()</tt>.</td></tr>
+    <tr><td><sup>6</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
+    <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>*get()</tt>.</td></tr>
   </table><p/>  
   <b><tt>constexpr const element_type* get() const</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is an object pointer type, otherwise <tt>t_.get()</tt>.</td></tr>
+    <tr><td><sup>8</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is an object pointer type, otherwise <tt>t_.get()</tt>.</td></tr>
   </table>  
 </div>
 
@@ -629,21 +660,22 @@ participates in overload resolution. &mdash; <i>end note</i>] </p>
 <div style="margin-left:20px">
   <b><tt>constexpr element_type* operator-&gt;()</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>1</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
+    <tr><td><sup>1</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
+    <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
   </table><p/>  
   <b><tt>constexpr operator element_type*()</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>2</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
-    <tr><td><sup>3</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>T</tt> is an object pointer type or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
+    <tr><td><sup>3</sup></td><td><i>Returns:</i> <tt>get()</tt>.</td></tr>
+    <tr><td><sup>4</sup></td><td><i>Remarks:</i> This function shall not participate in overload resolution unless <tt>T</tt> is an object pointer type or has an implicit conversion to <tt>element_type*</tt>.</td></tr>
   </table><p/>  
   <b><tt>constexpr element_type&amp; operator*()</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>4</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
-    <tr><td><sup>5</sup></td><td><i>Returns:</i> <tt>*get()</tt>.</td></tr>
+    <tr><td><sup>5</sup></td><td><i>Requires:</i> <tt>get() != nullptr</tt>.</td></tr>
+    <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>*get()</tt>.</td></tr>
   </table><p/>
   <b><tt>constexpr element_type* get()</tt></b><br/> 
   <table cellpadding="6px">
-    <tr><td><sup>6</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is an object pointer type, otherwise <tt>t_.get()</tt>.</td></tr>
+    <tr><td><sup>7</sup></td><td><i>Returns:</i> <tt>t_</tt> if <tt>T</tt> is an object pointer type, otherwise <tt>t_.get()</tt>.</td></tr>
   </table>  
 </div>
 
