@@ -854,7 +854,7 @@ These functions are intended to resemble cast operations to encourage caution wh
 <div style="margin-left:20px">
   <b><tt>template &lt;class T&gt; struct hash&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;</tt></b><br/>
   <div>
-    <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;()(p)</tt>
+    <p style="margin-left:20px">For an object <tt>p</tt> of type <tt>propagate_const&lt;T&gt;</tt>, <tt>hash&lt;experimental::fundamentals_v2::propagate_const&lt;T&gt;&gt;()(p)</tt>
     shall evaluate to the same value as <tt>hash&lt;T&gt;()(p.t_)</tt>.</p>
   <table cellpadding="6px">
     <tr><td><sup>1</sup></td><td><i>Requires:</i> The specialization <tt>hash&lt;T&gt;
