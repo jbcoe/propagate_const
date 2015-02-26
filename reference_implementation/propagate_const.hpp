@@ -56,9 +56,6 @@ private:
   {
   };
 
-  template <class U>
-  using is_propagate_const_v = is_propagate_const<U>::value;
-
 public:
   // [propagate_const.ctor], constructors
   constexpr propagate_const() = default;
@@ -73,7 +70,7 @@ public:
   {
   }
 
-  template <class U, class V = enable_if_t<is_propagate_const_v<decay_t<U>>>>
+  template <class U, class V = enable_if_t<is_propagate_const<decay_t<U>>::value>>
   constexpr propagate_const(U&& u)
       : t_(std::forward<U>(u))
   {
@@ -91,10 +88,10 @@ public:
     return *this;
   }
 
-  template <class U, class V = enable_if_t<is_propagate_const_v<decay_t<U>>>>
+  template <class U, class V = enable_if_t<is_propagate_const<decay_t<U>>::value>>
   constexpr propagate_const& operator=(U&& u)
   {
-    t_ = std::move(pu.t_);
+    t_ = std::move(u);
     return *this;
   }
 
@@ -111,7 +108,7 @@ public:
   template <class U = enable_if_t<HAS_CPTR_CONVERSION>>
   constexpr operator const element_type*() const // Not always defined
   {
-    return get() :
+    return get();
   }
 
   constexpr const element_type& operator*() const
@@ -133,7 +130,7 @@ public:
   template <class U = enable_if_t<HAS_PTR_CONVERSION>>
   constexpr operator element_type*()
   {
-    return get() :
+    return get();
   }
 
   constexpr element_type& operator*()
@@ -154,8 +151,11 @@ public:
 private:
   T t_;
 };
-
+} // fundamentals_v2
+} // experimental
 /*
+namespace experimental{
+namespace fundamentals_v2{
 // [propagate_const.relational], relational operators
 template <class T>
 constexpr bool operator==(const propagate_const<T>& pt, nullptr_t);
