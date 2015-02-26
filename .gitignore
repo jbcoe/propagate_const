@@ -12,3 +12,4 @@ c++14_unique_ptr_tex/std.aux
 c++14_unique_ptr_tex/std.out
 c++14_unique_ptr_tex/std.pdf
 c++14_unique_ptr_tex/utilities.aux
+*.o
