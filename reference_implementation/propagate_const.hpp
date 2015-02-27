@@ -102,6 +102,7 @@ public:
     return get();
   }
 
+  template<class T_=T, class U=enable_if_t<is_convertible<const T_, const element_type*>::value>>
   constexpr operator const element_type*() const // Not always defined
   {
     return get();
@@ -123,7 +124,8 @@ public:
     return get();
   }
 
-  constexpr operator element_type*()
+  template<class T_=T, class U=enable_if_t<is_convertible<T_, element_type*>::value>>
+  constexpr operator element_type*() // Not always defined
   {
     return get();
   }
@@ -132,6 +134,7 @@ public:
   {
     return *get();
   }
+  
   constexpr element_type* get()
   {
     return get_pointer(t_);

@@ -54,6 +54,7 @@ TEST_CASE("Plain pointer operator *", "[ptr_op_*]")
   REQUIRE_RETURN_TYPE_MATCH(cpc_a.get(), const A*);
 }
 
+
 //
 // unique_ptr
 //
@@ -125,3 +126,4 @@ TEST_CASE("shared_ptr operator *", "[sptr_op_*]")
   REQUIRE((*cpc_a).method() == CONST_METHOD);
   REQUIRE_RETURN_TYPE_MATCH(cpc_a.get(), const A*);
 }
+
