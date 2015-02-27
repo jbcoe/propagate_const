@@ -20,32 +20,29 @@ public:
 
 private:
   template <class U>
-  element_type* get_pointer(const U* u)
+  static element_type* get_pointer(U* u)
   {
     return u;
   }
 
   template <class U>
-  element_type* get_pointer(const U& u)
+  static element_type* get_pointer(U& u)
   {
     return get_pointer(u.get());
   }
 
-  enum
+  template <class U>
+  static const element_type* get_pointer(const U* u)
   {
-    IS_NOEXCEPT_SWAP = noexcept(swap(declval<T&>(), declval<T&>()))
-  };
+    return u;
+  }
 
-  enum
+  template <class U>
+  static const element_type* get_pointer(const U& u)
   {
-    HAS_PTR_CONVERSION = is_convertible<T, element_type*>::value
-  };
-
-  enum
-  {
-    HAS_CPTR_CONVERSION = is_convertible<const T, const element_type*>::value
-  };
-
+    return get_pointer(u.get());
+  }
+  
   template <class U>
   struct is_propagate_const : false_type
   {
@@ -70,7 +67,7 @@ public:
   {
   }
 
-  template <class U, class V = enable_if_t<is_propagate_const<decay_t<U>>::value>>
+  template <class U, class V = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
   constexpr propagate_const(U&& u)
       : t_(std::forward<U>(u))
   {
@@ -88,7 +85,7 @@ public:
     return *this;
   }
 
-  template <class U, class V = enable_if_t<is_propagate_const<decay_t<U>>::value>>
+  template <class U, class V = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
   constexpr propagate_const& operator=(U&& u)
   {
     t_ = std::move(u);
@@ -105,7 +102,6 @@ public:
     return get();
   }
 
-  template <class U = enable_if_t<HAS_CPTR_CONVERSION>>
   constexpr operator const element_type*() const // Not always defined
   {
     return get();
@@ -118,7 +114,7 @@ public:
 
   constexpr const element_type* get() const
   {
-    return get_const_pointer(t_);
+    return get_pointer(t_);
   }
 
   // [propagate_const.non_const_observers], non-const observers
@@ -127,7 +123,6 @@ public:
     return get();
   }
 
-  template <class U = enable_if_t<HAS_PTR_CONVERSION>>
   constexpr operator element_type*()
   {
     return get();
@@ -143,7 +138,7 @@ public:
   }
 
   // [propagate_const.modifiers], modifiers
-  constexpr void swap(propagate_const& pt) noexcept(IS_NOEXCEPT_SWAP)
+  constexpr void swap(propagate_const& pt) noexcept(noexcept(swap(declval<T&>(),declval<T&>())))
   {
     swap(t_, pt.t_);
   }
