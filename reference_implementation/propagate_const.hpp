@@ -151,12 +151,9 @@ private:
 
 friend constexpr const T& get_underlying(const propagate_const<T>& pt);
 friend constexpr T& get_underlying(propagate_const<T>& pt);
-};
-} // fundamentals_v2
-} // experimental
 
-namespace experimental{
-inline namespace fundamentals_v2{
+};
+
 // [propagate_const.relational], relational operators
 template <class T>
 constexpr bool operator==(const propagate_const<T>& pt, nullptr_t)
