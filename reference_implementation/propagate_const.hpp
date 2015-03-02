@@ -148,129 +148,253 @@ public:
 
 private:
   T t_;
+
+friend constexpr const T& get_underlying(const propagate_const<T>& pt);
+friend constexpr T& get_underlying(propagate_const<T>& pt);
 };
 } // fundamentals_v2
 } // experimental
-/*
+
 namespace experimental{
-namespace fundamentals_v2{
+inline namespace fundamentals_v2{
 // [propagate_const.relational], relational operators
 template <class T>
-constexpr bool operator==(const propagate_const<T>& pt, nullptr_t);
-template <class T>
-constexpr bool operator==(nullptr_t, const propagate_const<T>& pu);
+constexpr bool operator==(const propagate_const<T>& pt, nullptr_t)
+{
+  return get_underlying(pt) == nullptr;
+}
 
 template <class T>
-constexpr bool operator!=(const propagate_const<T>& pt, nullptr_t);
+constexpr bool operator==(nullptr_t, const propagate_const<T>& pu)
+{
+  return nullptr == get_underlying(pu);
+}
+
 template <class T>
-constexpr bool operator!=(nullptr_t, const propagate_const<T>& pu);
+constexpr bool operator!=(const propagate_const<T>& pt, nullptr_t)
+{
+  return get_underlying(pt) != nullptr;
+}
+
+template <class T>
+constexpr bool operator!=(nullptr_t, const propagate_const<T>& pu)
+{
+  return nullptr != get_underlying(pu);
+}
 
 template <class T, class U>
 constexpr bool operator==(const propagate_const<T>& pt,
-                          const propagate_const<U>& pu);
+                          const propagate_const<U>& pu)
+{
+  return get_underlying(pt) == get_underlying(pu);
+}
+
 template <class T, class U>
 constexpr bool operator!=(const propagate_const<T>& pt,
-                          const propagate_const<U>& pu);
+                          const propagate_const<U>& pu)
+{
+  return get_underlying(pt) != get_underlying(pu);
+}
+
 template <class T, class U>
 constexpr bool operator<(const propagate_const<T>& pt,
-                         const propagate_const<U>& pu);
+                         const propagate_const<U>& pu)
+{
+  return get_underlying(pt) < get_underlying(pu);
+}
+
 template <class T, class U>
 constexpr bool operator>(const propagate_const<T>& pt,
-                         const propagate_const<U>& pu);
+                         const propagate_const<U>& pu)
+{
+  return get_underlying(pt) > get_underlying(pu);
+}
+
 template <class T, class U>
 constexpr bool operator<=(const propagate_const<T>& pt,
-                          const propagate_const<U>& pu);
+                          const propagate_const<U>& pu)
+{
+  return get_underlying(pt) <= get_underlying(pu);
+}
+
 template <class T, class U>
 constexpr bool operator>=(const propagate_const<T>& pt,
-                          const propagate_const<U>& pu);
+                          const propagate_const<U>& pu)
+{
+  return get_underlying(pt) >= get_underlying(pu);
+}
 
 template <class T, class U>
-constexpr bool operator==(const propagate_const<T>& pt, const U& u);
-template <class T, class U>
-constexpr bool operator!=(const propagate_const<T>& pt, const U& u);
-template <class T, class U>
-constexpr bool operator<(const propagate_const<T>& pt, const U& u);
-template <class T, class U>
-constexpr bool operator>(const propagate_const<T>& pt, const U& u);
-template <class T, class U>
-constexpr bool operator<=(const propagate_const<T>& pt, const U& u);
-template <class T, class U>
-constexpr bool operator>=(const propagate_const<T>& pt, const U& u);
+constexpr bool operator==(const propagate_const<T>& pt, const U& u)
+{
+  return get_underlying(pt) == u;
+}
 
 template <class T, class U>
-constexpr bool operator==(const T& t, const propagate_const<U>& pu);
+constexpr bool operator!=(const propagate_const<T>& pt, const U& u)
+{
+  return get_underlying(pt) != u;
+}
+
 template <class T, class U>
-constexpr bool operator!=(const T& t, const propagate_const<U>& pu);
+constexpr bool operator<(const propagate_const<T>& pt, const U& u)
+{
+  return get_underlying(pt) < u;
+}
+
 template <class T, class U>
-constexpr bool operator<(const T& t, const propagate_const<U>& pu);
+constexpr bool operator>(const propagate_const<T>& pt, const U& u)
+{
+  return get_underlying(pt) > u;
+}
+
 template <class T, class U>
-constexpr bool operator>(const T& t, const propagate_const<U>& pu);
+constexpr bool operator<=(const propagate_const<T>& pt, const U& u)
+{
+  return get_underlying(pt) <= u;
+}
+
 template <class T, class U>
-constexpr bool operator<=(const T& t, const propagate_const<U>& pu);
+constexpr bool operator>=(const propagate_const<T>& pt, const U& u)
+{
+  return get_underlying(pt) >= u;
+}
+
+
 template <class T, class U>
-constexpr bool operator>=(const T& t, const propagate_const<U>& pu);
+constexpr bool operator==(const T& t, const propagate_const<U>& pu)
+{
+  return t == get_underlying(pu);
+}
+
+template <class T, class U>
+constexpr bool operator!=(const T& t, const propagate_const<U>& pu)
+{
+  return t != get_underlying(pu);
+}
+
+template <class T, class U>
+constexpr bool operator<(const T& t, const propagate_const<U>& pu)
+{
+  return t < get_underlying(pu);
+}
+
+template <class T, class U>
+constexpr bool operator>(const T& t, const propagate_const<U>& pu)
+{
+  return t > get_underlying(pu);
+}
+
+template <class T, class U>
+constexpr bool operator<=(const T& t, const propagate_const<U>& pu)
+{
+  return t <= get_underlying(pu);
+}
+
+template <class T, class U>
+constexpr bool operator>=(const T& t, const propagate_const<U>& pu)
+{
+  return t >= get_underlying(pu);
+}
+
 
 // [propagate_const.algorithms], specialized algorithms
 template <class T>
-constexpr void swap(propagate_const<T>& pt,
-                    propagate_const<T>& pt2) noexcept(IS_NOEXCEPT_SWAP);
+constexpr void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept(
+    noexcept(swap(declval<T&>(), declval<T&>())))
+{
+  swap(get_underlying(pt), get_underlying(pu));
+}
+
 
 // [propagate_const.underlying], underlying pointer access
 template <class T>
-constexpr const T& get_underlying(const propagate_const<T>& pt) noexcept;
+constexpr const T& get_underlying(const propagate_const<T>& pt) noexcept
+{
+  return pt.t_;
+}
+
 template <class T>
-constexpr T& get_underlying(propagate_const<T>& pt) noexcept;
+constexpr T& get_underlying(propagate_const<T>& pt) noexcept
+{
+  return pt.t_;
+}
+
 } //  end namespace fundamentals_v2
 } //  end namespace experimental
 
+
 // [propagate_const.hash], hash support
 template <class T>
-struct hash;
-template <class T>
-struct hash<experimental::fundamentals_v2::propagate_const<T>> : hash<T>
+struct hash<experimental::fundamentals_v2::propagate_const<T>>
 {
+  bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
+      const experimental::fundamentals_v2::propagate_const<T>& pc2) const
+  {
+    return std::hash<T>()(get_underlying(pc1), get_underlying(pc2));
+  }
 };
 
 // [propagate_const.comparison_function_objects], comparison function objects
 template <class T>
-struct equal_to;
-template <class T>
-struct equal_to<experimental::fundamentals_v2::propagate_const<T>> : equal_to<T>
+struct equal_to<experimental::fundamentals_v2::propagate_const<T>>
 {
+  bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
+      const experimental::fundamentals_v2::propagate_const<T>& pc2) const
+  {
+    return std::equal_to<T>()(get_underlying(pc1), get_underlying(pc2));
+  }
 };
-template <class T>
-struct not_equal_to;
+
 template <class T>
 struct not_equal_to<experimental::fundamentals_v2::propagate_const<T>>
-    : not_equal_to<T>
 {
+  bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
+      const experimental::fundamentals_v2::propagate_const<T>& pc2) const
+  {
+    return std::not_equal_to<T>()(get_underlying(pc1), get_underlying(pc2));
+  }
 };
+
 template <class T>
-struct less;
-template <class T>
-struct less<experimental::fundamentals_v2::propagate_const<T>> : less<T>
+struct less<experimental::fundamentals_v2::propagate_const<T>>
 {
+  bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
+      const experimental::fundamentals_v2::propagate_const<T>& pc2) const
+  {
+    return std::less<T>()(get_underlying(pc1), get_underlying(pc2)); 
+  }
 };
+
 template <class T>
-struct greater;
-template <class T>
-struct greater<experimental::fundamentals_v2::propagate_const<T>> : greater<T>
+struct greater<experimental::fundamentals_v2::propagate_const<T>> 
 {
+  bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
+      const experimental::fundamentals_v2::propagate_const<T>& pc2) const
+  {
+    return std::greater<T>()(get_underlying(pc1), get_underlying(pc2));
+  }
 };
-template <class T>
-struct less_equal;
+
 template <class T>
 struct less_equal<experimental::fundamentals_v2::propagate_const<T>>
-    : less_equal<T>
 {
+  bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
+      const experimental::fundamentals_v2::propagate_const<T>& pc2) const
+  {
+    return std::less_equal<T>()(get_underlying(pc1), get_underlying(pc2));
+  }
 };
-template <class T>
-struct greater_equal;
+
 template <class T>
 struct greater_equal<experimental::fundamentals_v2::propagate_const<T>>
-    : greater_equal<T>
 {
-};*/
+  bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
+      const experimental::fundamentals_v2::propagate_const<T>& pc2) const
+  {
+    return std::greater_equal<T>()(get_underlying(pc1), get_underlying(pc2));
+  }
+};
 
 } // end namespace std
 
