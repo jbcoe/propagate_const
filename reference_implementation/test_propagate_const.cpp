@@ -157,3 +157,130 @@ TEST_CASE("const shared_ptr operator *", "[csptr_op_*]")
   REQUIRE_RETURN_TYPE_MATCH(cpc_a.get(), const A*);
 }
 
+size_t a_hash_calls = 0;
+template<> struct std::hash<A*>  
+{
+  size_t operator()(const A*) const
+  {
+    ++a_hash_calls;
+    return 0;
+  }
+};
+
+TEST_CASE("hash", "[hash]")
+{
+  A a;
+  propagate_const<A*> pa(&a);
+  a_hash_calls = 0;
+  std::hash<A*>()(pa);
+  REQUIRE(a_hash_calls == 1);
+}
+
+size_t a_equal_to_calls = 0;
+template<> struct std::equal_to<A*> 
+{
+  bool operator()(const A*, const A*) const
+  {
+    ++a_equal_to_calls;
+    return false;
+  }
+};
+TEST_CASE("equal_to", "[equal_to]")
+{
+  A a;
+  propagate_const<A*> pa(&a);
+  a_equal_to_calls = 0;
+  std::equal_to<A*>()(pa,pa);
+  REQUIRE(a_equal_to_calls == 1);
+}
+
+size_t a_not_equal_to_calls = 0;
+template<> struct std::not_equal_to<A*> 
+{
+  bool operator()(const A*, const A*) const
+  {
+    ++a_not_equal_to_calls;
+    return false;
+  }
+};
+TEST_CASE("not_equal_to", "[not_equal_to]")
+{
+  A a;
+  propagate_const<A*> pa(&a);
+  a_not_equal_to_calls = 0;
+  std::not_equal_to<A*>()(pa,pa);
+  REQUIRE(a_not_equal_to_calls == 1);
+}
+
+size_t a_greater_calls = 0;
+template<> struct std::greater<A*> 
+{
+  bool operator()(const A*, const A*) const
+  {
+    ++a_greater_calls;
+    return false;
+  }
+};
+TEST_CASE("greater", "[greater]")
+{
+  A a;
+  propagate_const<A*> pa(&a);
+  a_greater_calls = 0;
+  std::greater<A*>()(pa,pa);
+  REQUIRE(a_greater_calls == 1);
+}
+
+size_t a_less_calls = 0;
+template<> struct std::less<A*> 
+{
+  bool operator()(const A*, const A*) const
+  {
+    ++a_less_calls;
+    return false;
+  }
+};
+TEST_CASE("less", "[less]")
+{
+  A a;
+  propagate_const<A*> pa(&a);
+  a_less_calls = 0;
+  std::less<A*>()(pa,pa);
+  REQUIRE(a_less_calls == 1);
+}
+
+size_t a_greater_equal_calls = 0;
+template<> struct std::greater_equal<A*> 
+{
+  bool operator()(const A*, const A*) const
+  {
+    ++a_greater_equal_calls;
+    return false;
+  }
+};
+TEST_CASE("greater_equal", "[greater_equal]")
+{
+  A a;
+  propagate_const<A*> pa(&a);
+  a_greater_equal_calls = 0;
+  std::greater_equal<A*>()(pa,pa);
+  REQUIRE(a_greater_equal_calls == 1);
+}
+
+size_t a_less_equal_calls = 0;
+template<> struct std::less_equal<A*> 
+{
+  bool operator()(const A*, const A*) const
+  {
+    ++a_less_equal_calls;
+    return false;
+  }
+};
+TEST_CASE("less_equal", "[less_equal]")
+{
+  A a;
+  propagate_const<A*> pa(&a);
+  a_equal_to_calls = 0;
+  std::less_equal<A*>()(pa,pa);
+  REQUIRE(a_less_equal_calls == 1);
+}
+
