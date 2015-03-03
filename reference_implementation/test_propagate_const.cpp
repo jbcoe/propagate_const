@@ -279,7 +279,7 @@ TEST_CASE("less_equal", "[less_equal]")
 {
   A a;
   propagate_const<A*> pa(&a);
-  a_equal_to_calls = 0;
+  a_less_equal_calls = 0;
   std::less_equal<A*>()(pa,pa);
   REQUIRE(a_less_equal_calls == 1);
 }
