@@ -306,3 +306,78 @@ TEST_CASE("equals function", "[free ==]")
   auto r = (f == g);
   REQUIRE(fPtr_equals_fPtr_calls == 1);
 }
+
+size_t fPtr_not_equals_fPtr_calls = 0;
+bool operator != (const FakePtr& f, const FakePtr& g)
+{
+  ++fPtr_not_equals_fPtr_calls;
+  return false;
+}
+TEST_CASE("not equals function", "[free !=]")
+{
+  propagate_const<FakePtr> f;
+  propagate_const<FakePtr> g;
+  fPtr_not_equals_fPtr_calls = 0;
+  auto r = (f != g);
+  REQUIRE(fPtr_not_equals_fPtr_calls == 1);
+}
+
+size_t fPtr_less_fPtr_calls = 0;
+bool operator < (const FakePtr& f, const FakePtr& g)
+{
+  ++fPtr_less_fPtr_calls;
+  return false;
+}
+TEST_CASE("less function", "[free <]")
+{
+  propagate_const<FakePtr> f;
+  propagate_const<FakePtr> g;
+  fPtr_less_fPtr_calls = 0;
+  auto r = (f < g);
+  REQUIRE(fPtr_less_fPtr_calls == 1);
+}
+
+size_t fPtr_greater_fPtr_calls = 0;
+bool operator > (const FakePtr& f, const FakePtr& g)
+{
+  ++fPtr_greater_fPtr_calls;
+  return false;
+}
+TEST_CASE("greater function", "[free >]")
+{
+  propagate_const<FakePtr> f;
+  propagate_const<FakePtr> g;
+  fPtr_greater_fPtr_calls = 0;
+  auto r = (f > g);
+  REQUIRE(fPtr_greater_fPtr_calls == 1);
+}
+
+size_t fPtr_less_or_equal_fPtr_calls = 0;
+bool operator <= (const FakePtr& f, const FakePtr& g)
+{
+  ++fPtr_less_or_equal_fPtr_calls;
+  return false;
+}
+TEST_CASE("less or equal function", "[free <=]")
+{
+  propagate_const<FakePtr> f;
+  propagate_const<FakePtr> g;
+  fPtr_less_or_equal_fPtr_calls = 0;
+  auto r = (f <= g);
+  REQUIRE(fPtr_less_or_equal_fPtr_calls == 1);
+}
+
+size_t fPtr_greater_or_equal_fPtr_calls = 0;
+bool operator >= (const FakePtr& f, const FakePtr& g)
+{
+  ++fPtr_greater_or_equal_fPtr_calls;
+  return false;
+}
+TEST_CASE("greater or equal function", "[free >=]")
+{
+  propagate_const<FakePtr> f;
+  propagate_const<FakePtr> g;
+  fPtr_greater_or_equal_fPtr_calls = 0;
+  auto r = (f >= g);
+  REQUIRE(fPtr_greater_or_equal_fPtr_calls == 1);
+}
