@@ -149,10 +149,13 @@ public:
 private:
   T t_;
 
-friend constexpr const T& get_underlying(const propagate_const<T>& pt);
-friend constexpr T& get_underlying(propagate_const<T>& pt);
+friend constexpr const T& get_underlying(const propagate_const<T>& pt) noexcept { return pt.t_; }
+friend constexpr T& get_underlying(propagate_const<T>& pt) noexcept { return pt.t_; }
 
 };
+
+// [propagate_const.underlying], underlying pointer access
+// defined inline in the class
 
 // [propagate_const.relational], relational operators
 template <class T>
@@ -303,19 +306,6 @@ constexpr void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept(
   swap(get_underlying(pt), get_underlying(pu));
 }
 
-
-// [propagate_const.underlying], underlying pointer access
-template <class T>
-constexpr const T& get_underlying(const propagate_const<T>& pt) noexcept
-{
-  return pt.t_;
-}
-
-template <class T>
-constexpr T& get_underlying(propagate_const<T>& pt) noexcept
-{
-  return pt.t_;
-}
 
 } //  end namespace fundamentals_v2
 } //  end namespace experimental

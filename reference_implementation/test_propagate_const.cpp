@@ -284,3 +284,25 @@ TEST_CASE("less_equal", "[less_equal]")
   REQUIRE(a_less_equal_calls == 1);
 }
 
+class FakePtr
+{
+  public:
+  auto operator->() const { return this; }
+  auto get() const { return this; }
+  auto operator*() const { return *this; }
+};
+
+size_t fPtr_equals_fPtr_calls = 0;
+bool operator == (const FakePtr& f, const FakePtr& g)
+{
+  ++fPtr_equals_fPtr_calls;
+  return false;
+}
+TEST_CASE("equals function", "[free ==]")
+{
+  propagate_const<FakePtr> f;
+  propagate_const<FakePtr> g;
+  fPtr_equals_fPtr_calls = 0;
+  auto r = (f == g);
+  REQUIRE(fPtr_equals_fPtr_calls == 1);
+}
