@@ -315,10 +315,9 @@ constexpr void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept(
 template <class T>
 struct hash<experimental::fundamentals_v2::propagate_const<T>>
 {
-  bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
-      const experimental::fundamentals_v2::propagate_const<T>& pc2) const
+  bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1) const
   {
-    return std::hash<T>()(get_underlying(pc1), get_underlying(pc2));
+    return std::hash<T>()(get_underlying(pc1));
   }
 };
 

@@ -172,7 +172,7 @@ TEST_CASE("hash", "[hash]")
   A a;
   propagate_const<A*> pa(&a);
   a_hash_calls = 0;
-  std::hash<A*>()(pa);
+  std::hash<propagate_const<A*>>()(pa);
   REQUIRE(a_hash_calls == 1);
 }
 
@@ -190,7 +190,7 @@ TEST_CASE("equal_to", "[equal_to]")
   A a;
   propagate_const<A*> pa(&a);
   a_equal_to_calls = 0;
-  std::equal_to<A*>()(pa,pa);
+  std::equal_to<propagate_const<A*>>()(pa,pa);
   REQUIRE(a_equal_to_calls == 1);
 }
 
@@ -208,7 +208,7 @@ TEST_CASE("not_equal_to", "[not_equal_to]")
   A a;
   propagate_const<A*> pa(&a);
   a_not_equal_to_calls = 0;
-  std::not_equal_to<A*>()(pa,pa);
+  std::not_equal_to<propagate_const<A*>>()(pa,pa);
   REQUIRE(a_not_equal_to_calls == 1);
 }
 
@@ -226,7 +226,7 @@ TEST_CASE("greater", "[greater]")
   A a;
   propagate_const<A*> pa(&a);
   a_greater_calls = 0;
-  std::greater<A*>()(pa,pa);
+  std::greater<propagate_const<A*>>()(pa,pa);
   REQUIRE(a_greater_calls == 1);
 }
 
@@ -244,7 +244,7 @@ TEST_CASE("less", "[less]")
   A a;
   propagate_const<A*> pa(&a);
   a_less_calls = 0;
-  std::less<A*>()(pa,pa);
+  std::less<propagate_const<A*>>()(pa,pa);
   REQUIRE(a_less_calls == 1);
 }
 
@@ -262,7 +262,7 @@ TEST_CASE("greater_equal", "[greater_equal]")
   A a;
   propagate_const<A*> pa(&a);
   a_greater_equal_calls = 0;
-  std::greater_equal<A*>()(pa,pa);
+  std::greater_equal<propagate_const<A*>>()(pa,pa);
   REQUIRE(a_greater_equal_calls == 1);
 }
 
@@ -280,7 +280,7 @@ TEST_CASE("less_equal", "[less_equal]")
   A a;
   propagate_const<A*> pa(&a);
   a_less_equal_calls = 0;
-  std::less_equal<A*>()(pa,pa);
+  std::less_equal<propagate_const<A*>>()(pa,pa);
   REQUIRE(a_less_equal_calls == 1);
 }
 
