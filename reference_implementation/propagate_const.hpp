@@ -61,20 +61,38 @@ public:
 
   constexpr propagate_const(propagate_const&& p) = default;
 
-  template <class U, enable_if_t<is_constructible<T, U&&>::value>>
+  template <class U, enable_if_t<!is_convertible<U&&, T>::value &&
+                                 is_constructible<T, U&&>::value>>
   explicit constexpr propagate_const(propagate_const<U>&& pu)
       : t_(std::move(get_underlying(pu)))
   {
   }
 
+  template <class U, enable_if_t<is_convertible<U&&, T>::value &&
+                                 is_constructible<T, U&&>::value>>
+  constexpr propagate_const(propagate_const<U>&& pu)
+      : t_(std::move(get_underlying(pu)))
+  {
+  }
+
   template <class U,
-            class V = enable_if_t<is_constructible<T, U&&>::value &&
+            class V = enable_if_t<!is_convertible<U&&, T>::value &&
+                                  is_constructible<T, U&&>::value &&
                                   !is_propagate_const<decay_t<U>>::value>>
   explicit constexpr propagate_const(U&& u)
       : t_(std::forward<U>(u))
   {
   }
 
+  template <class U,
+            class V = enable_if_t<is_convertible<U&&, T>::value &&
+                                  is_constructible<T, U&&>::value &&
+                                  !is_propagate_const<decay_t<U>>::value>>
+  constexpr propagate_const(U&& u)
+      : t_(std::forward<U>(u))
+  {
+  }
+  
   // [propagate_const.assignment], assignment
   propagate_const& operator=(const propagate_const& p) = delete;
 
