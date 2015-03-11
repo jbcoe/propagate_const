@@ -62,32 +62,30 @@ public:
   constexpr propagate_const(propagate_const&& p) = default;
 
   template <class U, enable_if_t<!is_convertible<U&&, T>::value &&
-                                 is_constructible<T, U&&>::value>>
+                                 is_constructible<T, U&&>::value,bool> = true>
   explicit constexpr propagate_const(propagate_const<U>&& pu)
       : t_(std::move(get_underlying(pu)))
   {
   }
 
   template <class U, enable_if_t<is_convertible<U&&, T>::value &&
-                                 is_constructible<T, U&&>::value>>
+                                 is_constructible<T, U&&>::value,bool> = false>
   constexpr propagate_const(propagate_const<U>&& pu)
       : t_(std::move(get_underlying(pu)))
   {
   }
 
-  template <class U,
-            class V = enable_if_t<!is_convertible<U&&, T>::value &&
-                                  is_constructible<T, U&&>::value &&
-                                  !is_propagate_const<decay_t<U>>::value>>
+  template <class U, enable_if_t<!is_convertible<U&&, T>::value &&
+                                 is_constructible<T, U&&>::value &&
+                                 !is_propagate_const<decay_t<U>>::value,bool> = true>
   explicit constexpr propagate_const(U&& u)
       : t_(std::forward<U>(u))
   {
   }
 
-  template <class U,
-            class V = enable_if_t<is_convertible<U&&, T>::value &&
-                                  is_constructible<T, U&&>::value &&
-                                  !is_propagate_const<decay_t<U>>::value>>
+  template <class U, enable_if_t<is_convertible<U&&, T>::value &&
+                                 is_constructible<T, U&&>::value &&
+                                 !is_propagate_const<decay_t<U>>::value,bool> = false>
   constexpr propagate_const(U&& u)
       : t_(std::forward<U>(u))
   {
