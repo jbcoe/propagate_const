@@ -62,13 +62,13 @@ public:
   constexpr propagate_const(propagate_const&& p) = default;
 
   template <class U>
-  constexpr propagate_const(propagate_const<U>&& pu)
+  explicit constexpr propagate_const(propagate_const<U>&& pu)
       : t_(std::move(get_underlying(pu)))
   {
   }
 
   template <class U, class V = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  constexpr propagate_const(U&& u)
+  explicit constexpr propagate_const(U&& u)
       : t_(std::forward<U>(u))
   {
   }
