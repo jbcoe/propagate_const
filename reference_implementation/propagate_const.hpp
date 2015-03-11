@@ -315,6 +315,9 @@ constexpr void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept(
 template <class T>
 struct hash<experimental::fundamentals_v2::propagate_const<T>>
 {
+  typedef size_t result_type;
+  typedef experimental::fundamentals_v2::propagate_const<T> argument_type;
+
   bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1) const
   {
     return std::hash<T>()(get_underlying(pc1));
@@ -325,6 +328,9 @@ struct hash<experimental::fundamentals_v2::propagate_const<T>>
 template <class T>
 struct equal_to<experimental::fundamentals_v2::propagate_const<T>>
 {
+  typedef experimental::fundamentals_v2::propagate_const<T> first_argument_type;
+  typedef experimental::fundamentals_v2::propagate_const<T> second_argument_type;
+
   bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
       const experimental::fundamentals_v2::propagate_const<T>& pc2) const
   {
@@ -335,6 +341,9 @@ struct equal_to<experimental::fundamentals_v2::propagate_const<T>>
 template <class T>
 struct not_equal_to<experimental::fundamentals_v2::propagate_const<T>>
 {
+  typedef experimental::fundamentals_v2::propagate_const<T> first_argument_type;
+  typedef experimental::fundamentals_v2::propagate_const<T> second_argument_type;
+
   bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
       const experimental::fundamentals_v2::propagate_const<T>& pc2) const
   {
@@ -345,6 +354,9 @@ struct not_equal_to<experimental::fundamentals_v2::propagate_const<T>>
 template <class T>
 struct less<experimental::fundamentals_v2::propagate_const<T>>
 {
+  typedef experimental::fundamentals_v2::propagate_const<T> first_argument_type;
+  typedef experimental::fundamentals_v2::propagate_const<T> second_argument_type;
+
   bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
       const experimental::fundamentals_v2::propagate_const<T>& pc2) const
   {
@@ -355,6 +367,9 @@ struct less<experimental::fundamentals_v2::propagate_const<T>>
 template <class T>
 struct greater<experimental::fundamentals_v2::propagate_const<T>> 
 {
+  typedef experimental::fundamentals_v2::propagate_const<T> first_argument_type;
+  typedef experimental::fundamentals_v2::propagate_const<T> second_argument_type;
+
   bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
       const experimental::fundamentals_v2::propagate_const<T>& pc2) const
   {
@@ -365,6 +380,9 @@ struct greater<experimental::fundamentals_v2::propagate_const<T>>
 template <class T>
 struct less_equal<experimental::fundamentals_v2::propagate_const<T>>
 {
+  typedef experimental::fundamentals_v2::propagate_const<T> first_argument_type;
+  typedef experimental::fundamentals_v2::propagate_const<T> second_argument_type;
+
   bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
       const experimental::fundamentals_v2::propagate_const<T>& pc2) const
   {
@@ -375,6 +393,9 @@ struct less_equal<experimental::fundamentals_v2::propagate_const<T>>
 template <class T>
 struct greater_equal<experimental::fundamentals_v2::propagate_const<T>>
 {
+  typedef experimental::fundamentals_v2::propagate_const<T> first_argument_type;
+  typedef experimental::fundamentals_v2::propagate_const<T> second_argument_type;
+
   bool operator()(const experimental::fundamentals_v2::propagate_const<T>& pc1,
       const experimental::fundamentals_v2::propagate_const<T>& pc2) const
   {
