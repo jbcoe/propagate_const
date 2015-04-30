@@ -19,10 +19,10 @@ in a Library Fundamentals TS.
 
 ## A summary of `propagate_const`
 The template class `propagate_const` [N4388] allows a pointer type to be wrapped so that, when
-accessed through a const-access path, the `const`ness is propagated to the pointee. 
+accessed through a `const` access path, the `const`ness is propagated to the pointee. 
 
 A class with pointer members can access non-`const` member functions of the pointees even when
-accessed through a const-access path.
+accessed through a `const` access path.
 
     struct A {
       B* b_;
@@ -61,7 +61,7 @@ Move construction and assignment are allowed as they cannot be performed from `c
 
 For `propagate_const<std::unique_ptr<T>>` the deletion of copy and assigment is not a restriction as `std::unique_ptr` is
 itself a move-only type. For `propagate_const<std::shared_ptr<T>>` and `propagate_const<T*>` the restriction is limiting.
-This is intended behaviour, if copy construction from a `const` reference were possible then accidental loss of `const`-ness
+This is intended behaviour: if copy construction from a `const` reference were possible then accidental loss of `const`-ness
 would be possible. It is also excessively restrictive. 
 
 ### Non-`const` copy construction and assignment
@@ -72,8 +72,8 @@ Copy-construction and assignment from a non-`const` reference does not present a
 
 could be made legal.
 
-This design interacts poorly with other Standard Library components, like std::vector, which make use of copy and assignment
-from `const` references. Rather than propose a Standard Library addition that is know to work poorly with existing
+This design interacts poorly with other Standard Library components, like `std::vector`, which make use of copy and assignment
+from `const` references. Rather than propose a Standard Library addition that is known to work poorly with existing
 components, the authors have opted for a stronger than necessary restriction.
 
 
