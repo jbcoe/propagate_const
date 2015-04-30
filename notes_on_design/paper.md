@@ -1,6 +1,13 @@
 # The deleted copy-constructor of `propagate_const`
 
-ISO/IEC JTC1 SC22 WG21 DXXXX 2015-04-28
+Document: WG21 DXXXX 
+
+Date: 2015-04-30
+
+Project: JTC1.22.32 Programming Language C++
+
+Working Group: Library
+
 
 _Jonathan Coe \<jbcoe@me.com\>_
 
@@ -12,12 +19,14 @@ _Titus Winters \<titus@google.com\>_
 
 _Andy Sawyer \<andy.sawyer@gmail.com\>_
 
-## Abstract
+_Ville Voutilainen \<ville.voutilainen@gmail.com\>_
+
+## 1 Abstract
 This document gives motivation for the decision to delete the copy constructor
 and copy assignment from `propagate_const` and lays out the case for the inclusion of this class
 in a Library Fundamentals TS.
 
-## A summary of `propagate_const`
+## 2 A summary of `propagate_const`
 The template class `propagate_const` [N4388] allows a pointer type to be wrapped so that, when
 accessed through a `const` access path, the `const`ness is propagated to the pointee. 
 
@@ -44,18 +53,48 @@ Using `propagate_const`:
 
 only the non-`const` `foo()` is able to invoke non-`const` methods of the class `B` through the member `b_`.
 
+
 The intention of `propagate_const` is not to unduly restrict the user but to prevent accidental `const`-incorrect use.
 A free-standing function, `get_underlying`, allows the wrapped pointer type to be explicitly extracted.
 
-## Copy construction and assignment
-The copy and assignment operators of `propagate_const<T>` are deleted because copies from `const` `propagate_const<T>`
-references would otherwise allow creation of non-`const` `propagate_const<T>` objects and consequently non-`const` access
-to potentially shared state. 
+## 3 Copy construction and assignment
+The copy and assignment operators of `propagate_const` are deleted because copies from `const` `propagate_const`
+references would otherwise allow creation of non-`const` `propagate_const` objects and consequently non-`const` access
+to potentially shared state; 
+
+#### Example 1
+
+A function taking a `const` reference could copy it internally to access non-const functions on the copied object.
 
     void bar(const C& cc) {
       C c(cc);
-      c.foo(); // calls non-const foo 
+      c.foo(); // calls non-const foo
     }
+
+Since `C` has a `propagate_const` member, the function `bar` will not compile unless the user defines a copy constructor for `C`.
+
+#### Example 2
+
+It is possible to lose `const`ness by copying pointer member variables as return values from const methods:
+
+    struct X { 
+      int* i_;
+
+      int* phoo() const { return i_; }
+    };
+
+Using `propagate_const`:
+
+    struct Y { 
+      propagate_const<int*> i_;
+
+      propagate_const<int*> phoo() const { return i_; }
+    };
+
+The method `Y::phoo` will not compile as `propagate_const` cannot be copied from a `const` reference 
+(as `i_` is a member, elision criteria are not met and there is no automatic move-on-return).
+
+### Move construction and assignment
 
 Move construction and assignment are allowed as they cannot be performed from `const` references.
 
@@ -72,12 +111,12 @@ Copy-construction and assignment from a non-`const` reference does not present a
 
 could be made legal.
 
-This design interacts poorly with other Standard Library components, like `std::vector`, which make use of copy and assignment
-from `const` references. Rather than propose a Standard Library addition that is known to work poorly with existing
-components, the authors have opted for a stronger than necessary restriction.
+such a design would interact poorly with other Standard Library components, 
+like `std::vector`, which make use of copy and assignment from `const` references. Rather than propose a Standard Library 
+addition that is known to work poorly with existing components, the authors have opted for a stronger than necessary restriction.
 
 
-## User-experience, TS 2 and extensions
+## 4 User-experience, TS 2 and extensions
 
 As proposed, `propagate_const` identifies problems with accidental `const`-incorrectness
 where pointer members represent ownership and the pointee is part of an object's logical state.
