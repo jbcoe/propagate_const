@@ -1,12 +1,12 @@
 # The deleted copy-constructor of `propagate_const`
 
-Document: WG21 DXXXX 
-
-Date: 2015-04-30
-
 Project: JTC1.22.32 Programming Language C++
 
 Working Group: Library
+
+Document: WG21 D4493
+
+Date: 2015-04-30
 
 
 _Jonathan Coe \<jbcoe@me.com\>_
