@@ -252,7 +252,7 @@ TEST_CASE("greater_equal", "[greater_equal]") {
 size_t a_less_equal_calls = 0;
 namespace std {
 template <>
-struct std::less_equal<A*> {
+struct less_equal<A*> {
   bool operator()(const A*, const A*) const {
     ++a_less_equal_calls;
     return false;
