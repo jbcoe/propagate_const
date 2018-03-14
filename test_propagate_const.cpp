@@ -139,13 +139,16 @@ TEST_CASE("const shared_ptr operator *", "[csptr_op_*]") {
 }
 
 size_t a_hash_calls = 0;
+
+namespace std {
 template <>
-struct std::hash<A*> {
+struct hash<A*> {
   size_t operator()(const A*) const {
     ++a_hash_calls;
     return 0;
   }
 };
+} // namespace std
 
 TEST_CASE("hash", "[hash]") {
   A a;
@@ -156,13 +159,16 @@ TEST_CASE("hash", "[hash]") {
 }
 
 size_t a_equal_to_calls = 0;
+namespace std {
 template <>
-struct std::equal_to<A*> {
+struct equal_to<A*> {
   bool operator()(const A*, const A*) const {
     ++a_equal_to_calls;
     return false;
   }
 };
+} // namespace std
+
 TEST_CASE("equal_to", "[equal_to]") {
   A a;
   propagate_const<A*> pa(&a);
@@ -172,13 +178,15 @@ TEST_CASE("equal_to", "[equal_to]") {
 }
 
 size_t a_not_equal_to_calls = 0;
+namespace std {
 template <>
-struct std::not_equal_to<A*> {
+struct not_equal_to<A*> {
   bool operator()(const A*, const A*) const {
     ++a_not_equal_to_calls;
     return false;
   }
 };
+} // namespace std
 TEST_CASE("not_equal_to", "[not_equal_to]") {
   A a;
   propagate_const<A*> pa(&a);
@@ -188,13 +196,15 @@ TEST_CASE("not_equal_to", "[not_equal_to]") {
 }
 
 size_t a_greater_calls = 0;
+namespace std {
 template <>
-struct std::greater<A*> {
+struct greater<A*> {
   bool operator()(const A*, const A*) const {
     ++a_greater_calls;
     return false;
   }
 };
+} // namespace std
 TEST_CASE("greater", "[greater]") {
   A a;
   propagate_const<A*> pa(&a);
@@ -204,13 +214,15 @@ TEST_CASE("greater", "[greater]") {
 }
 
 size_t a_less_calls = 0;
+namespace std {
 template <>
-struct std::less<A*> {
+struct less<A*> {
   bool operator()(const A*, const A*) const {
     ++a_less_calls;
     return false;
   }
 };
+} // namespace std
 TEST_CASE("less", "[less]") {
   A a;
   propagate_const<A*> pa(&a);
@@ -220,13 +232,15 @@ TEST_CASE("less", "[less]") {
 }
 
 size_t a_greater_equal_calls = 0;
+namespace std {
 template <>
-struct std::greater_equal<A*> {
+struct greater_equal<A*> {
   bool operator()(const A*, const A*) const {
     ++a_greater_equal_calls;
     return false;
   }
 };
+} // namespace std
 TEST_CASE("greater_equal", "[greater_equal]") {
   A a;
   propagate_const<A*> pa(&a);
@@ -236,13 +250,15 @@ TEST_CASE("greater_equal", "[greater_equal]") {
 }
 
 size_t a_less_equal_calls = 0;
+namespace std {
 template <>
-struct std::less_equal<A*> {
+struct less_equal<A*> {
   bool operator()(const A*, const A*) const {
     ++a_less_equal_calls;
     return false;
   }
 };
+} // namespace std
 TEST_CASE("less_equal", "[less_equal]") {
   A a;
   propagate_const<A*> pa(&a);
