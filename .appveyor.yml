@@ -1,0 +1,11 @@
+install:
+  - git submodule update --init
+
+clone_folder: c:\projects\propagate_const
+
+before_build:
+  - cd c:\projects\propagate_const
+  
+build_script:
+  - python scripts\build.py -t
+

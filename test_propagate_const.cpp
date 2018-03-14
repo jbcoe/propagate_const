@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#include "propagate_const.hpp"
+#include "propagate_const.h"
 
 using std::experimental::propagate_const;
 
