@@ -134,6 +134,7 @@ class propagate_const {
   friend struct std::greater_equal<propagate_const<T>>;
   friend struct std::less_equal<propagate_const<T>>;
 
+  // [propagate_const.relational], relational operators
   friend constexpr bool operator==(const propagate_const& pt, nullptr_t) {
     return pt.t_ == nullptr;
   }
@@ -259,10 +260,6 @@ class propagate_const {
   }
 };
 
-// [propagate_const.underlying], underlying pointer access
-// defined inline in the class
-
-// [propagate_const.relational], relational operators
 
 // [propagate_const.algorithms], specialized algorithms
 template <class T>

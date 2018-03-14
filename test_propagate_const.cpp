@@ -139,13 +139,16 @@ TEST_CASE("const shared_ptr operator *", "[csptr_op_*]") {
 }
 
 size_t a_hash_calls = 0;
+
+namespace std {
 template <>
-struct std::hash<A*> {
+struct hash<A*> {
   size_t operator()(const A*) const {
     ++a_hash_calls;
     return 0;
   }
 };
+} // namespace std
 
 TEST_CASE("hash", "[hash]") {
   A a;
