@@ -41,68 +41,68 @@ class propagate_const {
 
  public:
   // [propagate_const.ctor], constructors
-  constexpr propagate_const() = default;
+  propagate_const() = default;
 
   propagate_const(const propagate_const& p) = delete;
 
-  constexpr propagate_const(propagate_const&& p) = default;
+  propagate_const(propagate_const&& p) = default;
 
   template <class U, class = enable_if_t<is_constructible<T, U&&>::value>>
-  explicit constexpr propagate_const(propagate_const<U>&& pu)
+  explicit propagate_const(propagate_const<U>&& pu)
       : t_(std::move(pu.t_)) {}
 
   template <class U, class = enable_if_t<is_constructible<T, U&&>::value>>
-  explicit constexpr propagate_const(U&& u) : t_(std::forward<U>(u)) {}
+  explicit propagate_const(U&& u) : t_(std::forward<U>(u)) {}
 
   // [propagate_const.assignment], assignment
   propagate_const& operator=(const propagate_const& p) = delete;
 
-  constexpr propagate_const& operator=(propagate_const&& p) = default;
+  propagate_const& operator=(propagate_const&& p) = default;
 
   template <class U>
-  constexpr propagate_const& operator=(propagate_const<U>&& pu) {
+  propagate_const& operator=(propagate_const<U>&& pu) {
     t_ = std::move(pu.t_);
     return *this;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  constexpr propagate_const& operator=(U&& u) {
+  propagate_const& operator=(U&& u) {
     t_ = std::move(u);
     return *this;
   }
 
   // [propagate_const.const_observers], const observers
-  explicit constexpr operator bool() const { return get() != nullptr; }
-  constexpr const element_type* operator->() const { return get(); }
+  explicit operator bool() const { return get() != nullptr; }
+  const element_type* operator->() const { return get(); }
 
   template <class T_ = T, class = enable_if_t<is_convertible<
                               const T_, const element_type*>::value>>
-  constexpr operator const element_type*() const  // Not always defined
+  operator const element_type*() const  // Not always defined
   {
     return get();
   }
 
-  constexpr const element_type& operator*() const { return *get(); }
+  const element_type& operator*() const { return *get(); }
 
-  constexpr const element_type* get() const { return get_pointer(t_); }
+  const element_type* get() const { return get_pointer(t_); }
 
   // [propagate_const.non_const_observers], non-const observers
-  constexpr element_type* operator->() { return get(); }
+  element_type* operator->() { return get(); }
 
   template <class T_ = T,
             class = enable_if_t<is_convertible<T_, element_type*>::value>>
-  constexpr operator element_type*()  // Not always defined
+  operator element_type*()  // Not always defined
   {
     return get();
   }
 
-  constexpr element_type& operator*() { return *get(); }
+  element_type& operator*() { return *get(); }
 
-  constexpr element_type* get() { return get_pointer(t_); }
+  element_type* get() { return get_pointer(t_); }
 
   // [propagate_const.modifiers], modifiers
-  constexpr void swap(propagate_const& pt) noexcept(
+  void swap(propagate_const& pt) noexcept(
       noexcept(swap(declval<T&>(), declval<T&>()))) {
     swap(t_, pt.t_);
   }
@@ -119,127 +119,127 @@ class propagate_const {
   friend struct std::less_equal<propagate_const<T>>;
 
   // [propagate_const.relational], relational operators
-  friend constexpr bool operator==(const propagate_const& pt, nullptr_t) {
+  friend bool operator==(const propagate_const& pt, nullptr_t) {
     return pt.t_ == nullptr;
   }
 
-  friend constexpr bool operator==(nullptr_t, const propagate_const& pu) {
+  friend bool operator==(nullptr_t, const propagate_const& pu) {
     return nullptr == pu.t_;
   }
 
-  friend constexpr bool operator!=(const propagate_const& pt, nullptr_t) {
+  friend bool operator!=(const propagate_const& pt, nullptr_t) {
     return pt.t_ != nullptr;
   }
 
-  friend constexpr bool operator!=(nullptr_t, const propagate_const& pu) {
+  friend bool operator!=(nullptr_t, const propagate_const& pu) {
     return nullptr != pu.t_;
   }
 
   template <class U>
-  friend constexpr bool operator==(const propagate_const& pt,
+  friend bool operator==(const propagate_const& pt,
                                    const propagate_const<U>& pu) {
     return pt.t_ == pu.t_;
   }
 
   template <class U>
-  friend constexpr bool operator!=(const propagate_const& pt,
+  friend bool operator!=(const propagate_const& pt,
                                    const propagate_const<U>& pu) {
     return pt.t_ != pu.t_;
   }
 
   template <class U>
-  friend constexpr bool operator<(const propagate_const& pt,
+  friend bool operator<(const propagate_const& pt,
                                   const propagate_const<U>& pu) {
     return pt.t_ < pu.t_;
   }
 
   template <class U>
-  friend constexpr bool operator>(const propagate_const& pt,
+  friend bool operator>(const propagate_const& pt,
                                   const propagate_const<U>& pu) {
     return pt.t_ > pu.t_;
   }
 
   template <class U>
-  friend constexpr bool operator<=(const propagate_const& pt,
+  friend bool operator<=(const propagate_const& pt,
                                    const propagate_const<U>& pu) {
     return pt.t_ <= pu.t_;
   }
 
   template <class U>
-  friend constexpr bool operator>=(const propagate_const& pt,
+  friend bool operator>=(const propagate_const& pt,
                                    const propagate_const<U>& pu) {
     return pt.t_ >= pu.t_;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator==(const propagate_const& pt, const U& u) {
+  friend bool operator==(const propagate_const& pt, const U& u) {
     return pt.t_ == u;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator!=(const propagate_const& pt, const U& u) {
+  friend bool operator!=(const propagate_const& pt, const U& u) {
     return pt.t_ != u;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator<(const propagate_const& pt, const U& u) {
+  friend bool operator<(const propagate_const& pt, const U& u) {
     return pt.t_ < u;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator>(const propagate_const& pt, const U& u) {
+  friend bool operator>(const propagate_const& pt, const U& u) {
     return pt.t_ > u;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator<=(const propagate_const& pt, const U& u) {
+  friend bool operator<=(const propagate_const& pt, const U& u) {
     return pt.t_ <= u;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator>=(const propagate_const& pt, const U& u) {
+  friend bool operator>=(const propagate_const& pt, const U& u) {
     return pt.t_ >= u;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator==(const U& u, const propagate_const& pu) {
+  friend bool operator==(const U& u, const propagate_const& pu) {
     return u == pu.t_;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator!=(const U& u, const propagate_const& pu) {
+  friend bool operator!=(const U& u, const propagate_const& pu) {
     return u != pu.t_;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator<(const U& u, const propagate_const& pu) {
+  friend bool operator<(const U& u, const propagate_const& pu) {
     return u < pu.t_;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator>(const U& u, const propagate_const& pu) {
+  friend bool operator>(const U& u, const propagate_const& pu) {
     return u > pu.t_;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator<=(const U& u, const propagate_const& pu) {
+  friend bool operator<=(const U& u, const propagate_const& pu) {
     return u <= pu.t_;
   }
 
   template <class U,
             class = enable_if_t<!is_propagate_const<decay_t<U>>::value>>
-  friend constexpr bool operator>=(const U& u, const propagate_const& pu) {
+  friend bool operator>=(const U& u, const propagate_const& pu) {
     return u >= pu.t_;
   }
 };
@@ -247,7 +247,7 @@ class propagate_const {
 
 // [propagate_const.algorithms], specialized algorithms
 template <class T>
-constexpr void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept(
+void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept(
     noexcept(swap(declval<T&>(), declval<T&>()))) {
   swap(get_underlying(pt), get_underlying(pu));
 }
