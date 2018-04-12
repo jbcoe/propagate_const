@@ -47,28 +47,12 @@ class propagate_const {
 
   constexpr propagate_const(propagate_const&& p) = default;
 
-  template <class U, enable_if_t<!is_convertible<U&&, T>::value &&
-                                     is_constructible<T, U&&>::value,
-                                 bool> = true>
+  template <class U, class = enable_if_t<is_constructible<T, U&&>::value>>
   explicit constexpr propagate_const(propagate_const<U>&& pu)
       : t_(std::move(pu.t_)) {}
 
-  template <class U, enable_if_t<is_convertible<U&&, T>::value &&
-                                     is_constructible<T, U&&>::value,
-                                 bool> = false>
-  constexpr propagate_const(propagate_const<U>&& pu) : t_(std::move(pu.t_)) {}
-
-  template <class U, enable_if_t<!is_convertible<U&&, T>::value &&
-                                     is_constructible<T, U&&>::value &&
-                                     !is_propagate_const<decay_t<U>>::value,
-                                 bool> = true>
+  template <class U, class = enable_if_t<is_constructible<T, U&&>::value>>
   explicit constexpr propagate_const(U&& u) : t_(std::forward<U>(u)) {}
-
-  template <class U, enable_if_t<is_convertible<U&&, T>::value &&
-                                     is_constructible<T, U&&>::value &&
-                                     !is_propagate_const<decay_t<U>>::value,
-                                 bool> = false>
-  constexpr propagate_const(U&& u) : t_(std::forward<U>(u)) {}
 
   // [propagate_const.assignment], assignment
   propagate_const& operator=(const propagate_const& p) = delete;
@@ -92,7 +76,7 @@ class propagate_const {
   explicit constexpr operator bool() const { return get() != nullptr; }
   constexpr const element_type* operator->() const { return get(); }
 
-  template <class T_ = T, class U = enable_if_t<is_convertible<
+  template <class T_ = T, class = enable_if_t<is_convertible<
                               const T_, const element_type*>::value>>
   constexpr operator const element_type*() const  // Not always defined
   {
@@ -107,7 +91,7 @@ class propagate_const {
   constexpr element_type* operator->() { return get(); }
 
   template <class T_ = T,
-            class U = enable_if_t<is_convertible<T_, element_type*>::value>>
+            class = enable_if_t<is_convertible<T_, element_type*>::value>>
   constexpr operator element_type*()  // Not always defined
   {
     return get();
