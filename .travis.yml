@@ -23,7 +23,23 @@ matrix:
           packages: ['g++-6']
       env: COMPILER='g++-6'
 
-#    # 3/ OSX Clang Builds - disabled for now
+    # 3/ Linux GCC 4.9 Builds
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+            - g++-6
+      env:
+         - COMPILER=g++-4.9
+         - CC=gcc-4.9
+         - CXX=g++-4.9
+
+
+#    # 4/ OSX Clang Builds - disabled for now
 #    - os: osx
 #      osx_image: xcode8
 #      compiler: clang
