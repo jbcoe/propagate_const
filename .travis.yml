@@ -32,6 +32,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
+            - g++-6
       env:
          - COMPILER=g++-4.9
          - CC=gcc-4.9
