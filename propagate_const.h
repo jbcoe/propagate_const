@@ -28,7 +28,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <utility>
 
+#ifndef _MSC_VER
 #define PROPAGATE_CONST_CONSTEXPR constexpr
+#else
+#if _MSC_VER <= 1900 // MSVS 2015 and earlier
+#define PROPAGATE_CONST_CONSTEXPR
+#define PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
+#endif
+#endif
 
 namespace std {
 namespace experimental {
@@ -73,7 +80,24 @@ class propagate_const {
 
   PROPAGATE_CONST_CONSTEXPR propagate_const(propagate_const&& p) = default;
 
-#ifdef PROPAGATE_CONST_HAS_EXPRESSION_SFINAE
+#ifdef PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
+  //
+  // Make converting constructors explicit as we cannot use SFINAE to check.
+  //
+  template <class U, class = enable_if_t<is_constructible<T, U&&>::value>>
+  explicit PROPAGATE_CONST_CONSTEXPR propagate_const(propagate_const<U>&& pu)
+      : t_(std::move(pu.t_))
+  {
+  }
+
+  template <class U,
+            class = enable_if_t<is_constructible<T, U&&>::value &&
+                                !is_propagate_const<decay_t<U>>::value>>
+  explicit PROPAGATE_CONST_CONSTEXPR propagate_const(U&& u)
+      : t_(std::forward<U>(u))
+  {
+  }
+#else
   //
   // Use SFINAE to check if converting constructor should be explicit.
   //
@@ -99,26 +123,8 @@ class propagate_const {
                                      !is_propagate_const<decay_t<U>>::value,
                                  bool> = false>
   PROPAGATE_CONST_CONSTEXPR propagate_const(U&& u) : t_(std::forward<U>(u)) {}
-
-#else
-  //
-  // Make converting constructors explicit as we cannot use SFINAE to check.
-  //
-  template <class U, class = enable_if_t<is_constructible<T, U&&>::value>>
-  explicit PROPAGATE_CONST_CONSTEXPR propagate_const(propagate_const<U>&& pu)
-      : t_(std::move(pu.t_))
-  {
-  }
-
-  template <class U,
-            class = enable_if_t<is_constructible<T, U&&>::value &&
-                                !is_propagate_const<decay_t<U>>::value>>
-  explicit PROPAGATE_CONST_CONSTEXPR propagate_const(U&& u)
-      : t_(std::forward<U>(u))
-  {
-  }
-
 #endif
+
   // [propagate_const.assignment], assignment
   propagate_const& operator=(const propagate_const& p) = delete;
 
