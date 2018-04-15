@@ -420,5 +420,5 @@ struct greater_equal<experimental::fundamentals_v2::propagate_const<T>> {
 
 }  // end namespace std
 
-#undef PROPAGATE_CONST_PROPAGATE_CONST_CONSTEXPR
+#undef PROPAGATE_CONST_CONSTEXPR
 #endif // JBCOE_PROPAGATE_CONST_INCLUDED
