@@ -28,15 +28,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <utility>
 
-#ifndef _MSC_VER
-#define PROPAGATE_CONST_CONSTEXPR constexpr
+#if defined(_MSC_VER) && _MSC_VER <= 1900 // MSVS 2015 and earlier
+  #define PROPAGATE_CONST_CONSTEXPR
+  #define PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
+#elif defined(__GNUC__) && __GNUC__ < 5 // GCC 4.9 and earlier
+  #define PROPAGATE_CONST_CONSTEXPR
+  #define PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
 #else
-#if _MSC_VER <= 1900 // MSVS 2015 and earlier
-#define PROPAGATE_CONST_CONSTEXPR
-#define PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
-#else
-#define PROPAGATE_CONST_CONSTEXPR constexpr
-#endif
+  #define PROPAGATE_CONST_CONSTEXPR constexpr
 #endif
 
 namespace std {
@@ -423,4 +422,5 @@ struct greater_equal<experimental::fundamentals_v2::propagate_const<T>> {
 }  // end namespace std
 
 #undef PROPAGATE_CONST_CONSTEXPR
+#undef PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
 #endif // JBCOE_PROPAGATE_CONST_INCLUDED
