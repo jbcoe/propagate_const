@@ -14,7 +14,7 @@ matrix:
           packages: ['clang-3.9', 'g++-6']
       env: COMPILER='clang++-3.9'
 
-    # 2/ Linux GCC Builds
+    # 2/ Linux GCC 6 Builds
     - os: linux
       compiler: gcc
       addons: &gcc6
@@ -32,18 +32,10 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-            - g++-6
       env:
          - COMPILER=g++-4.9
          - CC=gcc-4.9
          - CXX=g++-4.9
-
-
-#    # 4/ OSX Clang Builds - disabled for now
-#    - os: osx
-#      osx_image: xcode8
-#      compiler: clang
-#      env: COMPILER='clang++'
 
 install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
