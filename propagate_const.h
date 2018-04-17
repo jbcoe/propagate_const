@@ -28,12 +28,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <utility>
 
-#if defined(_MSC_VER) && _MSC_VER <= 1900 // MSVS 2015 and earlier
-  #define PROPAGATE_CONST_CONSTEXPR
-  #define PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
-#elif defined(__GNUC__) && __GNUC__ < 5 // GCC 4.9 and earlier
-  #define PROPAGATE_CONST_CONSTEXPR
-  #define PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
+#if defined(_MSC_VER) 
+  #if _MSC_VER <= 1900 // MSVS 2015 and earlier
+    #define PROPAGATE_CONST_CONSTEXPR
+    #define PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
+  #else
+    #define PROPAGATE_CONST_CONSTEXPR constexpr
+  #endif
+#elif defined(__GNUC__) 
+  #if __GNUC__ < 5 // GCC 4.9 and earlier
+    #define PROPAGATE_CONST_CONSTEXPR
+    #define PROPAGATE_CONST_HAS_NO_EXPRESSION_SFINAE
+  #else
+    #define PROPAGATE_CONST_CONSTEXPR constexpr
+  #endif
 #else
   #define PROPAGATE_CONST_CONSTEXPR constexpr
 #endif
