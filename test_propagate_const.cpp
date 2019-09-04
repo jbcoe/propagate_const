@@ -60,6 +60,17 @@ TEST_CASE("const Plain pointer operator *", "[cptr_op_*]") {
   REQUIRE_RETURN_TYPE_MATCH(cpc_a.get(), const A*);
 }
 
+TEST_CASE("Plain Pointer swap", "[ptr_swap]"){
+  A a;
+  A b;
+
+  propagate_const<A*> pc_a(&a);
+  propagate_const<A*> pc_b(&b);
+  
+  using std::swap;
+  swap(pc_a, pc_b);
+}
+
 //
 // unique_ptr
 //
