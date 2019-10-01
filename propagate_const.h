@@ -320,9 +320,7 @@ class propagate_const {
 
 // [propagate_const.algorithms], specialized algorithms
 template <class T>
-PROPAGATE_CONST_CONSTEXPR void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept(
-    noexcept(swap(declval<T&>(), declval<T&>())))
-{
+PROPAGATE_CONST_CONSTEXPR void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept {
   pt.swap(pu);
 }
 
