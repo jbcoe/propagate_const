@@ -46,7 +46,7 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
     target_compile_options(test_propagate_const
         PRIVATE
             $<$<CXX_COMPILER_ID:MSVC>:/EHsc>
-            $<$<CXX_COMPILER_ID:MSVC>:W4>
+            $<$<CXX_COMPILER_ID:MSVC>:/W4>
             $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Werror;-Wall;-Wno-self-assign-overloaded;-Wno-unknown-warning-option>
     )
 
