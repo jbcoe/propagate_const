@@ -1,25 +1,145 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.14)
 
-project(propagate_const)
-
-if(MSVC)
-  add_compile_options("/EHsc")
-else()
-  add_compile_options("-std=gnu++14")
-  set(CMAKE_CXX_FLAGS_SANITIZE "-fsanitize=address,undefined")
-  set(CMAKE_EXE_LINKER_FLAGS_SANITIZE "-fsanitize=address,undefined")
+if(NOT DEFINED PROJECT_NAME)
+    set(PROPAGATE_CONST_IS_NOT_SUBPROJECT ON)
 endif()
 
-if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" OR ${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-  add_compile_options("-Werror;-Wall")
+set(PROPAGATE_CONST_VALUE_VERSION "1.0.0")
+
+project(propagate_const VERSION ${PROPAGATE_CONST_VALUE_VERSION})
+
+option(ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
+
+add_library(propagate_const INTERFACE)
+target_include_directories(propagate_const
+    INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
+)
+
+target_sources(propagate_const
+    INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/propagate_const.h>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include/propagate_const.h>
+)
+
+target_compile_features(propagate_const
+    INTERFACE
+        cxx_defaulted_functions
+        cxx_explicit_conversions
+        cxx_noexcept
+        cxx_nullptr
+        cxx_right_angle_brackets
+        cxx_rvalue_references
+)
+
+add_library(propagate_const::propagate_const ALIAS propagate_const)
+
+if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
+
+    add_executable(test_propagate_const test_propagate_const.cpp)
+    target_link_libraries(test_propagate_const
+        PRIVATE
+            propagate_const::propagate_const
+    )
+
+    target_compile_options(test_propagate_const
+        PRIVATE
+            $<$<CXX_COMPILER_ID:MSVC>:/EHsc>
+            $<$<CXX_COMPILER_ID:MSVC>:/W4>
+            $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:Clang>>:-Werror;-Wall;-Wno-self-assign-overloaded;-Wno-unknown-warning-option>
+    )
+
+    set_target_properties(test_propagate_const PROPERTIES
+        CXX_STANDARD 14
+        CXX_STANDARD_REQUIRED YES
+        CXX_EXTENSIONS NO
+    )
+
+    if (ENABLE_SANITIZERS)
+        set(SANITIZER_FLAGS_ASAN "-fsanitize=address -fno-omit-frame-pointer")
+        set(SANITIZER_FLAGS_UBSAN "-fsanitize=undefined")
+
+        include(CheckCXXCompilerFlag)
+        check_cxx_compiler_flag("${SANITIZER_FLAGS_ASAN}" COMPILER_SUPPORTS_ASAN)
+        check_cxx_compiler_flag("${SANITIZER_FLAGS_UBSAN}" COMPILER_SUPPORTS_UBSAN)
+
+        if (COMPILER_SUPPORTS_ASAN)
+            add_library(asan INTERFACE IMPORTED)
+            set_target_properties(asan PROPERTIES
+                INTERFACE_COMPILE_OPTIONS "${SANITIZER_FLAGS_ASAN}"
+                INTERFACE_LINK_OPTIONS "${SANITIZER_FLAGS_ASAN}"
+            )
+            target_link_libraries(test_propagate_const
+                PRIVATE
+                     asan
+            )
+        endif(COMPILER_SUPPORTS_ASAN)
+
+        if (COMPILER_SUPPORTS_UBSAN)
+            add_library(ubsan INTERFACE IMPORTED)
+            set_target_properties(ubsan PROPERTIES
+                INTERFACE_COMPILE_OPTIONS "${SANITIZER_FLAGS_UBSAN}"
+                INTERFACE_LINK_OPTIONS "${SANITIZER_FLAGS_UBSAN}"
+            )
+            target_link_libraries(test_propagate_const
+                PRIVATE
+                     ubsan
+            )
+        endif(COMPILER_SUPPORTS_UBSAN)
+    endif(ENABLE_SANITIZERS)
+
+    enable_testing()
+    add_test(
+        NAME test_propagate_const
+        COMMAND test_propagate_const
+        WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+    install(
+        FILES
+            "${CMAKE_CURRENT_SOURCE_DIR}/propagate_const.h"
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/include
+    )
+
+    install(
+        FILES
+            "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt"
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
+    )
+
+    install(
+        TARGETS propagate_const
+        EXPORT propagate_const_target
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/cmake
+    )
+
+    install(
+        EXPORT propagate_const_target
+        NAMESPACE propagate_const::
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/cmake
+	    FILE propagate_const-target.cmake
+    )
+
+    include(CMakePackageConfigHelpers)
+    configure_package_config_file(
+        ${CMAKE_CURRENT_LIST_DIR}/propagate_const-config.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-config.cmake
+        INSTALL_DESTINATION
+            ${CMAKE_INSTALL_PREFIX}/cmake
+    )
+
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-version.cmake
+        VERSION ${PROPAGATE_CONST_VERSION}
+        COMPATIBILITY SameMajorVersion
+        ARCH_INDEPENDENT
+    )
+
+    install(
+        FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-config.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-version.cmake
+        DESTINATION
+            ${CMAKE_INSTALL_PREFIX}/cmake
+    )
 endif()
-
-include_directories(${CMAKE_SOURCE_DIR})
-add_executable(test_propagate_const test_propagate_const.cpp)
-
-enable_testing()
-add_test(
-  NAME test_propagate_const
-  COMMAND test_propagate_const
-  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
