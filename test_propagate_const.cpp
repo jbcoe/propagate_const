@@ -276,7 +276,7 @@ class FakePtr {
 };
 
 size_t fPtr_equals_fPtr_calls = 0;
-bool operator==(const FakePtr& f, const FakePtr& g) {
+bool operator==(const FakePtr&, const FakePtr&) {
   ++fPtr_equals_fPtr_calls;
   return false;
 }
@@ -290,7 +290,7 @@ TEST_CASE("equals function", "[free ==]") {
 }
 
 size_t fPtr_not_equals_fPtr_calls = 0;
-bool operator!=(const FakePtr& f, const FakePtr& g) {
+bool operator!=(const FakePtr&, const FakePtr&) {
   ++fPtr_not_equals_fPtr_calls;
   return false;
 }
@@ -304,7 +304,7 @@ TEST_CASE("not equals function", "[free !=]") {
 }
 
 size_t fPtr_less_fPtr_calls = 0;
-bool operator<(const FakePtr& f, const FakePtr& g) {
+bool operator<(const FakePtr&, const FakePtr&) {
   ++fPtr_less_fPtr_calls;
   return false;
 }
@@ -318,7 +318,7 @@ TEST_CASE("less function", "[free <]") {
 }
 
 size_t fPtr_greater_fPtr_calls = 0;
-bool operator>(const FakePtr& f, const FakePtr& g) {
+bool operator>(const FakePtr&, const FakePtr&) {
   ++fPtr_greater_fPtr_calls;
   return false;
 }
@@ -332,7 +332,7 @@ TEST_CASE("greater function", "[free >]") {
 }
 
 size_t fPtr_less_or_equal_fPtr_calls = 0;
-bool operator<=(const FakePtr& f, const FakePtr& g) {
+bool operator<=(const FakePtr&, const FakePtr&) {
   ++fPtr_less_or_equal_fPtr_calls;
   return false;
 }
@@ -346,7 +346,7 @@ TEST_CASE("less or equal function", "[free <=]") {
 }
 
 size_t fPtr_greater_or_equal_fPtr_calls = 0;
-bool operator>=(const FakePtr& f, const FakePtr& g) {
+bool operator>=(const FakePtr&, const FakePtr&) {
   ++fPtr_greater_or_equal_fPtr_calls;
   return false;
 }
