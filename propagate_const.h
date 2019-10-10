@@ -175,8 +175,8 @@ class propagate_const {
   PROPAGATE_CONST_CONSTEXPR element_type* get() { return get_pointer(t_); }
   
   // [propagate_const.modifiers], modifiers
-  PROPAGATE_CONST_CONSTEXPR void swap(propagate_const& pt) noexcept(
-      noexcept(swap(declval<T&>(), declval<T&>()))) {
+  PROPAGATE_CONST_CONSTEXPR void swap(propagate_const& pt) noexcept {
+    using std::swap;
     swap(t_, pt.t_);
   }
 
@@ -320,10 +320,8 @@ class propagate_const {
 
 // [propagate_const.algorithms], specialized algorithms
 template <class T>
-PROPAGATE_CONST_CONSTEXPR void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept(
-    noexcept(swap(declval<T&>(), declval<T&>())))
-{
-  swap(pt.underlying_ptr(), pu.underlying_ptr());
+PROPAGATE_CONST_CONSTEXPR void swap(propagate_const<T>& pt, propagate_const<T>& pu) noexcept {
+  pt.swap(pu);
 }
 
 }  //  end namespace fundamentals_v2
