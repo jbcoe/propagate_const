@@ -37,10 +37,23 @@ add_library(propagate_const::propagate_const ALIAS propagate_const)
 
 if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
 
+    include(FetchContent)
+    FetchContent_Declare(
+        catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    )
+
+    FetchContent_GetProperties(catch2)
+    if(NOT googletest_POPULATED)
+        FetchContent_Populate(catch2)
+        add_subdirectory(${catch2_SOURCE_DIR} ${catch2_BINARY_DIR})
+    endif()
+
     add_executable(test_propagate_const test_propagate_const.cpp)
     target_link_libraries(test_propagate_const
         PRIVATE
             propagate_const::propagate_const
+            Catch2::Catch2
     )
 
     target_compile_options(test_propagate_const
@@ -94,6 +107,10 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
         NAME test_propagate_const
         COMMAND test_propagate_const
         WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+    list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/contrib)
+    include(Catch)
+    catch_discover_tests(test_propagate_const)
 
     install(
         FILES
