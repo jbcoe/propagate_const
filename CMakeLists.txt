@@ -14,13 +14,13 @@ add_library(propagate_const INTERFACE)
 target_include_directories(propagate_const
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
+        $<INSTALL_INTERFACE:include>
 )
 
 target_sources(propagate_const
     INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/propagate_const.h>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include/propagate_const.h>
+        $<INSTALL_INTERFACE:include/propagate_const.h>
 )
 
 target_compile_features(propagate_const
@@ -85,7 +85,7 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
             )
             target_link_libraries(test_propagate_const
                 PRIVATE
-                     asan
+                    asan
             )
         endif(COMPILER_SUPPORTS_ASAN)
 
@@ -97,7 +97,7 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
             )
             target_link_libraries(test_propagate_const
                 PRIVATE
-                     ubsan
+                    ubsan
             )
         endif(COMPILER_SUPPORTS_UBSAN)
     endif(ENABLE_SANITIZERS)
@@ -115,25 +115,27 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
     install(
         FILES
             "${CMAKE_CURRENT_SOURCE_DIR}/propagate_const.h"
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/include
+        DESTINATION
+            include
     )
 
     install(
         FILES
             "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt"
-        DESTINATION ${CMAKE_INSTALL_PREFIX}
+        DESTINATION
+            ./
     )
 
     install(
         TARGETS propagate_const
         EXPORT propagate_const_target
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/cmake
+        DESTINATION lib/cmake/propagate_const
     )
 
     install(
         EXPORT propagate_const_target
         NAMESPACE propagate_const::
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/cmake
+        DESTINATION lib/cmake/propagate_const
 	    FILE propagate_const-target.cmake
     )
 
@@ -142,7 +144,7 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
         ${CMAKE_CURRENT_LIST_DIR}/propagate_const-config.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-config.cmake
         INSTALL_DESTINATION
-            ${CMAKE_INSTALL_PREFIX}/cmake
+            lib/cmake/propagate_const
     )
 
     write_basic_package_version_file(
@@ -157,6 +159,6 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
             ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-config.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-version.cmake
         DESTINATION
-            ${CMAKE_INSTALL_PREFIX}/cmake
+            lib/cmake/propagate_const
     )
 endif()
