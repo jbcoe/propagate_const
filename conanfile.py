@@ -8,7 +8,7 @@ class PropagateconstConan(ConanFile):
     version = "1.0"
     license = "MIT"
     url = "https://github.com/jbcoe/propagate_const"
-    description = "<Description of Propagateconst here>"
+    description = "A const-propagating member-pointer-wrapper for the C++ standard library"
     topics = ("conan", "propagate_const", "header-only", "std", "experimental")
     exports_sources = '*', "!build"
     settings = "os", "compiler", "build_type", "arch"
