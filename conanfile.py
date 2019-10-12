@@ -8,7 +8,7 @@ class PropagateconstConan(ConanFile):
     url = "https://github.com/jbcoe/propagate_const"
     description = "<Description of Propagateconst here>"
     topics = ("conan", "propagate_const", "header-only", "std", "experimental")
-    exports_sources = '*'
+    exports_sources = '*', "!build"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
 
