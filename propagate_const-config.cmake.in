@@ -1,5 +1,8 @@
 @PACKAGE_INIT@
 
-set_and_check(PROPAGATE_CONST_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
-
 check_required_components(propagate_const)
+
+if(NOT TARGET propagate_const::propagate_const)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+    include(${CMAKE_CURRENT_LIST_DIR}/propagate_const-target.cmake)
+endif()

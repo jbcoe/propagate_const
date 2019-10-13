@@ -8,6 +8,12 @@ Specification V2.
 - on Travis: [![Travis Build Status](https://travis-ci.org/jbcoe/propagate_const.svg?branch=master)](https://travis-ci.org/jbcoe/propagate_const)
 - on AppVeyor: [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jbcoe/propagate_const?svg=true&branch=master)](https://ci.appveyor.com/project/jbcoe/propagate-const)
 
+# Contents
+- [Building](#building)
+- [Packaging](#packaging)
+  - [Conan](#conan)
+- [License](#license)
+
 # Building
 
 The project contains a helper scripts for building that can be found at **<project root>/scripts/build.py**. The project can be build with the helper scipt as follows:
@@ -43,4 +49,16 @@ cmake -G <generator> <configuration options> -DCMAKE_INSTALL_PREFIX=<install dir
 cmake --install ../
 ```
 
+# Packaging
+## Conan
+```bash
+cd <project root>
+conan create ./ propagate_const/1.0@conan/stable -tf .conan/test_package
+```
 
+
+# License
+
+<img align="right" src="http://opensource.org/trademarks/opensource/OSI-Approved-License-100x137.png">
+
+{{LICENSE.txt}}
