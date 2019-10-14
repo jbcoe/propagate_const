@@ -21,7 +21,7 @@ Propagate const is shiped as a single header file, [`propagate_const.h`](https:/
 ## CMake
 To include in your CMake build then add a dependency upon the interface target, `propagate_const::propagate_const`.  This provides the neccessary include paths and C++ features required to include `propagate_const` into your project.
 
-###Extenal
+### Extenal
 To include `propagate_const` you will need use find package to locate the provided namespace imported targets from the generated package configuration.  The package configuration file, *propagate_const-config.cmake* can be included from the install location or directly out of the build tree. 
 ```cmake
 # CMakeLists.txt
