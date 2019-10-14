@@ -20,6 +20,7 @@ Specification V2.
 Propagate const is shiped as a single header file, [`propagate_const.h`](https://github.com/jbcoe/propagate_const/blob/master/propagate_const.h) that can be directly included in your project or included via an official [release package](https://github.com/jbcoe/propagate_const/releases).
 ## CMake
 To include in your CMake build then add a dependency upon the interface target, `propagate_const::propagate_const`.  This provides the neccessary include paths and C++ features required to include `propagate_const` into your project.
+
 ###Extenal
 To include `propagate_const` you will need use find package to locate the provided namespace imported targets from the generated package configuration.  The package configuration file, *propagate_const-config.cmake* can be included from the install location or directly out of the build tree. 
 ```cmake
