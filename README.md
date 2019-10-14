@@ -9,11 +9,27 @@ Specification V2.
 - on AppVeyor: [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jbcoe/propagate_const?svg=true&branch=master)](https://ci.appveyor.com/project/jbcoe/propagate-const)
 
 # Contents
+- [Integration](#integration)
+  - [CMake](#cmake) 
 - [Building](#building)
 - [Packaging](#packaging)
   - [Conan](#conan)
 - [License](#license)
 
+# Integration
+Propagate const is shiped as a single header file, [`propagate_const.h`](https://github.com/jbcoe/propagate_const/blob/master/propagate_const.h) that can be directly included in your project or included via an official [release package](https://github.com/jbcoe/propagate_const/releases).
+## CMake
+To include in your CMake build then add a dependency upon the interface target, `propagate_const::propagate_const`.  This provides the neccessary include paths and C++ features required to include `propagate_const` into your project.
+###Extenal
+To include `propagate_const` you will need use find package to locate the provided namespace imported targets from the generated package configuration.  The package configuration file, *propagate_const-config.cmake* can be included from the install location or directly out of the build tree. 
+```cmake
+# CMakeLists.txt
+find_package(propagate_const 1.0.0 REQUIRED)
+...
+add_library(foo ...)
+...
+target_link_libraries(foo PRIVATE propagate_const::propagate_const)
+```
 # Building
 
 The project contains a helper scripts for building that can be found at **<project root>/scripts/build.py**. The project can be build with the helper scipt as follows:
