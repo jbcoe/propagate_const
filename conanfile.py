@@ -2,15 +2,14 @@
 # -*- coding: utf-8 -*-
 from conans import ConanFile, CMake, tools
 
-
 class PropagateconstConan(ConanFile):
     name = "propagate_const"
-    version = "1.0"
+    version = "1.0.0"
     license = "MIT"
     url = "https://github.com/jbcoe/propagate_const"
     description = "A const-propagating member-pointer-wrapper for the C++ standard library"
     topics = ("conan", "propagate_const", "header-only", "std", "experimental")
-    exports_sources = '*', "!build"
+    exports_sources = '*', "!build", "!install"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
 

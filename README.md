@@ -10,11 +10,13 @@ Specification V2.
 
 # Contents
 - [Integration](#integration)
-  - [CMake](#cmake) 
+  - [CMake](#cmake)
+    - [External](#external)
 - [Building](#building)
 - [Packaging](#packaging)
   - [Conan](#conan)
 - [License](#license)
+
 
 # Integration
 Propagate const is shiped as a single header file, [`propagate_const.h`](https://github.com/jbcoe/propagate_const/blob/master/propagate_const.h) that can be directly included in your project or included via an official [release package](https://github.com/jbcoe/propagate_const/releases).
