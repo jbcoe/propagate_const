@@ -46,7 +46,7 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
         )
 
         FetchContent_GetProperties(catch2)
-        if(NOT googletest_POPULATED)
+        if(NOT catch2_POPULATED)
             FetchContent_Populate(catch2)
             add_subdirectory(${catch2_SOURCE_DIR} ${catch2_BINARY_DIR})
         endif()
