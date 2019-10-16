@@ -270,6 +270,7 @@ TEST_CASE("less_equal", "[less_equal]") {
 
 class FakePtr {
  public:
+  using element_type = FakePtr;
   auto operator-> () const { return this; }
   auto get() const { return this; }
   auto operator*() const { return *this; }
@@ -358,3 +359,6 @@ TEST_CASE("greater or equal function", "[free >=]") {
   UNUSED(r);
   REQUIRE(fPtr_greater_or_equal_fPtr_calls == 1);
 }
+
+class FWD;
+using forward_declared = std::experimental::propagate_const<std::unique_ptr<std::map<int, FWD>>>;
