@@ -35,14 +35,15 @@ target_link_libraries(foo PRIVATE propagate_const::propagate_const)
 ```
 # Building
 
-The project contains a helper scripts for building that can be found at **<project root>/scripts/build.py**. The project can be build with the helper scipt as follows:
+## Conan
 
 ```bash
-cd <project root>
-python script/build.py [--clean] [-o|--output=<build dir>] [-c|--config=<Debug|Release>] [--sanitizers] [-v|--verbose] [-t|--tests]
+conan create <project root> [--test-folder None]
 ```
 
-The script will by default build the project via Visual Studio on Windows. On Linux and Mac it will attempt to build via Ninja if available, then Make and will default to the system defaults for choice of compiler.
+## Dependencies
+
+* [Catch2 2.10.2](https://github.com/catchorg/Catch2/tree/v2.10.2) to build the test suite
 
 ## Building Manually Via CMake
 
@@ -57,6 +58,14 @@ cmake --build ../
 ctest
 ```
 
+The following configuration options are available:
+
+| Name                | Possible Values | Description                             | Default Value |
+|---------------------|-----------------|-----------------------------------------|---------------|
+| `BUILD_TESTING`     | `ON`, `OFF`     | Build the test suite                    | `ON`          |
+| `ENABLE_SANITIZERS` | `ON`, `OFF`     | Build the tests with sanitizers enabled | `OFF`         |
+| `Catch2_ROOT`       | `<path>`        | Path to a Catch2 installation           | undefined     |
+
 ## Installing Via CMake
 
 ```bash
@@ -67,14 +76,6 @@ cd build
 cmake -G <generator> <configuration options> -DCMAKE_INSTALL_PREFIX=<install dir> ../
 cmake --install ../
 ```
-
-# Packaging
-## Conan
-```bash
-cd <project root>
-conan create ./ propagate_const/1.0@conan/stable -tf .conan/test_package
-```
-
 
 # License
 
