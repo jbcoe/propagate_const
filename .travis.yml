@@ -12,7 +12,7 @@ matrix:
         apt:
           sources: ['llvm-toolchain-precise-3.9', 'ubuntu-toolchain-r-test']
           packages: ['clang-3.9', 'g++-6']
-      env: COMPILER='clang++-3.9'
+      env: COMPILER='clang++-3.9' COVERAGE=1
 
     # 2/ Linux GCC Builds
     - os: linux
@@ -21,7 +21,7 @@ matrix:
         apt:
           sources: ['llvm-toolchain-precise-3.9', 'ubuntu-toolchain-r-test']
           packages: ['g++-6']
-      env: COMPILER='g++-6'
+      env: COMPILER='g++-6' COVERAGE=1
 
 #    # 3/ OSX Clang Builds - disabled for now
 #    - os: osx
@@ -47,7 +47,21 @@ install:
   - cmake --version
   - cd ${TRAVIS_BUILD_DIR}
 
-before_script: export CXX=${COMPILER}
+before_script:
+  - export CXX=${COMPILER}
+  # have CMake to generate build files
+  - cd "${TRAVIS_BUILD_DIR}"
+  - mkdir build && cd build
+  - cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DENABLE_CODE_COVERAGE=$COVERAGE
 
 script:
-  - ./scripts/build.py --tests
+  # build and run tests
+  - cmake --build . -- -j${JOBS}
+  - ctest --output-on-failure -j${JOBS}
+  # Waiting for the following issue to be fixed before Mac OS X support can be enabled: https://github.com/RWTH-HPC/CMake-codecov/pull/15
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]] && [[ "${COVERAGE}" == "1" ]]; then
+      cmake --build . --target gcov
+      cmake --build . --target lcov
+      bash <(curl -s https://codecov.io/bash) -X gcov || echo "Codecov did not collect coverage reports"
+    fi

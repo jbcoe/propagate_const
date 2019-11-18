@@ -1,12 +1,14 @@
+[![Travis Build Status](https://travis-ci.org/jbcoe/propagate_const.svg?branch=master)](https://travis-ci.org/jbcoe/propagate_const)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jbcoe/propagate_const?svg=true&branch=master)](https://ci.appveyor.com/project/jbcoe/propagate-const)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jbcoe/propagate_const/master/LICENSE.MIT)
+[![GitHub Issues](https://img.shields.io/github/issues/jbcoe/indirect.svg)](http://github.com/jbcoe/propagate_const/issues)
+[![codecov](https://codecov.io/gh/jbcoe/propagate_const/branch/master/graph/badge.svg)](https://codecov.io/gh/jbcoe/propagate_const)
+
 # A const-propagating member-pointer-wrapper for the C++ standard library
 
 On 2015-02-25 a proposal was accepted by the Library Working Group as N4388
 and will be put forward for inclusion in Library Fundamentals Technical 
 Specification V2.
-
-## Build status
-- on Travis: [![Travis Build Status](https://travis-ci.org/jbcoe/propagate_const.svg?branch=master)](https://travis-ci.org/jbcoe/propagate_const)
-- on AppVeyor: [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jbcoe/propagate_const?svg=true&branch=master)](https://ci.appveyor.com/project/jbcoe/propagate-const)
 
 # Contents
 - [Integration](#integration)

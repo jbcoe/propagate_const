@@ -6,10 +6,11 @@ endif()
 
 set(PROPAGATE_CONST_VALUE_VERSION 1.0.0)
 
-project(propagate_const VERSION ${PROPAGATE_CONST_VALUE_VERSION})
+project(propagate_const LANGUAGES CXX VERSION ${PROPAGATE_CONST_VALUE_VERSION})
 
 option(ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
 option(ENABLE_BUILDING_TESTS "Enable building the unit tests for this project" ON)
+option(ENABLE_CODE_COVERAGE "Enable code coverage if available (Mac OS X currently not supported)" OFF)
 
 add_library(propagate_const INTERFACE)
 target_include_directories(propagate_const
@@ -114,6 +115,29 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
         include(Catch)
         catch_discover_tests(test_propagate_const)
 
+        if (APPLE)
+            SET(ENABLE_CODE_COVERAGE OFF CACHE BOOL "Ensure code coverage is switched off for Mac OS until the code coverage library addresses the AppleClang issue" FORCE)
+        endif()
+
+        if (ENABLE_CODE_COVERAGE)
+            include(FetchContent)
+            FetchContent_Declare(
+               codecoverage
+               GIT_REPOSITORY https://github.com/RWTH-HPC/CMake-codecov.git
+            )
+
+            FetchContent_GetProperties(codecoverage)
+            if(NOT codecoverage_POPULATED)
+                FetchContent_Populate(codecoverage)
+                list(APPEND CMAKE_MODULE_PATH ${codecoverage_SOURCE_DIR}/cmake)
+            endif()
+
+            set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
+            find_package(codecov)
+            add_coverage(test_propagate_const)
+            list(APPEND LCOV_REMOVE_PATTERNS "'/usr/*'")
+            coverage_evaluate()
+        endif()
     endif(${ENABLE_BUILDING_TESTS})
 
     install(
