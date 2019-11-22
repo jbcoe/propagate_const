@@ -1,12 +1,14 @@
+[![Travis Build Status](https://travis-ci.org/jbcoe/propagate_const.svg?branch=master)](https://travis-ci.org/jbcoe/propagate_const)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jbcoe/propagate_const?svg=true&branch=master)](https://ci.appveyor.com/project/jbcoe/propagate-const)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jbcoe/propagate_const/master/LICENSE.MIT)
+[![GitHub Issues](https://img.shields.io/github/issues/jbcoe/indirect.svg)](http://github.com/jbcoe/propagate_const/issues)
+[![codecov](https://codecov.io/gh/jbcoe/propagate_const/branch/master/graph/badge.svg)](https://codecov.io/gh/jbcoe/propagate_const)
+
 # A const-propagating member-pointer-wrapper for the C++ standard library
 
 On 2015-02-25 a proposal was accepted by the Library Working Group as N4388
 and will be put forward for inclusion in Library Fundamentals Technical 
 Specification V2.
-
-## Build status
-- on Travis: [![Travis Build Status](https://travis-ci.org/jbcoe/propagate_const.svg?branch=master)](https://travis-ci.org/jbcoe/propagate_const)
-- on AppVeyor: [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jbcoe/propagate_const?svg=true&branch=master)](https://ci.appveyor.com/project/jbcoe/propagate-const)
 
 # Contents
 - [Integration](#integration)
@@ -19,11 +21,11 @@ Specification V2.
 
 
 # Integration
-Propagate const is shiped as a single header file, [`propagate_const.h`](https://github.com/jbcoe/propagate_const/blob/master/propagate_const.h) that can be directly included in your project or included via an official [release package](https://github.com/jbcoe/propagate_const/releases).
+Propagate const is shipped as a single header file, [`propagate_const.h`](https://github.com/jbcoe/propagate_const/blob/master/propagate_const.h) that can be directly included in your project or included via an official [release package](https://github.com/jbcoe/propagate_const/releases).
 ## CMake
-To include in your CMake build then add a dependency upon the interface target, `propagate_const::propagate_const`.  This provides the neccessary include paths and C++ features required to include `propagate_const` into your project.
+To include in your CMake build then add a dependency upon the interface target, `propagate_const::propagate_const`.  This provides the necessary include paths and C++ features required to include `propagate_const` into your project.
 
-### Extenal
+### External
 To include `propagate_const` you will need use find package to locate the provided namespace imported targets from the generated package configuration.  The package configuration file, *propagate_const-config.cmake* can be included from the install location or directly out of the build tree. 
 ```cmake
 # CMakeLists.txt
@@ -34,6 +36,8 @@ add_library(foo ...)
 target_link_libraries(foo PRIVATE propagate_const::propagate_const)
 ```
 # Building
+
+The project contains a helper scripts for building that can be found at **<project root>/scripts/build.py**. The project can be build with the helper script as follows:
 
 ## Conan
 

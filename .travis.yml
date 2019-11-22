@@ -59,11 +59,8 @@ matrix:
         osx_image: xcode11.2
         env: CONAN_APPLE_CLANG_VERSIONS=11.0
 
-
 install:
-  - chmod +x .travis/install.sh
   - ./.travis/install.sh
 
 script:
-  - chmod +x .travis/run.sh
   - ./.travis/run.sh

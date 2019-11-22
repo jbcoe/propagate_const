@@ -4,7 +4,9 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
     set(PROPAGATE_CONST_IS_NOT_SUBPROJECT ON)
 endif()
 
-project(propagate_const VERSION 1.0.0 LANGUAGES CXX)
+set(PROPAGATE_CONST_VERSION 1.0.0)
+
+project(propagate_const LANGUAGES CXX VERSION ${PROPAGATE_CONST_VERSION})
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/conanbuildinfo.cmake)
     include(${CMAKE_SOURCE_DIR}/conanbuildinfo.cmake)
