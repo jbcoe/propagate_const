@@ -9,6 +9,7 @@ class PropagateconstConan(ConanFile):
     url = "https://github.com/jbcoe/propagate_const"
     description = "A const-propagating member-pointer-wrapper for the C++ standard library"
     topics = ("conan", "propagate_const", "header-only", "std", "experimental")
+<<<<<<< HEAD
     exports_sources = "CMakeLists.txt", "*.h", "*.cpp", "*.cmake", "*.cmake.in", "LICENSE.txt"
     generators = "cmake"
 
@@ -31,3 +32,17 @@ class PropagateconstConan(ConanFile):
 
     def package(self):
         self.cmake.install()
+=======
+    exports_sources = '*', "!build", "!install"
+    settings = "os", "compiler", "build_type", "arch"
+    generators = "cmake"
+
+    def package(self):
+        cmake = CMake(self)
+        cmake.definitions["ENABLE_BUILDING_TESTS"] = "OFF"
+        cmake.configure()
+        cmake.install()
+
+    def package_id(self):
+        self.info.header_only()
+>>>>>>> master
