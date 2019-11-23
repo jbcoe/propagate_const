@@ -9,13 +9,8 @@ conan_basic_setup(TARGETS)
 find_package(propagate_const REQUIRED)
 find_package(Catch2 REQUIRED)
 
-add_executable(test_propagate_const ../../test_propagate_const.cpp)
+add_executable(test_propagate_const ../test_propagate_const.cpp)
 target_link_libraries(test_propagate_const PRIVATE propagate_const::propagate_const Catch2::Catch2)
-
-target_compile_options(test_propagate_const
-    PRIVATE
-        $<$<BOOL:${MINGW}>:-Wa,-mbig-obj>
-)
 
 enable_testing()
 include(Catch)

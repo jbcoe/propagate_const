@@ -1,15 +1,19 @@
 cmake_minimum_required(VERSION 3.14)
 
-if(NOT DEFINED PROJECT_NAME)
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
     set(PROPAGATE_CONST_IS_NOT_SUBPROJECT ON)
 endif()
 
-set(PROPAGATE_CONST_VALUE_VERSION 1.0.0)
+set(PROPAGATE_CONST_VERSION 1.0.0)
 
-project(propagate_const LANGUAGES CXX VERSION ${PROPAGATE_CONST_VALUE_VERSION})
+project(propagate_const LANGUAGES CXX VERSION ${PROPAGATE_CONST_VERSION})
+
+if(EXISTS ${CMAKE_SOURCE_DIR}/conanbuildinfo.cmake)
+    include(${CMAKE_SOURCE_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
+endif()
 
 option(ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
-option(ENABLE_BUILDING_TESTS "Enable building the unit tests for this project" ON)
 option(ENABLE_CODE_COVERAGE "Enable code coverage if available (Mac OS X currently not supported)" OFF)
 
 add_library(propagate_const INTERFACE)
@@ -27,30 +31,15 @@ target_sources(propagate_const
 
 target_compile_features(propagate_const
     INTERFACE
-        cxx_defaulted_functions
-        cxx_explicit_conversions
-        cxx_noexcept
-        cxx_nullptr
-        cxx_right_angle_brackets
-        cxx_rvalue_references
+        cxx_std_14
 )
 
 add_library(propagate_const::propagate_const ALIAS propagate_const)
 
 if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
-
-    if (${ENABLE_BUILDING_TESTS})
-        include(FetchContent)
-        FetchContent_Declare(
-            catch2
-            GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        )
-
-        FetchContent_GetProperties(catch2)
-        if(NOT catch2_POPULATED)
-            FetchContent_Populate(catch2)
-            add_subdirectory(${catch2_SOURCE_DIR} ${catch2_BINARY_DIR})
-        endif()
+    include(CTest)
+    if (BUILD_TESTING)
+        find_package(Catch2 REQUIRED)
 
         add_executable(test_propagate_const test_propagate_const.cpp)
         target_link_libraries(test_propagate_const
@@ -105,16 +94,13 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
             endif(COMPILER_SUPPORTS_UBSAN)
         endif(ENABLE_SANITIZERS)
 
-        enable_testing()
         add_test(
             NAME test_propagate_const
             COMMAND test_propagate_const
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
-        list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/contrib)
-        include(Catch)
         catch_discover_tests(test_propagate_const)
 
+    
         if (APPLE)
             SET(ENABLE_CODE_COVERAGE OFF CACHE BOOL "Ensure code coverage is switched off for Mac OS until the code coverage library addresses the AppleClang issue" FORCE)
         endif()
@@ -138,33 +124,36 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
             list(APPEND LCOV_REMOVE_PATTERNS "'/usr/*'")
             coverage_evaluate()
         endif()
-    endif(${ENABLE_BUILDING_TESTS})
+    endif(BUILD_TESTING)
+
+    include(GNUInstallDirs)
 
     install(
         FILES
             "${CMAKE_CURRENT_SOURCE_DIR}/propagate_const.h"
         DESTINATION
-            include
+            ${CMAKE_INSTALL_INCLUDEDIR}
     )
 
     install(
         FILES
             "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt"
         DESTINATION
-            ./
+            "${CMAKE_INSTALL_DATAROOTDIR}/licenses/propagate_const"
     )
 
     install(
         TARGETS propagate_const
-        EXPORT propagate_const_target
-        DESTINATION lib/cmake/propagate_const
+        EXPORT propagate_const-target
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
 
     install(
-        EXPORT propagate_const_target
+        EXPORT propagate_const-target
         NAMESPACE propagate_const::
-        DESTINATION lib/cmake/propagate_const
-	    FILE propagate_const-target.cmake
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/propagate_const"
     )
 
     include(CMakePackageConfigHelpers)
@@ -172,7 +161,7 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
         ${CMAKE_CURRENT_LIST_DIR}/propagate_const-config.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-config.cmake
         INSTALL_DESTINATION
-            lib/cmake/propagate_const
+            "${CMAKE_INSTALL_LIBDIR}/cmake/propagate_const"
     )
 
     write_basic_package_version_file(
@@ -187,6 +176,6 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
             ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-config.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/propagate_const-version.cmake
         DESTINATION
-            lib/cmake/propagate_const
+            "${CMAKE_INSTALL_LIBDIR}/cmake/propagate_const"
     )
 endif()
