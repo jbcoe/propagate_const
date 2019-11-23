@@ -1,10 +1,25 @@
-[![Travis Build Status](https://travis-ci.org/jbcoe/propagate_const.svg?branch=master)](https://travis-ci.org/jbcoe/propagate_const)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jbcoe/propagate_const?svg=true&branch=master)](https://ci.appveyor.com/project/jbcoe/propagate-const)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jbcoe/propagate_const/master/LICENSE.MIT)
-[![GitHub Issues](https://img.shields.io/github/issues/jbcoe/indirect.svg)](http://github.com/jbcoe/propagate_const/issues)
-[![codecov](https://codecov.io/gh/jbcoe/propagate_const/branch/master/graph/badge.svg)](https://codecov.io/gh/jbcoe/propagate_const)
-
 # A const-propagating member-pointer-wrapper for the C++ standard library
+
+[![travis][badge.travis]][travis]
+[![appveyor][badge.appveyor]][appveyor]
+[![codecov][badge.codecov]][codecov]
+[![language][badge.language]][language]
+[![license][badge.license]][license]
+[![issues][badge.issues]][issues]
+
+[badge.travis]: https://img.shields.io/travis/jbcoe/propagate_const/master.svg?logo=travis
+[badge.appveyor]: https://img.shields.io/appveyor/ci/jbcoe/propagate-const/master.svg?logo=appveyor
+[badge.codecov]: https://img.shields.io/codecov/c/github/jbcoe/propagate_const/master.svg?logo=codecov
+[badge.language]: https://img.shields.io/badge/language-C%2B%2B14-yellow.svg
+[badge.license]: https://img.shields.io/badge/license-MIT-blue.svg
+[badge.issues]: https://img.shields.io/github/issues/jbcoe/propagate_const.svg
+
+[travis]: https://travis-ci.org/jbcoe/propagate_const
+[appveyor]: https://ci.appveyor.com/project/jbcoe/propagate-const
+[codecov]: https://codecov.io/gh/jbcoe/propagate_const
+[language]: https://en.wikipedia.org/wiki/C%2B%2B14
+[license]: https://en.wikipedia.org/wiki/MIT_License
+[issues]: http://github.com/jbcoe/propagate_const/issues
 
 On 2015-02-25 a proposal was accepted by the Library Working Group as N4388
 and will be put forward for inclusion in Library Fundamentals Technical 
