@@ -14,6 +14,7 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/conanbuildinfo.cmake)
 endif()
 
 option(ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
+option(ENABLE_CODE_COVERAGE "Enable code coverage if available (Mac OS X currently not supported)" OFF)
 
 add_library(propagate_const INTERFACE)
 target_include_directories(propagate_const
@@ -57,7 +58,7 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
         set_target_properties(test_propagate_const PROPERTIES
             CXX_STANDARD 14
             CXX_STANDARD_REQUIRED YES
-            CXX_EXTENSIONS OFF
+            CXX_EXTENSIONS NO
         )
 
         if (ENABLE_SANITIZERS)
@@ -98,6 +99,31 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
             COMMAND test_propagate_const
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
         catch_discover_tests(test_propagate_const)
+
+    
+        if (APPLE)
+            SET(ENABLE_CODE_COVERAGE OFF CACHE BOOL "Ensure code coverage is switched off for Mac OS until the code coverage library addresses the AppleClang issue" FORCE)
+        endif()
+
+        if (ENABLE_CODE_COVERAGE)
+            include(FetchContent)
+            FetchContent_Declare(
+               codecoverage
+               GIT_REPOSITORY https://github.com/RWTH-HPC/CMake-codecov.git
+            )
+
+            FetchContent_GetProperties(codecoverage)
+            if(NOT codecoverage_POPULATED)
+                FetchContent_Populate(codecoverage)
+                list(APPEND CMAKE_MODULE_PATH ${codecoverage_SOURCE_DIR}/cmake)
+            endif()
+
+            set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
+            find_package(codecov)
+            add_coverage(test_propagate_const)
+            list(APPEND LCOV_REMOVE_PATTERNS "'/usr/*'")
+            coverage_evaluate()
+        endif()
     endif(BUILD_TESTING)
 
     include(GNUInstallDirs)
