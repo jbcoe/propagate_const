@@ -1,12 +1,14 @@
+[![Travis Build Status](https://travis-ci.org/jbcoe/propagate_const.svg?branch=master)](https://travis-ci.org/jbcoe/propagate_const)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jbcoe/propagate_const?svg=true&branch=master)](https://ci.appveyor.com/project/jbcoe/propagate-const)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/jbcoe/propagate_const/master/LICENSE.MIT)
+[![GitHub Issues](https://img.shields.io/github/issues/jbcoe/indirect.svg)](http://github.com/jbcoe/propagate_const/issues)
+[![codecov](https://codecov.io/gh/jbcoe/propagate_const/branch/master/graph/badge.svg)](https://codecov.io/gh/jbcoe/propagate_const)
+
 # A const-propagating member-pointer-wrapper for the C++ standard library
 
 On 2015-02-25 a proposal was accepted by the Library Working Group as N4388
 and will be put forward for inclusion in Library Fundamentals Technical 
 Specification V2.
-
-## Build status
-- on Travis: [![Travis Build Status](https://travis-ci.org/jbcoe/propagate_const.svg?branch=master)](https://travis-ci.org/jbcoe/propagate_const)
-- on AppVeyor: [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jbcoe/propagate_const?svg=true&branch=master)](https://ci.appveyor.com/project/jbcoe/propagate-const)
 
 # Contents
 - [Integration](#integration)
@@ -19,11 +21,11 @@ Specification V2.
 
 
 # Integration
-Propagate const is shiped as a single header file, [`propagate_const.h`](https://github.com/jbcoe/propagate_const/blob/master/propagate_const.h) that can be directly included in your project or included via an official [release package](https://github.com/jbcoe/propagate_const/releases).
+Propagate const is shipped as a single header file, [`propagate_const.h`](https://github.com/jbcoe/propagate_const/blob/master/propagate_const.h) that can be directly included in your project or included via an official [release package](https://github.com/jbcoe/propagate_const/releases).
 ## CMake
-To include in your CMake build then add a dependency upon the interface target, `propagate_const::propagate_const`.  This provides the neccessary include paths and C++ features required to include `propagate_const` into your project.
+To include in your CMake build then add a dependency upon the interface target, `propagate_const::propagate_const`.  This provides the necessary include paths and C++ features required to include `propagate_const` into your project.
 
-### Extenal
+### External
 To include `propagate_const` you will need use find package to locate the provided namespace imported targets from the generated package configuration.  The package configuration file, *propagate_const-config.cmake* can be included from the install location or directly out of the build tree. 
 ```cmake
 # CMakeLists.txt
@@ -35,14 +37,17 @@ target_link_libraries(foo PRIVATE propagate_const::propagate_const)
 ```
 # Building
 
-The project contains a helper scripts for building that can be found at **<project root>/scripts/build.py**. The project can be build with the helper scipt as follows:
+The project contains a helper scripts for building that can be found at **<project root>/scripts/build.py**. The project can be build with the helper script as follows:
+
+## Conan
 
 ```bash
-cd <project root>
-python script/build.py [--clean] [-o|--output=<build dir>] [-c|--config=<Debug|Release>] [--sanitizers] [-v|--verbose] [-t|--tests]
+conan create <project root> [--test-folder None]
 ```
 
-The script will by default build the project via Visual Studio on Windows. On Linux and Mac it will attempt to build via Ninja if available, then Make and will default to the system defaults for choice of compiler.
+## Dependencies
+
+* [Catch2 2.10.2](https://github.com/catchorg/Catch2/tree/v2.10.2) to build the test suite
 
 ## Building Manually Via CMake
 
@@ -57,6 +62,14 @@ cmake --build ../
 ctest
 ```
 
+The following configuration options are available:
+
+| Name                | Possible Values | Description                             | Default Value |
+|---------------------|-----------------|-----------------------------------------|---------------|
+| `BUILD_TESTING`     | `ON`, `OFF`     | Build the test suite                    | `ON`          |
+| `ENABLE_SANITIZERS` | `ON`, `OFF`     | Build the tests with sanitizers enabled | `OFF`         |
+| `Catch2_ROOT`       | `<path>`        | Path to a Catch2 installation           | undefined     |
+
 ## Installing Via CMake
 
 ```bash
@@ -67,14 +80,6 @@ cd build
 cmake -G <generator> <configuration options> -DCMAKE_INSTALL_PREFIX=<install dir> ../
 cmake --install ../
 ```
-
-# Packaging
-## Conan
-```bash
-cd <project root>
-conan create ./ propagate_const/1.0@conan/stable -tf .conan/test_package
-```
-
 
 # License
 

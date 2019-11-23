@@ -3,24 +3,21 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 from conans import ConanFile, CMake, tools
+import os
+
 
 class TestPackageConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
     build_requires = "Catch2/2.10.2@catchorg/stable"
 
-    _cmake = None
-    @property
-    def cmake(self):
-        if self._cmake is None:
-            self._cmake = CMake(self)
-            self._cmake.configure()
-        return self._cmake
-
     def build(self):
-        self.cmake.build()
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
 
     def test(self):
-        if tools.cross_building(self.settings):
-            return
-        self.cmake.test()
+    	if tools.cross_building(self.settings):
+    		return
+    	bin_path = os.path.join("bin", "test_propagate_const")
+    	self.run(bin_path, run_environment=True)
