@@ -98,6 +98,7 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
             NAME test_propagate_const
             COMMAND test_propagate_const
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+        include(Catch)
         catch_discover_tests(test_propagate_const)
 
     
