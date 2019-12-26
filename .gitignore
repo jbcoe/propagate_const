@@ -7,4 +7,3 @@ doc/html/*
 doc/polymorphic_value_reference.xml
 makePDF.sh
 talks/.ipynb_checkpoints
-_deps
