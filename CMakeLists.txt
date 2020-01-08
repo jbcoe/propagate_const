@@ -13,6 +13,8 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/conanbuildinfo.cmake)
     conan_basic_setup(TARGETS NO_OUTPUT_DIRS)
 endif()
 
+include(FetchContent)
+
 option(ENABLE_SANITIZERS "Enable Address Sanitizer and Undefined Behaviour Sanitizer if available" OFF)
 option(ENABLE_CODE_COVERAGE "Enable code coverage if available (Mac OS X currently not supported)" OFF)
 
@@ -39,7 +41,16 @@ add_library(propagate_const::propagate_const ALIAS propagate_const)
 if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
     include(CTest)
     if (BUILD_TESTING)
-        find_package(Catch2 REQUIRED)
+        FetchContent_Declare(
+            catch2
+            GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        )
+
+        FetchContent_GetProperties(catch2)
+        if(NOT catch2_POPULATED)
+            FetchContent_Populate(catch2)
+            add_subdirectory(${catch2_SOURCE_DIR} ${catch2_BINARY_DIR})
+        endif()
 
         add_executable(test_propagate_const test_propagate_const.cpp)
         target_link_libraries(test_propagate_const
@@ -98,6 +109,8 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
             NAME test_propagate_const
             COMMAND test_propagate_const
             WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+        list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/contrib)
         include(Catch)
         catch_discover_tests(test_propagate_const)
 
@@ -107,7 +120,6 @@ if (${PROPAGATE_CONST_IS_NOT_SUBPROJECT})
         endif()
 
         if (ENABLE_CODE_COVERAGE)
-            include(FetchContent)
             FetchContent_Declare(
                codecoverage
                GIT_REPOSITORY https://github.com/RWTH-HPC/CMake-codecov.git
