@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from conans import ConanFile, CMake, tools
+from conans.tools import load
+import re, os
 
 class PropagateconstConan(ConanFile):
     name = "propagate_const"
-    version = "1.0.0"
     license = "MIT"
     url = "https://github.com/jbcoe/propagate_const"
     description = "A const-propagating member-pointer-wrapper for the C++ standard library"
     topics = ("conan", "propagate_const", "header-only", "std", "experimental")
     exports_sources = "CMakeLists.txt", "*.h", "*.cpp", "*.cmake", "*.cmake.in", "LICENSE.txt"
     generators = "cmake"
+
+    def set_version(self):
+        content = load(os.path.join(self.recipe_folder, "CMakeLists.txt"))
+        version = re.search(r"set\(PROPAGATE_CONST_VERSION (.*)\)", content).group(1)
+        self.version = version.strip()
 
     _cmake = None
     @property
