@@ -14,7 +14,7 @@ class PropagateconstConan(ConanFile):
     generators = "cmake"
 
     def set_version(self):
-        content = load(os.path.join(self.recipe_folder, "CMakeLists.txt"))
+        content = load(os.path.join(os.path.dirname(__file__), "CMakeLists.txt"))
         version = re.search(r"set\(PROPAGATE_CONST_VERSION (.*)\)", content).group(1)
         self.version = version.strip()
 
