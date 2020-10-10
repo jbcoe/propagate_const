@@ -45,7 +45,18 @@ inline namespace fundamentals_v2 {
 template <class T>
 class propagate_const {
  public:
-  typedef remove_reference_t<decltype(*declval<T&>())> element_type;
+     
+ template<class U>
+ struct detect_element_type {
+   using type = typename U::element_type;
+ };
+
+ template<class U>
+ struct detect_element_type<U*> {
+   using type = U;
+ };
+
+ using element_type = typename detect_element_type<T>::type;
 
  private:
   template <class U>

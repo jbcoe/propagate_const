@@ -1,5 +1,5 @@
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include "catch2/catch.hpp"
 #include "propagate_const.h"
 
 using std::experimental::propagate_const;
@@ -14,6 +14,7 @@ struct A {
 #define REQUIRE_RETURN_TYPE_MATCH(expr, type)                          \
   static_assert((std::is_same<decltype(expr), type>::value), #expr "-" \
                                                                    ">" #type);
+#define UNUSED(var) (void)var;
 
 //
 // plain pointer
@@ -280,13 +281,14 @@ TEST_CASE("less_equal", "[less_equal]") {
 
 class FakePtr {
  public:
+  using element_type = FakePtr;
   auto operator-> () const { return this; }
   auto get() const { return this; }
   auto operator*() const { return *this; }
 };
 
 size_t fPtr_equals_fPtr_calls = 0;
-bool operator==(const FakePtr& f, const FakePtr& g) {
+bool operator==(const FakePtr&, const FakePtr&) {
   ++fPtr_equals_fPtr_calls;
   return false;
 }
@@ -295,11 +297,12 @@ TEST_CASE("equals function", "[free ==]") {
   propagate_const<FakePtr> g;
   fPtr_equals_fPtr_calls = 0;
   auto r = (f == g);
+  UNUSED(r);
   REQUIRE(fPtr_equals_fPtr_calls == 1);
 }
 
 size_t fPtr_not_equals_fPtr_calls = 0;
-bool operator!=(const FakePtr& f, const FakePtr& g) {
+bool operator!=(const FakePtr&, const FakePtr&) {
   ++fPtr_not_equals_fPtr_calls;
   return false;
 }
@@ -308,11 +311,12 @@ TEST_CASE("not equals function", "[free !=]") {
   propagate_const<FakePtr> g;
   fPtr_not_equals_fPtr_calls = 0;
   auto r = (f != g);
+  UNUSED(r);
   REQUIRE(fPtr_not_equals_fPtr_calls == 1);
 }
 
 size_t fPtr_less_fPtr_calls = 0;
-bool operator<(const FakePtr& f, const FakePtr& g) {
+bool operator<(const FakePtr&, const FakePtr&) {
   ++fPtr_less_fPtr_calls;
   return false;
 }
@@ -321,11 +325,12 @@ TEST_CASE("less function", "[free <]") {
   propagate_const<FakePtr> g;
   fPtr_less_fPtr_calls = 0;
   auto r = (f < g);
+  UNUSED(r);
   REQUIRE(fPtr_less_fPtr_calls == 1);
 }
 
 size_t fPtr_greater_fPtr_calls = 0;
-bool operator>(const FakePtr& f, const FakePtr& g) {
+bool operator>(const FakePtr&, const FakePtr&) {
   ++fPtr_greater_fPtr_calls;
   return false;
 }
@@ -334,11 +339,12 @@ TEST_CASE("greater function", "[free >]") {
   propagate_const<FakePtr> g;
   fPtr_greater_fPtr_calls = 0;
   auto r = (f > g);
+  UNUSED(r);
   REQUIRE(fPtr_greater_fPtr_calls == 1);
 }
 
 size_t fPtr_less_or_equal_fPtr_calls = 0;
-bool operator<=(const FakePtr& f, const FakePtr& g) {
+bool operator<=(const FakePtr&, const FakePtr&) {
   ++fPtr_less_or_equal_fPtr_calls;
   return false;
 }
@@ -347,11 +353,12 @@ TEST_CASE("less or equal function", "[free <=]") {
   propagate_const<FakePtr> g;
   fPtr_less_or_equal_fPtr_calls = 0;
   auto r = (f <= g);
+  UNUSED(r);
   REQUIRE(fPtr_less_or_equal_fPtr_calls == 1);
 }
 
 size_t fPtr_greater_or_equal_fPtr_calls = 0;
-bool operator>=(const FakePtr& f, const FakePtr& g) {
+bool operator>=(const FakePtr&, const FakePtr&) {
   ++fPtr_greater_or_equal_fPtr_calls;
   return false;
 }
@@ -360,5 +367,9 @@ TEST_CASE("greater or equal function", "[free >=]") {
   propagate_const<FakePtr> g;
   fPtr_greater_or_equal_fPtr_calls = 0;
   auto r = (f >= g);
+  UNUSED(r);
   REQUIRE(fPtr_greater_or_equal_fPtr_calls == 1);
 }
+
+class FWD;
+using forward_declared = std::experimental::propagate_const<std::unique_ptr<std::map<int, FWD>>>;
