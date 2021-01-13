@@ -25,6 +25,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define JBCOE_PROPAGATE_CONST_INCLUDED
 
 #include <functional>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -45,18 +46,7 @@ inline namespace fundamentals_v2 {
 template <class T>
 class propagate_const {
  public:
-     
- template<class U>
- struct detect_element_type {
-   using type = typename U::element_type;
- };
-
- template<class U>
- struct detect_element_type<U*> {
-   using type = U;
- };
-
- using element_type = typename detect_element_type<T>::type;
+ using element_type = typename std::pointer_traits<T>::element_type;
 
  private:
   template <class U>
